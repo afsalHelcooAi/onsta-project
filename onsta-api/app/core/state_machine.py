@@ -21,12 +21,17 @@ VALID_TRANSITIONS: Dict[ClinicStatus, Set[ClinicStatus]] = {
     },
     ClinicStatus.SUBMITTED: {
         ClinicStatus.UNDER_REVIEW,
-        ClinicStatus.APPROVED # Fast-path auto-approval if rules 100% pass
     },
     ClinicStatus.UNDER_REVIEW: {
         ClinicStatus.APPROVED,
         ClinicStatus.REJECTED,
-        ClinicStatus.READY_FOR_REVIEW # Request modifications
+        ClinicStatus.READY_FOR_REVIEW,
+        ClinicStatus.ADDITIONAL_INFO_REQUESTED,
+    },
+    ClinicStatus.ADDITIONAL_INFO_REQUESTED: {
+        ClinicStatus.READY_FOR_REVIEW,
+        ClinicStatus.SUBMITTED,
+        ClinicStatus.REJECTED,
     },
     ClinicStatus.APPROVED: {
         ClinicStatus.UNDER_REVIEW # Re-eval if document expires

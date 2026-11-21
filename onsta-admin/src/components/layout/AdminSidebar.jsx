@@ -10,7 +10,7 @@ import {
   Sparkles
 } from 'lucide-react';
 
-export default function AdminSidebar({ activeTab, setActiveTab, pendingCount = 0 }) {
+export default function AdminSidebar({ activeTab, setActiveTab, pendingCount = 0, onSignOut }) {
   const menuItems = [
     { id: 'review-queue', label: 'Clinic Verifications', icon: ShieldCheck, badge: pendingCount },
     { id: 'all-clinics', label: 'Registered Clinics', icon: Building2 },
@@ -73,11 +73,14 @@ export default function AdminSidebar({ activeTab, setActiveTab, pendingCount = 0
       <div className="p-4 border-t border-[#1a4a37]/60 text-xs text-cream-300/60 flex flex-col gap-2">
         <div className="flex items-center gap-2 text-emerald-300/80">
           <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-          <span>Gemini 2.0 Ingestion Active</span>
+          <span>Human review required</span>
         </div>
         <div className="text-[11px] text-emerald-200/50">
           Environment: <span className="text-emerald-300 font-semibold">Local Dev (Port 3001)</span>
         </div>
+        <button onClick={onSignOut} className="mt-2 flex items-center gap-2 rounded-lg px-2 py-2 text-left text-xs text-emerald-100 hover:bg-white/10">
+          <LogOut className="h-3.5 w-3.5" /> Sign out
+        </button>
       </div>
     </aside>
   );

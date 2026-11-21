@@ -2,6 +2,10 @@ import os
 from enum import Enum
 from typing import Optional
 
+from dotenv import load_dotenv
+
+load_dotenv()
+
 class ClinicStatus(str, Enum):
     DRAFT = "DRAFT"
     DOCUMENTS_UPLOADED = "DOCUMENTS_UPLOADED"
@@ -9,6 +13,7 @@ class ClinicStatus(str, Enum):
     READY_FOR_REVIEW = "READY_FOR_REVIEW"
     SUBMITTED = "SUBMITTED"
     UNDER_REVIEW = "UNDER_REVIEW"
+    ADDITIONAL_INFO_REQUESTED = "ADDITIONAL_INFO_REQUESTED"
     APPROVED = "APPROVED"
     REJECTED = "REJECTED"
 
@@ -34,8 +39,12 @@ class Settings:
     # Local Postgres (Development & Local Testing):
     DATABASE_URL: str = os.getenv(
         "DATABASE_URL", 
-        "postgresql+asyncpg://postgres:postgres@localhost:5432/onsta_clinic_db"
+        "postgresql+asyncpg://postgres:12345@localhost:5432/onsta_platform_db"
     )
+    JWT_SECRET: str = os.getenv("JWT_SECRET", "change-this-development-secret-before-use")
+    SUPER_ADMIN_EMAIL: Optional[str] = os.getenv("SUPER_ADMIN_EMAIL")
+    SUPER_ADMIN_PASSWORD: Optional[str] = os.getenv("SUPER_ADMIN_PASSWORD")
+    SUPER_ADMIN_NAME: str = os.getenv("SUPER_ADMIN_NAME", "ONSTA Super Admin")
     # AWS RDS Postgres (Production Configuration - Keep for future AWS deployment):
     # DATABASE_URL: str = "postgresql+asyncpg://onsta_admin:SECURE_PASSWORD@onsta-rds.c12345.me-central-1.rds.amazonaws.com:5432/onsta_clinic_prod"
     

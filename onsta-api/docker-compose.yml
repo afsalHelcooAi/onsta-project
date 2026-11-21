@@ -8,7 +8,8 @@ services:
     ports:
       - "8000:8000"
     environment:
-      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/onsta_clinic_db
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgres@db:5432/onsta_platform_db
+      - JWT_SECRET=${JWT_SECRET:-local-development-secret-change-before-deploy}
       - REDIS_URL=redis://redis:6379/0
       - AWS_REGION=me-central-1
       - S3_BUCKET_NAME=onsta-clinic-regulatory-docs
@@ -25,7 +26,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: onsta_clinic_db
+      POSTGRES_DB: onsta_platform_db
     ports:
       - "5432:5432"
     volumes:
