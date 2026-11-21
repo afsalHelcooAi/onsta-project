@@ -10,8 +10,9 @@ export default function Tab5ReviewSubmit({ onBack, onSaveDraft }) {
 
   const [declaration1, setDeclaration1] = useState(true);
   const [declaration2, setDeclaration2] = useState(true);
+  const [submissionError, setSubmissionError] = useState('');
 
-  // Submission simulation states: null | 'submitting' | 'submitted' | 'in_review' | 'approved'
+  // Submission states: null | 'submitting' | 'in_review'
   const [submissionPhase, setSubmissionPhase] = useState(null);
 
   const canSubmit = declaration1 && declaration2;
@@ -20,6 +21,7 @@ export default function Tab5ReviewSubmit({ onBack, onSaveDraft }) {
     if (!canSubmit) return;
 
     setSubmissionPhase('submitting');
+    setSubmissionError('');
     try {
       const clinicId = clinicData.id || "clinic-alnoor-01";
       const res = await registrationApi.submitRegistration(
@@ -28,27 +30,13 @@ export default function Tab5ReviewSubmit({ onBack, onSaveDraft }) {
         clinicData.companyEmail || "info@alnoorclinic.ae"
       );
 
-      setTimeout(() => {
-        if (res.dashboard_unlocked) {
-          setSubmissionPhase('approved');
-          submitRegistration({
-            ...clinicData,
-            status: 'approved'
-          });
-          showToast("success", "Application Approved", res.message || "Welcome to the ONSTA Clinic Partner Network!");
-        } else {
-          setSubmissionPhase('in_review');
-          submitRegistration({
-            ...clinicData,
-            status: 'in_review'
-          });
-          showToast("warning", "Under Compliance Review", res.message);
-        }
-      }, 1000);
+      setSubmissionPhase('in_review');
+      submitRegistration({ ...clinicData, status: 'in_review' });
+      showToast("warning", "Under Compliance Review", res.message || "Your application is waiting for an administrator to review it.");
     } catch (err) {
-      setSubmissionPhase('approved');
-      submitRegistration({ ...clinicData, status: 'approved' });
-      showToast("success", "Application Approved", "Welcome to the ONSTA Clinic Partner Network!");
+      setSubmissionPhase(null);
+      setSubmissionError(err.message || 'Could not submit your application. Please try again.');
+      showToast("error", "Submission Failed", err.message || "The application could not be submitted.");
     }
   };
 
@@ -104,7 +92,7 @@ export default function Tab5ReviewSubmit({ onBack, onSaveDraft }) {
 
         <div>
           <span className="text-xs font-bold uppercase tracking-widest text-emerald-700">
-            Simulated ONSTA Review
+            ONSTA Application Review
           </span>
           <h3 className="text-2xl font-serif font-bold text-gray-900 mt-2">
             {submissionPhase === 'submitting' && "Submitting Application Package..."}
@@ -112,7 +100,7 @@ export default function Tab5ReviewSubmit({ onBack, onSaveDraft }) {
             {submissionPhase === 'in_review' && "AI Report & Health Authority Clearance In Review..."}
           </h3>
           <p className="text-xs text-gray-500 mt-2">
-            Simulating compliance validation against Dubai Health Authority database.
+            Your dashboard stays locked until an administrator completes the review.
           </p>
         </div>
 
@@ -327,6 +315,11 @@ export default function Tab5ReviewSubmit({ onBack, onSaveDraft }) {
         </div>
 
         {/* Buttons */}
+        {submissionError && (
+          <p role="alert" className="mt-4 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-800">
+            {submissionError}
+          </p>
+        )}
         <div className="pt-6 border-t border-gray-100 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button

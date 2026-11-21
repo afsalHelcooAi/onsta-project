@@ -12,6 +12,7 @@ import {
   INITIAL_ENQUIRIES
 } from '../data/initialData';
 import { evaluateRuleEngine } from '../data/rules';
+import { loginAccount } from '../api/accountApi';
 
 const ClinicContext = createContext(null);
 
@@ -35,10 +36,21 @@ export function ClinicProvider({ children }) {
   };
 
   // Auth State
-  const [auth, setAuth] = useState(() => loadState('auth', {
-    isAuthenticated: false,
-    user: null
-  }));
+  const [auth, setAuth] = useState({ isAuthenticated: false, user: null });
+  const [authReady, setAuthReady] = useState(false);
+  const applyClinicIdentity = (clinic, applicationStatus = null) => {
+    if (clinic) setClinicData((current) => ({
+      ...current,
+      id: clinic.clinic_id,
+      legalName: clinic.legal_name,
+      displayName: clinic.trading_name,
+      category: clinic.facility_type,
+      companyEmail: clinic.primary_email,
+      contactPhone: clinic.primary_phone,
+      status: 'approved',
+    }));
+    else if (applicationStatus) setClinicData((current) => ({ ...current, status: applicationStatus.toLowerCase() }));
+  };
 
   // Main State
   const [clinicData, setClinicData] = useState(() => loadState('clinic', {
@@ -66,6 +78,21 @@ export function ClinicProvider({ children }) {
   // Toast Notifications
   const [toast, setToast] = useState(null);
 
+  useEffect(() => {
+    const token = localStorage.getItem('onsta_access_token');
+    if (!token) { setAuthReady(true); return; }
+    fetch('/api/v1/auth/me', { headers: { Authorization: `Bearer ${token}` } })
+      .then((response) => response.ok ? response.json() : Promise.reject())
+      .then((session) => {
+        setAuth({ isAuthenticated: true, user: session.user, application: session.application, tenantId: session.tenant_id, clinic: session.clinic });
+        if (session.application) {
+          setClinicData((current) => ({ ...current, id: session.application.id, status: session.application.application_status.toLowerCase() }));
+        } else if (session.user.workspace === 'CLINIC') applyClinicIdentity(session.clinic);
+      })
+      .catch(() => { localStorage.removeItem('onsta_access_token'); setAuth({ isAuthenticated: false, user: null }); })
+      .finally(() => setAuthReady(true));
+  }, []);
+
   const showToast = (type, title, message) => {
     setToast({ type, title, message, id: Date.now() });
     setTimeout(() => {
@@ -86,39 +113,34 @@ export function ClinicProvider({ children }) {
   useEffect(() => saveState('history', verificationHistory), [verificationHistory]);
 
   // Authentication Methods
-  const login = (email, role = 'new_clinic') => {
-    const isApproved = role === 'approved_clinic';
-    const updatedStatus = isApproved ? 'approved' : 'draft';
+  const login = async (email, password) => {
+    const session = await loginAccount(email, password);
+    localStorage.setItem('onsta_access_token', session.access_token);
+    const nextAuth = { isAuthenticated: true, user: session.user, application: session.application, tenantId: session.tenant_id, clinic: session.clinic };
+    setAuth(nextAuth);
+    if (session.application) applyClinicIdentity(null, session.application.application_status);
+    else if (session.clinic) applyClinicIdentity(session.clinic);
+    showToast('success', 'Signed in', session.application ? `Application status: ${session.application.application_status}` : 'Your clinic workspace is ready.');
+    return session;
+  };
 
-    const newAuth = {
-      isAuthenticated: true,
-      user: {
-        email: email || (isApproved ? 'info@alnoorclinic.ae' : 'onboarding@newclinic.ae'),
-        name: isApproved ? 'Dr. Fatima Al Mansoori' : 'Clinic Administrator',
-        role: isApproved ? 'Approved Partner' : 'New Applicant'
-      }
-    };
-
-    setAuth(newAuth);
-    setClinicData(prev => ({
-      ...prev,
-      status: updatedStatus
-    }));
-
-    showToast(
-      "success",
-      "Signed In",
-      isApproved
-        ? "Welcome back, Al Noor Clinic! Full dashboard unlocked."
-        : "Welcome! Complete clinic registration to unlock dashboard access."
-    );
-
-    return { success: true, status: updatedStatus };
+  const refreshSession = async () => {
+    const token = localStorage.getItem('onsta_access_token');
+    if (!token) return null;
+    const response = await fetch('/api/v1/auth/me', { headers: { Authorization: `Bearer ${token}` } });
+    if (!response.ok) throw new Error('Your session expired. Sign in again.');
+    const session = await response.json();
+    const nextAuth = { isAuthenticated: true, user: session.user, application: session.application, tenantId: session.tenant_id, clinic: session.clinic };
+    setAuth(nextAuth);
+    if (session.application) setClinicData((current) => ({ ...current, id: session.application.id, status: session.application.application_status.toLowerCase() }));
+    else if (session.clinic) applyClinicIdentity(session.clinic);
+    return session;
   };
 
   const logout = () => {
+    localStorage.removeItem('onsta_access_token');
     setAuth({ isAuthenticated: false, user: null });
-    showToast("info", "Signed Out", "You have been logged out of ONSTA Clinic Partner Portal.");
+    showToast("info", "Signed out", "You have been logged out of ONSTA Clinic Partner Portal.");
   };
 
   const setClinicStatus = (newStatus) => {
@@ -556,7 +578,9 @@ export function ClinicProvider({ children }) {
     <ClinicContext.Provider
       value={{
         auth,
+        authReady,
         login,
+        refreshSession,
         logout,
         clinicData,
         setClinicData,

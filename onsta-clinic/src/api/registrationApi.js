@@ -162,14 +162,8 @@ export const registrationApi = {
       if (!res.ok) throw new Error(`Submission failed: ${res.statusText}`);
       return await res.json();
     } catch (err) {
-      console.warn('Backend offline, using fallback approval logic:', err);
-      return {
-        clinic_id: clinicId,
-        status: 'APPROVED',
-        message: 'Application Verified & Approved. Full dashboard access unlocked.',
-        dashboard_unlocked: true,
-        review_queue_id: null
-      };
+      console.error('Registration submission failed:', err);
+      throw err;
     }
   },
 
@@ -182,13 +176,8 @@ export const registrationApi = {
       if (!res.ok) throw new Error('Gate check failed');
       return await res.json();
     } catch (err) {
-      return {
-        clinic_id: clinicId,
-        status: 'APPROVED',
-        access_granted: true,
-        dashboard_url: '/dashboard/overview',
-        lock_reason: null
-      };
+      console.error('Dashboard access check failed:', err);
+      throw err;
     }
   }
 };

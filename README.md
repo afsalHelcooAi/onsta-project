@@ -37,6 +37,11 @@ source .venv/bin/activate
 # Install dependencies
 pip install -r requirements.txt
 
+# Configure .env from .env.example, create an empty onsta_platform_db,
+# and run app/db/standalone_schema.sql against it once in pgAdmin.
+# Then create the initial admin and lookup rows:
+python -m app.db.seed_initial_admin
+
 # Run the FastAPI server
 uvicorn app.main:app --reload --port 8000
 ```
@@ -62,12 +67,14 @@ npm run dev
 
 ---
 
-## 🔄 End-to-End Inter-Module Workflow
-1. A clinic registers at `http://localhost:3000/register`, uploads 3 licenses (Trade License, Facility License, MOHAP Permit).
-2. Gemini 2.0 Flash extracts all details in sub-2s and fills the 5-tab registration form.
-3. On "Review & Submit", the clinic state transitions to `UNDER_REVIEW`. The clinic dashboard shows "Application Submitted — Pending Admin Approval".
-4. The colleague opens `http://localhost:3001` (Admin Portal), inspects the documents, and clicks **"Approve & Unlock Dashboard"**.
-5. The status updates in the shared backend to `APPROVED`. The clinic dashboard immediately unlocks!
+## 🔄 Initial Login & Clinic Registration
+1. A Super Admin signs in at `http://localhost:3001` using the account configured in `onsta-api/.env` and seeded by `python -m app.db.seed_initial_admin`.
+2. A clinic registers at `http://localhost:3000/register`, creates its account, enters clinic details, and uploads the trade license, facility license, and advertising permit.
+3. The API stores the application as `SUBMITTED`. The clinic can sign in at `http://localhost:3000/login` to see its status; its operational dashboard remains locked.
+4. The Super Admin reviews the submitted clinic and documents in the review queue, then approves, rejects, or requests more information.
+5. Approval creates the clinic tenant and owner membership. On the clinic user's next sign-in, the API recognizes its membership and opens the Clinic Dashboard.
+
+The role is resolved by the API from the account's assignments; neither sign-in form asks the user to choose a role. See [onsta-api/README.md](onsta-api/README.md) for database and setup details. Do not run `onsta-api/app/db/step4_onboarding.sql` against the new full schema; it is only for the older starter database.
 
 ---
 

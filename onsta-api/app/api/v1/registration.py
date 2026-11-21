@@ -1,5 +1,10 @@
+import hashlib
+from datetime import datetime, timezone
 from fastapi import APIRouter, Header, HTTPException, status, UploadFile, File, Query
 from typing import Optional
+from sqlalchemy import select
+from app.db.database import SessionLocal
+from app.db.models import ClinicInvitation
 from app.services.clinic_service import clinic_service
 from app.schemas.registration import (
     PresignedUrlRequest,
@@ -8,10 +13,45 @@ from app.schemas.registration import (
     FastExtractResponse,
     SubmitRegistrationRequest,
     SubmitRegistrationResponse,
-    DashboardGateCheckResponse
+    DashboardGateCheckResponse,
+    OnboardingApplicationRequest,
+    OnboardingApplicationResponse,
 )
 
 router = APIRouter(prefix="/registration", tags=["Clinic Onboarding & Ingestion"])
+
+
+@router.get("/invitations/{token}")
+async def get_onboarding_invitation(token: str):
+    """Validate an invitation token without exposing the stored token hash."""
+    token_hash = hashlib.sha256(token.encode("utf-8")).hexdigest()
+    async with SessionLocal() as session:
+        invitation = await session.scalar(select(ClinicInvitation).where(ClinicInvitation.token_hash == token_hash))
+        if invitation is None or invitation.status in {"EXPIRED", "REVOKED"} or invitation.expires_at <= datetime.now(timezone.utc):
+            raise HTTPException(status_code=404, detail="Invitation is invalid or expired.")
+        return {
+            "clinic_name": invitation.clinic_name,
+            "contact_name": invitation.contact_name,
+            "email": invitation.email,
+            "emirate": invitation.emirate,
+            "facility_type": invitation.facility_type,
+            "expires_at": invitation.expires_at,
+            "status": invitation.status,
+        }
+
+
+@router.post("/invitations/{token}/application", response_model=OnboardingApplicationResponse, status_code=201)
+async def submit_onboarding_application(token: str, payload: OnboardingApplicationRequest):
+    try:
+        application = await clinic_service.create_application_from_invitation(token, payload)
+    except ValueError as exc:
+        raise HTTPException(status_code=400, detail=str(exc)) from exc
+    return OnboardingApplicationResponse(
+        clinic_id=application.clinic_id,
+        application_reference=application.application_reference,
+        application_status=application.application_status,
+        message="Application started. Upload the required documents to continue.",
+    )
 
 @router.post("/upload-url/{clinic_id}", response_model=PresignedUrlResponse)
 async def get_upload_url(clinic_id: str, payload: PresignedUrlRequest):
@@ -81,16 +121,15 @@ async def submit_clinic_registration(
     idempotency_key: Optional[str] = Header(None, alias="Idempotency-Key")
 ):
     """
-    Step 3: Submit Registration & Automated Compliance Evaluation.
-    If 100% compliant, status transitions to APPROVED and unlocks the dashboard.
-    If discrepancies are detected, routes to UNDER_REVIEW for admin sign-off.
+    Step 3: Submit registration for authorized human review.
+    AI extraction supports review; it never approves an application.
     """
     return await clinic_service.submit_registration(payload, idempotency_key=idempotency_key)
 
 @router.get("/dashboard-gate/{clinic_id}", response_model=DashboardGateCheckResponse)
-def check_dashboard_access_gate(clinic_id: str):
+async def check_dashboard_access_gate(clinic_id: str):
     """
     Dashboard Gatekeeper:
     Checks whether clinic status is APPROVED. If not, access is locked.
     """
-    return clinic_service.check_dashboard_access(clinic_id)
+    return await clinic_service.check_dashboard_access(clinic_id)

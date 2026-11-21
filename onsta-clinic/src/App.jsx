@@ -12,11 +12,13 @@ import EnquiriesManagement from './components/dashboard/EnquiriesManagement';
 import GalleryManagement from './components/dashboard/GalleryManagement';
 import RequestsReview from './components/dashboard/RequestsReview';
 import ComplianceCentre from './components/dashboard/ComplianceCentre';
-import RegistrationWizard from './components/registration/RegistrationWizard';
+import ClinicRegistrationPage from './components/auth/ClinicRegistrationPage';
+import ApplicationStatusPage from './components/auth/ApplicationStatusPage';
 
 // Guard for Registration Module: Requires login
 function RequireAuth({ children }) {
-  const { auth } = useClinic();
+  const { auth, authReady } = useClinic();
+  if (!authReady) return <div className="flex min-h-screen items-center justify-center">Loading secure session…</div>;
   if (!auth.isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
@@ -25,7 +27,9 @@ function RequireAuth({ children }) {
 
 // Guard for Management Dashboard: Requires login AND approved status!
 function RequireApprovedClinic({ children }) {
-  const { auth, clinicData } = useClinic();
+  const { auth, authReady, clinicData } = useClinic();
+
+  if (!authReady) return <div className="flex min-h-screen items-center justify-center">Loading secure session…</div>;
 
   if (!auth.isAuthenticated) {
     return <Navigate to="/login" replace />;
@@ -41,14 +45,24 @@ function RequireApprovedClinic({ children }) {
 
 // Smart Root Redirect based on user state
 function RootRedirect() {
-  const { auth, clinicData } = useClinic();
+  const { auth, clinicData, authReady } = useClinic();
+
+  if (!authReady) return <div className="flex min-h-screen items-center justify-center">Loading secure session…</div>;
 
   if (!auth.isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
+  if (auth.user?.workspace !== 'CLINIC') {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (auth.application) {
+    return <Navigate to="/application" replace />;
+  }
+
   if (clinicData.status !== 'approved') {
-    return <Navigate to="/register" replace />;
+    return <Navigate to="/application" replace />;
   }
 
   return <Navigate to="/dashboard/overview" replace />;
@@ -64,13 +78,14 @@ function AppRoutes() {
 
       {/* Login Page */}
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<ClinicRegistrationPage />} />
 
-      {/* Registration Module (Accessible to logged-in applicants) */}
+      {/* Submitted applicants can see status but cannot access the clinic dashboard. */}
       <Route
-        path="/register"
+        path="/application"
         element={
           <RequireAuth>
-            <RegistrationWizard />
+            <ApplicationStatusPage />
           </RequireAuth>
         }
       />
