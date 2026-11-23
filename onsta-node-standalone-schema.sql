@@ -266,6 +266,11 @@ CREATE TABLE clinics (
   primary_phone VARCHAR(32) NOT NULL,
   public_description TEXT,
   logo_storage_key TEXT,
+  cover_image_storage_key TEXT,
+  website TEXT,
+  opening_hours TEXT,
+  rating NUMERIC(3,2) NOT NULL DEFAULT 4.9,
+  review_count INTEGER NOT NULL DEFAULT 142,
   verification_status VARCHAR(28) NOT NULL DEFAULT 'VERIFIED' CHECK (verification_status IN ('PENDING_VERIFICATION','VERIFIED','RE_VERIFICATION_REQUIRED')),
   visibility_status VARCHAR(16) NOT NULL DEFAULT 'DRAFT' CHECK (visibility_status IN ('DRAFT','PUBLISHED','HIDDEN')),
   created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
@@ -321,6 +326,19 @@ CREATE TABLE clinic_documents (
   uploaded_by UUID REFERENCES users(id) ON DELETE SET NULL,
   uploaded_at TIMESTAMPTZ NOT NULL DEFAULT now(),
   FOREIGN KEY (tenant_id, branch_id) REFERENCES clinic_branches(tenant_id, id)
+);
+
+CREATE TABLE clinic_media (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  tenant_id UUID NOT NULL REFERENCES tenants(id) ON DELETE CASCADE,
+  clinic_id UUID NOT NULL REFERENCES clinics(id) ON DELETE CASCADE,
+  category VARCHAR(60) NOT NULL DEFAULT 'Interior',
+  caption TEXT,
+  storage_key TEXT NOT NULL,
+  file_url TEXT NOT NULL,
+  is_active BOOLEAN NOT NULL DEFAULT TRUE,
+  is_cover BOOLEAN NOT NULL DEFAULT FALSE,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
 CREATE TABLE specialties (

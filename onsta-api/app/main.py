@@ -1,12 +1,15 @@
 from contextlib import asynccontextmanager
+from pathlib import Path
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 from sqlalchemy import text
 from app.config import settings
 from app.db.database import engine
 from app.api.v1.auth import router as auth_router
 from app.api.v1.platform_admin import router as platform_admin_router
 from app.api.v1.clinic_accounts import router as clinic_accounts_router
+from app.api.v1.clinic_profile import router as clinic_profile_router
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
@@ -49,6 +52,12 @@ def create_app() -> FastAPI:
     app.include_router(auth_router, prefix=settings.API_V1_STR)
     app.include_router(platform_admin_router, prefix=settings.API_V1_STR)
     app.include_router(clinic_accounts_router, prefix=settings.API_V1_STR)
+    app.include_router(clinic_profile_router, prefix=settings.API_V1_STR)
+
+    # Static uploads mounting for images and media
+    upload_dir = Path(settings.LOCAL_UPLOAD_DIR).resolve()
+    upload_dir.mkdir(parents=True, exist_ok=True)
+    app.mount("/uploads", StaticFiles(directory=str(upload_dir)), name="uploads")
 
     @app.get("/health", tags=["Health"])
     def health_check():
