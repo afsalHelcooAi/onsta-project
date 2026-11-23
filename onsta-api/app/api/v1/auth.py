@@ -69,8 +69,18 @@ async def resolve_workspace(session: Any, user_id: str) -> dict[str, Any]:
             WHERE application_id = CAST(:application_id AS uuid) AND status = 'OPEN'
             ORDER BY created_at DESC
         """), {"application_id": application["id"]})).mappings().all()
+        latest_review = (await session.execute(text("""
+            SELECT decision, rejection_reason, review_notes, created_at
+            FROM clinic_application_reviews
+            WHERE application_id = CAST(:application_id AS uuid)
+            ORDER BY created_at DESC LIMIT 1
+        """), {"application_id": application["id"]})).mappings().first()
         application_data = dict(application)
         application_data["open_requests"] = [dict(item) for item in open_requests]
+        if latest_review:
+            application_data["rejection_reason"] = latest_review["rejection_reason"]
+            application_data["review_notes"] = latest_review["review_notes"]
+            application_data["review_decision"] = latest_review["decision"]
         return {"workspace": "CLINIC", "role": "CLINIC_APPLICANT", "application": application_data}
     raise HTTPException(status_code=403, detail="This account has no assigned workspace.")
 

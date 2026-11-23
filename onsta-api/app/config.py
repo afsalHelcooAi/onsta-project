@@ -8,8 +8,11 @@ load_dotenv()
 
 class ClinicStatus(str, Enum):
     DRAFT = "DRAFT"
-    DOCUMENTS_UPLOADED = "DOCUMENTS_UPLOADED"
-    PROCESSING = "PROCESSING"
+    IN_PROGRESS = "IN_PROGRESS"
+    DOCUMENTS_UPLOADED = "DOCUMENTS_PENDING"
+    DOCUMENTS_PENDING = "DOCUMENTS_PENDING"
+    PROCESSING = "SCANNING"
+    SCANNING = "SCANNING"
     READY_FOR_REVIEW = "READY_FOR_REVIEW"
     SUBMITTED = "SUBMITTED"
     UNDER_REVIEW = "UNDER_REVIEW"
@@ -39,7 +42,7 @@ class Settings:
     # Local Postgres (Development & Local Testing):
     DATABASE_URL: str = os.getenv(
         "DATABASE_URL", 
-        "postgresql+asyncpg://postgres:12345@localhost:5432/onsta_platform_db"
+        "postgresql+asyncpg://postgres:12345@10.255.254.61:5432/onsta_platform_db"
     )
     JWT_SECRET: str = os.getenv("JWT_SECRET", "change-this-development-secret-before-use")
     SUPER_ADMIN_EMAIL: Optional[str] = os.getenv("SUPER_ADMIN_EMAIL")

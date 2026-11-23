@@ -171,7 +171,7 @@ export default function RegistrationWizard() {
     { id: 1, title: "1. Basic details", badge: aiFastCompleted ? "Auto-Filled" : "Completed" },
     { id: 2, title: "2. Licence details", badge: aiFastCompleted ? "Auto-Filled" : "Completed" },
     { id: 3, title: "3. Medical director", badge: aiFastCompleted ? "Auto-Filled" : "Completed" },
-    { id: 4, title: "4. Advertising and services", badge: aiFastCompleted ? "Auto-Filled" : "Completed" },
+    { id: 4, title: "4. MOHAP Advertising & Services", badge: aiFastCompleted ? "Auto-Filled" : "Completed" },
     { id: 5, title: "5. Review and submit", badge: "Ready" }
   ];
 

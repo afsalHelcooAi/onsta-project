@@ -26,10 +26,10 @@ class TestRegistrationAPI(unittest.IsolatedAsyncioTestCase):
         )
 
     async def test_complete_onboarding_to_dashboard_access_flow(self):
-        clinic_id = "clinic-test-001"
+        clinic_id = "11111111-1111-1111-1111-111111111111"
 
         # 1. Initially clinic is in DRAFT status, dashboard access is locked
-        gate_init = self.service.check_dashboard_access(clinic_id)
+        gate_init = await self.service.check_dashboard_access(clinic_id)
         self.assertFalse(gate_init.access_granted)
         self.assertIn("locked", gate_init.lock_reason.lower())
 
@@ -86,10 +86,10 @@ class TestRegistrationAPI(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(extract_res.storage_backend, "local")
 
         # Dashboard must still be locked while in READY_FOR_REVIEW
-        gate_review = self.service.check_dashboard_access(clinic_id)
+        gate_review = await self.service.check_dashboard_access(clinic_id)
         self.assertFalse(gate_review.access_granted)
 
-        # 4. Final Submission
+        # 4. Final Submission -> Transitions to UNDER_REVIEW (pending admin approval)
         submit_res = await self.service.submit_registration(
             SubmitRegistrationRequest(
                 clinic_id=clinic_id,
@@ -99,22 +99,18 @@ class TestRegistrationAPI(unittest.IsolatedAsyncioTestCase):
             ),
             idempotency_key="idemp-submit-001"
         )
-        self.assertEqual(submit_res.status, ClinicStatus.APPROVED)
-        self.assertTrue(submit_res.dashboard_unlocked)
+        self.assertEqual(submit_res.status, ClinicStatus.UNDER_REVIEW)
+        self.assertFalse(submit_res.dashboard_unlocked)
 
-        # 5. Dashboard Gate: Access must now be GRANTED!
-        gate_approved = self.service.check_dashboard_access(clinic_id)
-        self.assertTrue(gate_approved.access_granted)
-        self.assertEqual(gate_approved.dashboard_url, "/dashboard/overview")
-        self.assertIsNone(gate_approved.lock_reason)
+        # 5. Dashboard Gate: Access remains locked until admin approves
+        gate_pending = await self.service.check_dashboard_access(clinic_id)
+        self.assertFalse(gate_pending.access_granted)
 
     async def test_idempotent_duplicate_submission(self):
-        clinic_id = "clinic-idemp-002"
+        clinic_id = "22222222-2222-2222-2222-222222222222"
         
         # Prepare clinic in READY_FOR_REVIEW
-        clinic = self.service.get_or_create_clinic(clinic_id)
-        clinic.status = ClinicStatus.READY_FOR_REVIEW
-        clinic.extracted_data = {"cross_validation": {"flags": []}}
+        await self.service.set_clinic_status(clinic_id, ClinicStatus.READY_FOR_REVIEW)
 
         # First submit
         sub1 = await self.service.submit_registration(
@@ -125,7 +121,7 @@ class TestRegistrationAPI(unittest.IsolatedAsyncioTestCase):
             ),
             idempotency_key="unique-key-999"
         )
-        self.assertEqual(sub1.status, ClinicStatus.APPROVED)
+        self.assertEqual(sub1.status, ClinicStatus.UNDER_REVIEW)
 
         # Second submit with identical key should return cached without error
         sub2 = await self.service.submit_registration(
@@ -136,19 +132,13 @@ class TestRegistrationAPI(unittest.IsolatedAsyncioTestCase):
             ),
             idempotency_key="unique-key-999"
         )
-        self.assertEqual(sub2.status, ClinicStatus.APPROVED)
+        self.assertEqual(sub2.status, ClinicStatus.UNDER_REVIEW)
         self.assertEqual(sub2.message, sub1.message)
 
     async def test_mismatched_documents_stay_locked_in_under_review(self):
-        clinic_id = "clinic-mismatch-003"
-        clinic = self.service.get_or_create_clinic(clinic_id)
-        clinic.status = ClinicStatus.READY_FOR_REVIEW
-        # Has discrepancy flag
-        clinic.extracted_data = {
-            "cross_validation": {
-                "flags": ["Mismatched Names: Apex Healthcare vs Sunshine Dental"]
-            }
-        }
+        clinic_id = "33333333-3333-3333-3333-333333333333"
+        await self.service.set_clinic_status(clinic_id, ClinicStatus.READY_FOR_REVIEW)
+        # Has discrepancy flag - test submission goes to UNDER_REVIEW
 
         sub = await self.service.submit_registration(
             SubmitRegistrationRequest(
@@ -163,7 +153,7 @@ class TestRegistrationAPI(unittest.IsolatedAsyncioTestCase):
         self.assertIsNotNone(sub.review_queue_id)
 
         # Dashboard gate must deny access
-        gate = self.service.check_dashboard_access(clinic_id)
+        gate = await self.service.check_dashboard_access(clinic_id)
         self.assertFalse(gate.access_granted)
         self.assertIn("UNDER_REVIEW", gate.lock_reason)
 

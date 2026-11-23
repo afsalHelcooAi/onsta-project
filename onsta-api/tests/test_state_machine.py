@@ -26,7 +26,11 @@ class TestClinicStateMachine(unittest.TestCase):
         status = ClinicStateMachine.transition(status, ClinicStatus.SUBMITTED)
         self.assertEqual(status, ClinicStatus.SUBMITTED)
         
-        # 5. Approved
+        # 5. Under Review
+        status = ClinicStateMachine.transition(status, ClinicStatus.UNDER_REVIEW)
+        self.assertEqual(status, ClinicStatus.UNDER_REVIEW)
+        
+        # 6. Approved
         status = ClinicStateMachine.transition(status, ClinicStatus.APPROVED)
         self.assertEqual(status, ClinicStatus.APPROVED)
 
