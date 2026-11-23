@@ -37,6 +37,7 @@ class FakeSession:
     def __init__(self, results):
         self.results = iter(results)
         self.statements = []
+        self.committed = False
 
     async def __aenter__(self):
         return self
@@ -47,6 +48,9 @@ class FakeSession:
     async def execute(self, statement, params):
         self.statements.append((str(statement), params))
         return next(self.results)
+
+    async def commit(self):
+        self.committed = True
 
 
 class TestPlatformAdminUsers(unittest.IsolatedAsyncioTestCase):
@@ -138,6 +142,78 @@ class TestPlatformAdminUsers(unittest.IsolatedAsyncioTestCase):
                 await platform_admin.require_super_admin({"id": str(uuid4())})
 
         self.assertEqual(raised.exception.status_code, 403)
+
+    async def test_update_user_status_records_audit_and_commits(self):
+        user_id = uuid4()
+        actor_id = uuid4()
+        session = FakeSession([
+            ExecuteResult(rows=[{"status": "ACTIVE", "is_platform_admin": False}]),
+            ExecuteResult(),
+            ExecuteResult(),
+        ])
+
+        with patch.object(platform_admin, "SessionLocal", return_value=session):
+            result = await platform_admin.update_user_status(
+                user_id,
+                platform_admin.UserStatusRequest(status="suspended", reason="Access review"),
+                actor={"id": str(actor_id)},
+            )
+
+        self.assertEqual(result, {"user_id": str(user_id), "status": "SUSPENDED"})
+        self.assertIn("UPDATE users", session.statements[1][0])
+        self.assertIn("INSERT INTO audit_logs", session.statements[2][0])
+        self.assertEqual(session.statements[2][1]["reason"], "Access review")
+        self.assertTrue(session.committed)
+
+    async def test_update_user_status_does_not_activate_invited_accounts(self):
+        user_id = uuid4()
+        session = FakeSession([ExecuteResult(rows=[{"status": "INVITED", "is_platform_admin": False}])])
+
+        with patch.object(platform_admin, "SessionLocal", return_value=session):
+            with self.assertRaises(HTTPException) as raised:
+                await platform_admin.update_user_status(
+                    user_id,
+                    platform_admin.UserStatusRequest(status="ACTIVE", reason="Invite bypass attempt"),
+                    actor={"id": str(uuid4())},
+                )
+
+        self.assertEqual(raised.exception.status_code, 409)
+        self.assertFalse(session.committed)
+
+    async def test_update_user_status_protects_the_last_active_super_admin(self):
+        user_id = uuid4()
+        session = FakeSession([
+            ExecuteResult(rows=[{"status": "ACTIVE", "is_platform_admin": True}]),
+            ExecuteResult(scalar=1),
+        ])
+
+        with patch.object(platform_admin, "SessionLocal", return_value=session):
+            with self.assertRaises(HTTPException) as raised:
+                await platform_admin.update_user_status(
+                    user_id,
+                    platform_admin.UserStatusRequest(status="DISABLED", reason="Access review"),
+                    actor={"id": str(uuid4())},
+                )
+
+        self.assertEqual(raised.exception.status_code, 409)
+        self.assertFalse(session.committed)
+
+    async def test_overview_returns_platform_and_ai_counts(self):
+        session = FakeSession([
+            ExecuteResult(rows=[{"status": "ACTIVE", "count": 4}]),
+            ExecuteResult(rows=[{"status": "SUBMITTED", "count": 2}]),
+            ExecuteResult(scalar=3),
+            ExecuteResult(rows=[{"status": "FAILED", "count": 1}]),
+        ])
+
+        with patch.object(platform_admin, "SessionLocal", return_value=session):
+            result = await platform_admin.get_platform_overview(actor={"id": str(uuid4())})
+
+        self.assertEqual(result["users"], {"ACTIVE": 4})
+        self.assertEqual(result["applications"], {"SUBMITTED": 2})
+        self.assertEqual(result["registered_clinics"], 3)
+        self.assertEqual(result["ai"]["scan_jobs"], {"FAILED": 1})
+        self.assertEqual(result["system_health"]["database"], "HEALTHY")
 
 
 if __name__ == "__main__":

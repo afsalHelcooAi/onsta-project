@@ -75,6 +75,28 @@ export async function fetchUsers({ search = '', accountType = '', status = '', r
   return res.json();
 }
 
+export async function fetchAdminOverview() {
+  const res = await fetch(`${API_BASE}/overview`, { headers: authHeaders() });
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error.detail || `Failed to fetch platform overview (${res.status})`);
+  }
+  return res.json();
+}
+
+export async function updateUserStatus(userId, status, reason) {
+  const res = await fetch(`${API_BASE}/users/${encodeURIComponent(userId)}/status`, {
+    method: 'PATCH',
+    headers: authHeaders(true),
+    body: JSON.stringify({ status, reason }),
+  });
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error.detail || `Failed to update user status (${res.status})`);
+  }
+  return res.json();
+}
+
 export async function downloadApplicationDocument(applicationId, documentId, fileName) {
   const res = await fetch(`${API_BASE}/applications/${encodeURIComponent(applicationId)}/documents/${encodeURIComponent(documentId)}`, { headers: authHeaders() });
   if (!res.ok) {

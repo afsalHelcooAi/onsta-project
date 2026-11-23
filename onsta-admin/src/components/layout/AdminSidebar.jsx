@@ -5,18 +5,18 @@ import {
   FileCheck,
   UserRound,
   Settings,
-  Activity,
+  LayoutDashboard,
   LogOut,
   Sparkles
 } from 'lucide-react';
 
 export default function AdminSidebar({ activeTab, setActiveTab, pendingCount = 0, onSignOut }) {
   const menuItems = [
+    { id: 'overview', label: 'Overview', icon: LayoutDashboard },
     { id: 'review-queue', label: 'Clinic Verifications', icon: ShieldCheck, badge: pendingCount },
     { id: 'all-clinics', label: 'Registered Clinics', icon: Building2 },
     { id: 'compliance-audit', label: 'Compliance & Permits', icon: FileCheck },
     { id: 'all-users', label: 'All Users', icon: UserRound },
-    { id: 'system-health', label: 'System Health & AI', icon: Activity },
     { id: 'settings', label: 'Platform Settings', icon: Settings },
   ];
 
