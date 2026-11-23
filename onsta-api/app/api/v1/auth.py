@@ -39,11 +39,16 @@ async def get_current_actor(authorization: str | None = Header(default=None)) ->
 async def resolve_workspace(session: Any, user_id: str) -> dict[str, Any]:
     platform = (await session.execute(text("""
         SELECT r.name FROM user_roles ur JOIN roles r ON r.id = ur.role_id
-        WHERE ur.user_id = CAST(:user_id AS uuid) AND r.scope = 'PLATFORM'
-        ORDER BY CASE r.name WHEN 'SUPER_ADMIN' THEN 0 ELSE 1 END LIMIT 1
+        WHERE ur.user_id = CAST(:user_id AS uuid)
+          AND r.name = 'SUPER_ADMIN' AND r.scope = 'PLATFORM'
+        LIMIT 1
     """), {"user_id": user_id})).first()
     if platform:
-        return {"workspace": "SUPER_ADMIN", "role": platform[0], "application": None}
+        return {
+            "workspace": "SUPER_ADMIN",
+            "role": platform[0],
+            "application": None,
+        }
     membership = (await session.execute(text("""
         SELECT r.name, t.id::text AS tenant_id, c.id::text AS clinic_id,
             c.legal_name, c.trading_name, c.facility_type,

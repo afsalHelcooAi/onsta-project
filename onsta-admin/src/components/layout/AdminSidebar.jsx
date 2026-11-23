@@ -3,7 +3,7 @@ import {
   ShieldCheck,
   Building2,
   FileCheck,
-  Users,
+  UserRound,
   Settings,
   Activity,
   LogOut,
@@ -15,7 +15,7 @@ export default function AdminSidebar({ activeTab, setActiveTab, pendingCount = 0
     { id: 'review-queue', label: 'Clinic Verifications', icon: ShieldCheck, badge: pendingCount },
     { id: 'all-clinics', label: 'Registered Clinics', icon: Building2 },
     { id: 'compliance-audit', label: 'Compliance & Permits', icon: FileCheck },
-    { id: 'admin-users', label: 'Admin Accounts', icon: Users },
+    { id: 'all-users', label: 'All Users', icon: UserRound },
     { id: 'system-health', label: 'System Health & AI', icon: Activity },
     { id: 'settings', label: 'Platform Settings', icon: Settings },
   ];

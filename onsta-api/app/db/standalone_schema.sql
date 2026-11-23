@@ -42,7 +42,7 @@ CREATE TABLE role_permissions (
   PRIMARY KEY(role_id, permission_id)
 );
 
--- Platform-wide assignments (Super Admin, Verification Officer, Sales, etc.).
+-- Platform-wide assignments (currently Super Admin only).
 CREATE TABLE user_roles (
   user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
   role_id UUID NOT NULL REFERENCES roles(id) ON DELETE RESTRICT,
