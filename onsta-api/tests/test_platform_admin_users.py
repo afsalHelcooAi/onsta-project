@@ -1,3 +1,4 @@
+import json
 import unittest
 from unittest.mock import patch
 from uuid import uuid4
@@ -162,7 +163,10 @@ class TestPlatformAdminUsers(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result, {"user_id": str(user_id), "status": "SUSPENDED"})
         self.assertIn("UPDATE users", session.statements[1][0])
         self.assertIn("INSERT INTO audit_logs", session.statements[2][0])
-        self.assertEqual(session.statements[2][1]["reason"], "Access review")
+        audit_details = json.loads(session.statements[2][1]["details"])
+        self.assertEqual(audit_details["reason"], "Access review")
+        self.assertEqual(audit_details["old_status"], "ACTIVE")
+        self.assertEqual(audit_details["new_status"], "SUSPENDED")
         self.assertTrue(session.committed)
 
     async def test_update_user_status_does_not_activate_invited_accounts(self):
@@ -230,6 +234,41 @@ class TestPlatformAdminUsers(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result["expiring_licenses_total"], 1)
         self.assertEqual(len(result["expiring_licenses"]), 1)
         self.assertEqual(result["expiring_licenses"][0]["trading_name"], "Care Clinic")
+
+    async def test_list_audit_logs(self):
+        log_id = str(uuid4())
+        session = FakeSession([
+            ExecuteResult(scalar=1),
+            ExecuteResult(rows=[{
+                "id": log_id,
+                "actor_user_id": str(uuid4()),
+                "actor_name": "ONSTA Admin",
+                "actor_email": "admin@helcoo.com",
+                "tenant_id": None,
+                "tenant_name": None,
+                "action": "USER_STATUS_CHANGED",
+                "entity_type": "USER",
+                "entity_id": str(uuid4()),
+                "details": {"reason": "Test audit"},
+                "ip_address": None,
+                "created_at": "2026-11-23T12:00:00Z",
+            }]),
+        ])
+
+        with patch.object(platform_admin, "SessionLocal", return_value=session):
+            result = await platform_admin.list_audit_logs(
+                search=None,
+                action=None,
+                entity_type=None,
+                limit=25,
+                offset=0,
+                actor={"id": str(uuid4())},
+            )
+
+        self.assertEqual(result["total"], 1)
+        self.assertEqual(len(result["items"]), 1)
+        self.assertEqual(result["items"][0]["action"], "USER_STATUS_CHANGED")
+        self.assertEqual(result["items"][0]["actor_name"], "ONSTA Admin")
 
 
 if __name__ == "__main__":

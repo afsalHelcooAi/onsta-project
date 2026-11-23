@@ -652,18 +652,21 @@ async def update_user_status(
             SET status = :status, updated_at = now()
             WHERE id = CAST(:user_id AS uuid)
         """), {"status": new_status, "user_id": str(user_id)})
+        details_json = json.dumps({
+            "old_status": old_status,
+            "new_status": new_status,
+            "reason": reason,
+        })
         await session.execute(text("""
             INSERT INTO audit_logs (actor_user_id, action, entity_type, entity_id, details)
             VALUES (
                 CAST(:actor_id AS uuid), 'USER_STATUS_CHANGED', 'USER', CAST(:user_id AS uuid),
-                jsonb_build_object('old_status', :old_status, 'new_status', :new_status, 'reason', :reason)
+                CAST(:details AS jsonb)
             )
         """), {
             "actor_id": str(actor["id"]),
             "user_id": str(user_id),
-            "old_status": old_status,
-            "new_status": new_status,
-            "reason": reason,
+            "details": details_json,
         })
         await session.commit()
 
@@ -767,6 +770,20 @@ async def approve_application(application_id: str, payload: DecisionRequest, act
                 INSERT INTO clinic_application_history(application_id, old_status, new_status, changed_by, reason)
                 VALUES (CAST(:id AS uuid), :old, 'APPROVED', CAST(:admin AS uuid), :reason)
             """), {"id": application_id, "old": old_status, "admin": actor["id"], "reason": payload.reason})
+            approve_details = json.dumps({
+                "trading_name": app["trading_name"],
+                "legal_name": app["legal_entity_name"],
+                "reason": payload.reason,
+                "tenant_id": tenant["id"],
+                "clinic_id": clinic["id"],
+            })
+            await session.execute(text("""
+                INSERT INTO audit_logs (actor_user_id, tenant_id, action, entity_type, entity_id, details)
+                VALUES (
+                    CAST(:actor_id AS uuid), CAST(:tenant_id AS uuid), 'CLINIC_APPROVED', 'CLINIC_APPLICATION', CAST(:id AS uuid),
+                    CAST(:details AS jsonb)
+                )
+            """), {"actor_id": str(actor["id"]), "tenant_id": tenant["id"], "id": application_id, "details": approve_details})
     return {"application_id": application_id, "clinic_id": clinic["id"], "tenant_id": tenant["id"], "application_status": "APPROVED", "message": "Clinic approved; clinic workspace access is active."}
 
 
@@ -782,6 +799,14 @@ async def reject_application(application_id: str, payload: DecisionRequest, acto
             await session.execute(text("UPDATE clinic_applications SET application_status = 'REJECTED', updated_at = now() WHERE id = CAST(:id AS uuid)"), {"id": application_id})
             await session.execute(text("INSERT INTO clinic_application_reviews(application_id, reviewer_id, decision, rejection_reason, review_notes) VALUES (CAST(:id AS uuid), CAST(:admin AS uuid), 'REJECTED', :reason, :reason)"), {"id": application_id, "admin": actor["id"], "reason": payload.reason})
             await session.execute(text("INSERT INTO clinic_application_history(application_id, old_status, new_status, changed_by, reason) VALUES (CAST(:id AS uuid), :old, 'REJECTED', CAST(:admin AS uuid), :reason)"), {"id": application_id, "old": row[0], "admin": actor["id"], "reason": payload.reason})
+            reject_details = json.dumps({"reason": payload.reason})
+            await session.execute(text("""
+                INSERT INTO audit_logs (actor_user_id, action, entity_type, entity_id, details)
+                VALUES (
+                    CAST(:actor_id AS uuid), 'CLINIC_REJECTED', 'CLINIC_APPLICATION', CAST(:id AS uuid),
+                    CAST(:details AS jsonb)
+                )
+            """), {"actor_id": str(actor["id"]), "id": application_id, "details": reject_details})
     return {"application_id": application_id, "application_status": "REJECTED"}
 
 
@@ -801,4 +826,79 @@ async def request_application_info(application_id: str, payload: InfoRequest, ac
             """), {"id": application_id, "admin": actor["id"], "fields": json.dumps(payload.requested_fields), "message": payload.message})
             await session.execute(text("INSERT INTO clinic_application_reviews(application_id, reviewer_id, decision, review_notes) VALUES (CAST(:id AS uuid), CAST(:admin AS uuid), 'REQUESTED_INFO', :message)"), {"id": application_id, "admin": actor["id"], "message": payload.message})
             await session.execute(text("INSERT INTO clinic_application_history(application_id, old_status, new_status, changed_by, reason) VALUES (CAST(:id AS uuid), :old, 'ADDITIONAL_INFO_REQUESTED', CAST(:admin AS uuid), :message)"), {"id": application_id, "old": row[0], "admin": actor["id"], "message": payload.message})
+            info_details = json.dumps({
+                "requested_fields": payload.requested_fields,
+                "message": payload.message,
+            })
+            await session.execute(text("""
+                INSERT INTO audit_logs (actor_user_id, action, entity_type, entity_id, details)
+                VALUES (
+                    CAST(:actor_id AS uuid), 'INFO_REQUESTED', 'CLINIC_APPLICATION', CAST(:id AS uuid),
+                    CAST(:details AS jsonb)
+                )
+            """), {"actor_id": str(actor["id"]), "id": application_id, "details": info_details})
     return {"application_id": application_id, "application_status": "ADDITIONAL_INFO_REQUESTED"}
+
+
+@router.get("/audit-logs")
+async def list_audit_logs(
+    search: Optional[str] = Query(None, max_length=200),
+    action: Optional[str] = Query(None, max_length=120),
+    entity_type: Optional[str] = Query(None, max_length=80),
+    limit: int = Query(25, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+    actor: Actor = Depends(require_super_admin),
+):
+    filters = []
+    params: dict = {"limit": limit, "offset": offset}
+
+    if search and search.strip():
+        filters.append("""
+            (u.full_name ILIKE :search OR u.email ILIKE :search
+             OR al.action ILIKE :search OR al.details::text ILIKE :search
+             OR al.id::text ILIKE :search)
+        """)
+        params["search"] = f"%{search.strip()}%"
+
+    if action and action.strip() and action.strip().upper() != "ALL":
+        filters.append("al.action = :action")
+        params["action"] = action.strip().upper()
+
+    if entity_type and entity_type.strip() and entity_type.strip().upper() != "ALL":
+        filters.append("al.entity_type = :entity_type")
+        params["entity_type"] = entity_type.strip().upper()
+
+    where_clause = f"WHERE {' AND '.join(filters)}" if filters else ""
+    filter_params = {k: v for k, v in params.items() if k not in {"limit", "offset"}}
+
+    async with SessionLocal() as session:
+        total = (await session.execute(text(f"""
+            SELECT count(*)
+            FROM audit_logs al
+            LEFT JOIN users u ON u.id = al.actor_user_id
+            {where_clause}
+        """), filter_params)).scalar_one()
+
+        rows = (await session.execute(text(f"""
+            SELECT
+                al.id::text AS id,
+                al.actor_user_id::text AS actor_user_id,
+                u.full_name AS actor_name,
+                u.email AS actor_email,
+                al.tenant_id::text AS tenant_id,
+                t.name AS tenant_name,
+                al.action,
+                al.entity_type,
+                al.entity_id::text AS entity_id,
+                al.details,
+                al.ip_address::text AS ip_address,
+                al.created_at
+            FROM audit_logs al
+            LEFT JOIN users u ON u.id = al.actor_user_id
+            LEFT JOIN tenants t ON t.id = al.tenant_id
+            {where_clause}
+            ORDER BY al.created_at DESC
+            LIMIT :limit OFFSET :offset
+        """), params)).mappings().all()
+
+    return {"items": [dict(row) for row in rows], "total": total, "limit": limit, "offset": offset}
