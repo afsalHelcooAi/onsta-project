@@ -11,6 +11,7 @@ from app.api.v1.platform_admin import router as platform_admin_router
 from app.api.v1.clinic_accounts import router as clinic_accounts_router
 from app.api.v1.clinic_profile import router as clinic_profile_router
 from app.api.v1.clinic_doctors import router as clinic_doctors_router
+from app.api.v1.clinic_services import router as clinic_services_router
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
@@ -58,6 +59,7 @@ def create_app() -> FastAPI:
     app.include_router(clinic_accounts_router, prefix=settings.API_V1_STR)
     app.include_router(clinic_profile_router, prefix=settings.API_V1_STR)
     app.include_router(clinic_doctors_router, prefix=settings.API_V1_STR)
+    app.include_router(clinic_services_router, prefix=settings.API_V1_STR)
 
     # Static uploads mounting for images and media
     upload_dir = Path(settings.LOCAL_UPLOAD_DIR).resolve()

@@ -7,17 +7,6 @@ import {
 } from 'lucide-react';
 import DoctorAvatar from './DoctorAvatar';
 
-const FALLBACK_SERVICES = [
-  { id: 'fb-1', name: 'Keratin Treatment', duration: '30 min', normalPrice: 80 },
-  { id: 'fb-2', name: 'Eyebrow Threading', duration: '45 min', normalPrice: 110 },
-  { id: 'fb-3', name: 'Waxing', duration: '60 min', normalPrice: 140 },
-  { id: 'fb-4', name: 'Skin Care', duration: '75 min', normalPrice: 170 },
-];
-
-const FALLBACK_OFFERS = [
-  { id: 'fb-off-1', title: 'Mega Laser Deal', discountPercent: 45 },
-];
-
 export default function CustomerPreviewModal({ isOpen, onClose }) {
   const { clinicData, services = [], offers = [], gallery = [], doctors = [] } = useClinic();
   const [deviceMode, setDeviceMode] = useState('desktop'); // desktop | mobile
@@ -27,12 +16,12 @@ export default function CustomerPreviewModal({ isOpen, onClose }) {
 
   const activeDoctors = doctors.filter((d) => d.isActive !== false);
 
-  // Active services & offers from context, falling back to realistic defaults if empty
+  // Active services & offers from context
   const activeServices = services.filter((s) => s.isActive && s.verificationStatus === 'VERIFIED');
-  const displayServices = activeServices.length > 0 ? activeServices : (services.length > 0 ? services.filter(s => s.isActive) : FALLBACK_SERVICES);
+  const displayServices = activeServices.length > 0 ? activeServices : services.filter(s => s.isActive);
 
   const activeOffers = offers.filter((o) => o.isActive && o.verificationStatus === 'VERIFIED');
-  const displayOffers = activeOffers.length > 0 ? activeOffers : FALLBACK_OFFERS;
+  const displayOffers = activeOffers.length > 0 ? activeOffers : offers.filter(o => o.isActive);
 
   const activeGallery = gallery.filter((g) => g.isActive);
 
@@ -225,36 +214,51 @@ export default function CustomerPreviewModal({ isOpen, onClose }) {
                 {/* Tab 1: Services List */}
                 {activeTab === 'services' && (
                   <div className="mt-4 space-y-3">
-                    {displayServices.map((srv) => (
-                      <div
-                        key={srv.id}
-                        className="bg-white rounded-2xl p-4 sm:p-5 flex items-center justify-between shadow-xs border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all"
-                      >
-                        <div className="pr-4">
-                          <h3 className="font-bold text-gray-900 text-sm sm:text-base">
-                            {srv.name}
-                          </h3>
-                          <div className="flex items-center gap-1.5 text-xs text-gray-500 mt-1">
-                            <Clock className="w-3.5 h-3.5 text-gray-400" />
-                            <span>{srv.duration || '30 min'}</span>
+                    {displayServices.length === 0 ? (
+                      <div className="bg-white rounded-2xl p-8 text-center border border-gray-100 shadow-xs">
+                        <Sparkles className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                        <p className="font-semibold text-sm text-gray-700">No active treatments published yet</p>
+                        <p className="text-xs text-gray-400 mt-1">Services added in the clinic portal will appear here for customers.</p>
+                      </div>
+                    ) : (
+                      displayServices.map((srv) => (
+                        <div
+                          key={srv.id}
+                          className="bg-white rounded-2xl p-4 sm:p-5 flex items-center justify-between shadow-xs border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all"
+                        >
+                          <div className="pr-4">
+                            <h3 className="font-bold text-gray-900 text-sm sm:text-base">
+                              {srv.name}
+                            </h3>
+                            <div className="flex items-center gap-1.5 text-xs text-gray-500 mt-1">
+                              <Clock className="w-3.5 h-3.5 text-gray-400" />
+                              <span>{srv.duration || '30 min'}</span>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-3 sm:gap-4 flex-shrink-0">
+                            <div className="text-right">
+                              <span className="font-bold text-gray-900 text-sm sm:text-base whitespace-nowrap block">
+                                {srv.offerPrice ? srv.offerPrice : srv.normalPrice} AED
+                              </span>
+                              {srv.offerPrice && (
+                                <span className="text-[10px] text-gray-400 line-through font-mono block">
+                                  {srv.normalPrice} AED
+                                </span>
+                              )}
+                            </div>
+
+                            <button
+                              type="button"
+                              className="flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-xl text-xs font-semibold bg-[#f4f3f0] hover:bg-[#eae7e0] text-gray-700 border border-gray-200/60 transition-colors"
+                            >
+                              <Hourglass className="w-3.5 h-3.5 text-gray-500" />
+                              <span>Booking soon</span>
+                            </button>
                           </div>
                         </div>
-
-                        <div className="flex items-center gap-3 sm:gap-4 flex-shrink-0">
-                          <span className="font-bold text-gray-900 text-sm sm:text-base whitespace-nowrap">
-                            {srv.offerPrice ? srv.offerPrice : srv.normalPrice} AED
-                          </span>
-
-                          <button
-                            type="button"
-                            className="flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-xl text-xs font-semibold bg-[#f4f3f0] hover:bg-[#eae7e0] text-gray-700 border border-gray-200/60 transition-colors"
-                          >
-                            <Hourglass className="w-3.5 h-3.5 text-gray-500" />
-                            <span>Booking soon</span>
-                          </button>
-                        </div>
-                      </div>
-                    ))}
+                      ))
+                    )}
                   </div>
                 )}
 
@@ -391,41 +395,43 @@ export default function CustomerPreviewModal({ isOpen, onClose }) {
                   </div>
                 </div>
 
-                {/* Card 2: Offers */}
-                <div className="bg-white rounded-3xl p-5 sm:p-6 shadow-xs border border-gray-100">
-                  <div className="flex items-center gap-2 mb-4">
-                    <Tag className="w-4 h-4 text-rose-500" />
-                    <h2 className="font-serif font-bold text-gray-900 text-base">
-                      Offers
-                    </h2>
-                  </div>
+                {/* Card 2: Offers (if published) */}
+                {displayOffers.length > 0 && (
+                  <div className="bg-white rounded-3xl p-5 sm:p-6 shadow-xs border border-gray-100">
+                    <div className="flex items-center gap-2 mb-4">
+                      <Tag className="w-4 h-4 text-rose-500" />
+                      <h2 className="font-serif font-bold text-gray-900 text-base">
+                        Offers
+                      </h2>
+                    </div>
 
-                  <div className="space-y-3">
-                    {displayOffers.map((offer) => (
-                      <div
-                        key={offer.id}
-                        className="bg-[#FFF9F6] border border-[#FFE7DE] rounded-2xl p-4 transition-all"
-                      >
-                        <div className="inline-block px-2 py-0.5 rounded-full bg-rose-50 border border-rose-200/60 text-[10px] font-bold text-rose-600 mb-1.5">
-                          {offer.discountPercent || 45}% off
-                        </div>
-
-                        <h3 className="text-sm font-bold text-gray-900">
-                          {offer.title || 'Mega Laser Deal'}
-                        </h3>
-
-                        {offer.offerPrice && (
-                          <div className="mt-2 flex items-baseline gap-2">
-                            <span className="text-sm font-bold text-[#0d281e]">AED {offer.offerPrice}</span>
-                            {offer.normalPrice && (
-                              <span className="text-xs text-gray-400 line-through">AED {offer.normalPrice}</span>
-                            )}
+                    <div className="space-y-3">
+                      {displayOffers.map((offer) => (
+                        <div
+                          key={offer.id}
+                          className="bg-[#FFF9F6] border border-[#FFE7DE] rounded-2xl p-4 transition-all"
+                        >
+                          <div className="inline-block px-2 py-0.5 rounded-full bg-rose-50 border border-rose-200/60 text-[10px] font-bold text-rose-600 mb-1.5">
+                            {offer.discountPercent || 45}% off
                           </div>
-                        )}
-                      </div>
-                    ))}
+
+                          <h3 className="text-sm font-bold text-gray-900">
+                            {offer.title || 'Special Promotion'}
+                          </h3>
+
+                          {offer.offerPrice && (
+                            <div className="mt-2 flex items-baseline gap-2">
+                              <span className="text-sm font-bold text-[#0d281e]">AED {offer.offerPrice}</span>
+                              {offer.normalPrice && (
+                                <span className="text-xs text-gray-400 line-through">AED {offer.normalPrice}</span>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                </div>
+                )}
 
               </div>
 

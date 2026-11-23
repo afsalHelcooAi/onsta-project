@@ -15,6 +15,14 @@ import { evaluateRuleEngine } from '../data/rules';
 import { loginAccount } from '../api/accountApi';
 import { fetchClinicProfile } from '../api/clinicProfileApi';
 import { fetchDoctors } from '../api/doctorApi';
+import {
+  fetchServices,
+  createService as apiCreateService,
+  batchCreateServices as apiBatchCreateServices,
+  updateService as apiUpdateService,
+  deleteService as apiDeleteService,
+  toggleServiceStatus as apiToggleServiceStatus
+} from '../api/serviceApi';
 
 const ClinicContext = createContext(null);
 
@@ -62,8 +70,24 @@ export function ClinicProvider({ children }) {
 
   const [documents, setDocuments] = useState(() => loadState('documents', INITIAL_DOCUMENTS));
   const [medicalDirector, setMedicalDirector] = useState(() => loadState('medicalDirector', INITIAL_MEDICAL_DIRECTOR));
-  const [services, setServices] = useState(() => loadState('services', INITIAL_SERVICES));
-  const [offers, setOffers] = useState(() => loadState('offers', INITIAL_OFFERS));
+  const [services, setServices] = useState(() => {
+    const loaded = loadState('services', INITIAL_SERVICES);
+    if (Array.isArray(loaded)) {
+      return loaded.filter((s) =>
+        !s.id?.startsWith('SRV-0') &&
+        !s.name?.includes('Profhilo Face & Neck') &&
+        !s.name?.includes('Morpheus8 RF')
+      );
+    }
+    return [];
+  });
+  const [offers, setOffers] = useState(() => {
+    const loaded = loadState('offers', INITIAL_OFFERS);
+    if (Array.isArray(loaded)) {
+      return loaded.filter((o) => !o.id?.startsWith('OFF-0'));
+    }
+    return [];
+  });
   const [doctors, setDoctors] = useState(() => {
     const loaded = loadState('doctors', INITIAL_DOCTORS);
     if (Array.isArray(loaded)) {
@@ -108,6 +132,9 @@ export function ClinicProvider({ children }) {
             fetchDoctors(token).then((docs) => {
               setDoctors(docs || []);
             }).catch(() => {});
+            fetchServices(token).then((srvs) => {
+              setServices(srvs || []);
+            }).catch(() => {});
           }
         } else if (session.user?.workspace === 'CLINIC') {
           applyClinicIdentity(session.clinic);
@@ -119,6 +146,9 @@ export function ClinicProvider({ children }) {
           }).catch(() => {});
           fetchDoctors(token).then((docs) => {
             setDoctors(docs || []);
+          }).catch(() => {});
+          fetchServices(token).then((srvs) => {
+            setServices(srvs || []);
           }).catch(() => {});
         }
       })
@@ -350,7 +380,35 @@ export function ClinicProvider({ children }) {
   };
 
   // SERVICES CRUD
-  const addService = (serviceData) => {
+  const addService = async (serviceData) => {
+    const token = localStorage.getItem('onsta_access_token');
+    if (token) {
+      try {
+        const created = await apiCreateService(serviceData, token);
+        const newService = {
+          id: created.id,
+          name: created.name,
+          category: created.category,
+          description: serviceData.description || '',
+          duration: created.duration,
+          normalPrice: created.normalPrice,
+          offerPrice: created.offerPrice,
+          applicableSpecialty: created.applicableSpecialty || created.category,
+          scopeRequired: created.scopeRequired,
+          isActive: created.isActive,
+          verificationStatus: "VERIFIED",
+          rulesPassed: 8,
+          lastUpdated: new Date().toISOString().split('T')[0]
+        };
+        setServices(prev => [newService, ...prev]);
+        showToast("success", "Service Added", `"${newService.name}" saved to catalogue.`);
+        return { success: true, service: newService };
+      } catch (err) {
+        showToast("error", "Failed to Add Service", err.message);
+        return { success: false, error: err.message };
+      }
+    }
+
     const newService = {
       ...serviceData,
       id: `SRV-${Date.now()}`,
@@ -364,9 +422,23 @@ export function ClinicProvider({ children }) {
     });
   };
 
-  const updateService = (id, updatedFields) => {
+  const updateService = async (id, updatedFields) => {
     const target = services.find(s => s.id === id);
     if (!target) return { success: false };
+
+    const token = localStorage.getItem('onsta_access_token');
+    if (token) {
+      try {
+        await apiUpdateService(id, updatedFields, token);
+        const merged = { ...target, ...updatedFields, lastUpdated: new Date().toISOString().split('T')[0] };
+        setServices(prev => prev.map(s => s.id === id ? merged : s));
+        showToast("success", "Service Updated", "Changes saved to catalogue.");
+        return { success: true };
+      } catch (err) {
+        showToast("error", "Update Failed", err.message);
+        return { success: false, error: err.message };
+      }
+    }
 
     const merged = { ...target, ...updatedFields, lastUpdated: new Date().toISOString().split('T')[0] };
 
@@ -375,18 +447,38 @@ export function ClinicProvider({ children }) {
     });
   };
 
-  const deleteService = (id) => {
+  const deleteService = async (id) => {
     const target = services.find(s => s.id === id);
+    const token = localStorage.getItem('onsta_access_token');
+    if (token) {
+      try {
+        await apiDeleteService(id, token);
+      } catch (err) {
+        console.error("Delete service API error:", err);
+      }
+    }
     setServices(prev => prev.filter(s => s.id !== id));
     setOffers(prev => prev.filter(o => o.linkedServiceId !== id));
     showToast("info", "Service Deleted", `"${target?.name}" removed from service directory.`);
     return true;
   };
 
-  const toggleServiceActive = (id) => {
+  const toggleServiceActive = async (id) => {
+    const target = services.find(s => s.id === id);
+    if (!target) return;
+    const nextState = !target.isActive;
+
+    const token = localStorage.getItem('onsta_access_token');
+    if (token) {
+      try {
+        await apiToggleServiceStatus(id, nextState, token);
+      } catch (err) {
+        console.error("Toggle service API error:", err);
+      }
+    }
+
     setServices(prev => prev.map(s => {
       if (s.id === id) {
-        const nextState = !s.isActive;
         logVerification(
           s.name,
           "Service Status",
@@ -401,7 +493,25 @@ export function ClinicProvider({ children }) {
     }));
   };
 
-  const batchAddServices = (servicesList) => {
+  const batchAddServices = async (servicesList) => {
+    const token = localStorage.getItem('onsta_access_token');
+    if (token) {
+      try {
+        const res = await apiBatchCreateServices(servicesList, token);
+        const fresh = await fetchServices(token);
+        if (fresh && fresh.length > 0) {
+          setServices(fresh);
+        } else {
+          setServices(prev => [...(res.items || []), ...prev]);
+        }
+        showToast("success", "Services Imported", `Successfully imported ${res.createdCount} services into catalogue.`);
+        return true;
+      } catch (err) {
+        showToast("error", "Import Failed", err.message);
+        return false;
+      }
+    }
+
     const formatted = servicesList.map((srv, idx) => ({
       id: `SRV-${Date.now()}-${idx}`,
       name: srv.name,
