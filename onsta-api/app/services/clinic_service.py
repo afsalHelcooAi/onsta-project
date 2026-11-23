@@ -36,10 +36,34 @@ class ClinicService:
     async def _get_or_create(self, session: AsyncSession, clinic_id: str) -> ClinicApplication:
         clinic = await session.get(ClinicApplication, clinic_id)
         if clinic is None:
-            clinic = ClinicApplication(clinic_id=clinic_id, status=ClinicStatus.DRAFT.value)
+            clinic = ClinicApplication(
+                clinic_id=clinic_id,
+                status=ClinicStatus.DRAFT.value,
+                legal_name="Pending Legal Entity",
+                display_name="Pending Clinic",
+                facility_type="Medical Clinic",
+                company_email="pending@onsta.health",
+                contact_phone="+971500000000",
+                contact_name="Authorized Representative",
+                emirate="Dubai",
+                city_area="Dubai",
+                street_building="Pending Address"
+            )
             session.add(clinic)
             await session.flush()
         return clinic
+
+    async def get_or_create_clinic(self, clinic_id: str) -> ClinicApplication:
+        async with SessionLocal() as session:
+            async with session.begin():
+                return await self._get_or_create(session, clinic_id)
+
+    async def set_clinic_status(self, clinic_id: str, new_status: ClinicStatus):
+        async with SessionLocal() as session:
+            async with session.begin():
+                clinic = await self._get_or_create(session, clinic_id)
+                clinic.status = new_status.value
+                clinic.application_status = new_status.value
 
     async def create_invitation(self, req: ClinicInvitationCreateRequest, created_by: str = "platform-admin") -> tuple[ClinicInvitation, str]:
         raw_token = secrets.token_urlsafe(32)

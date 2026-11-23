@@ -44,9 +44,9 @@ export default function Tab4AdvertisingServices({ onNext, onBack, onSaveDraft })
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div className="lg:col-span-2 bg-white rounded-2xl border border-[#e7e1d7] p-6 sm:p-8 shadow-sm space-y-8">
         <div>
-          <h3 className="text-xl font-serif font-bold text-gray-900">Advertising and services</h3>
+          <h3 className="text-xl font-serif font-bold text-gray-900">MOHAP Healthcare Advertising Permit & Services</h3>
           <p className="text-xs text-gray-500 mt-1">
-            Declare your MOHAP advertising permit and specify which clinical treatments you provide under your licensed scope.
+            Declare your MOHAP (Ministry of Health and Prevention) advertising permit and specify which clinical treatments you provide under your licensed scope.
           </p>
         </div>
 

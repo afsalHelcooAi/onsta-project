@@ -86,6 +86,9 @@ export function ClinicProvider({ children }) {
       .then((session) => {
         setAuth({ isAuthenticated: true, user: session.user, application: session.application, tenantId: session.tenant_id, clinic: session.clinic });
         if (session.application) {
+          if (session.application.id) {
+            localStorage.setItem('onsta_application_id', session.application.id);
+          }
           setClinicData((current) => ({ ...current, id: session.application.id, status: session.application.application_status.toLowerCase() }));
         } else if (session.user.workspace === 'CLINIC') applyClinicIdentity(session.clinic);
       })
@@ -116,11 +119,23 @@ export function ClinicProvider({ children }) {
   const login = async (email, password) => {
     const session = await loginAccount(email, password);
     localStorage.setItem('onsta_access_token', session.access_token);
+    if (session.application?.id) {
+      localStorage.setItem('onsta_application_id', session.application.id);
+    }
     const nextAuth = { isAuthenticated: true, user: session.user, application: session.application, tenantId: session.tenant_id, clinic: session.clinic };
     setAuth(nextAuth);
     if (session.application) applyClinicIdentity(null, session.application.application_status);
     else if (session.clinic) applyClinicIdentity(session.clinic);
-    showToast('success', 'Signed in', session.application ? `Application status: ${session.application.application_status}` : 'Your clinic workspace is ready.');
+
+    const appStatus = session.application?.application_status;
+    const reason = session.application?.rejection_reason || session.application?.review_notes;
+    if (appStatus === 'REJECTED') {
+      showToast('error', 'Application Rejected', reason ? `Reason: ${reason}` : 'Your application was rejected by the Super Admin.');
+    } else if (appStatus === 'ADDITIONAL_INFO_REQUESTED') {
+      showToast('warning', 'Modifications Requested', reason ? `Note: ${reason}` : 'The Super Admin requested updates to your application.');
+    } else {
+      showToast('success', 'Signed in', session.application ? `Application status: ${session.application.application_status}` : 'Your clinic workspace is ready.');
+    }
     return session;
   };
 

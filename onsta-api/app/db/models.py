@@ -1,7 +1,7 @@
 import uuid
 from datetime import date, datetime
 
-from sqlalchemy import Boolean, CheckConstraint, Date, DateTime, ForeignKey, Integer, JSON, Numeric, String, Text, UniqueConstraint, func
+from sqlalchemy import Boolean, CheckConstraint, Date, DateTime, ForeignKey, Integer, JSON, Numeric, String, Text, UniqueConstraint, func, UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.database import Base
@@ -18,7 +18,7 @@ def new_application_reference() -> str:
 class ClinicInvitation(Base):
     __tablename__ = "clinic_invitations"
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=new_id)
     clinic_name: Mapped[str] = mapped_column(String(200), nullable=False)
     contact_name: Mapped[str | None] = mapped_column(String(180))
     email: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
@@ -41,7 +41,7 @@ class ClinicInvitation(Base):
 class DocumentType(Base):
     __tablename__ = "document_types"
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=new_id)
     code: Mapped[str] = mapped_column(String(60), nullable=False, unique=True)
     name: Mapped[str] = mapped_column(String(160), nullable=False)
     scope: Mapped[str] = mapped_column(String(24), nullable=False, default="APPLICATION")
@@ -55,7 +55,7 @@ class FacilityDocumentRequirement(Base):
         CheckConstraint("valid_until IS NULL OR valid_until >= valid_from", name="ck_document_requirement_dates"),
     )
 
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
+    id: Mapped[str] = mapped_column(UUID(as_uuid=False), primary_key=True, default=new_id)
     emirate: Mapped[str] = mapped_column(String(60), nullable=False)
     authority: Mapped[str] = mapped_column(String(100), nullable=False)
     facility_type: Mapped[str] = mapped_column(String(100), nullable=False)
@@ -69,19 +69,26 @@ class FacilityDocumentRequirement(Base):
 class ClinicApplication(Base):
     __tablename__ = "clinic_applications"
 
-    # clinic_id is retained as the existing API key for compatibility; it identifies the application until approval.
-    clinic_id: Mapped[str] = mapped_column(String(80), primary_key=True, default=new_id)
+    # clinic_id is retained as the existing API attribute; maps to database column 'id'
+    clinic_id: Mapped[str] = mapped_column("id", UUID(as_uuid=False), primary_key=True, default=new_id)
     application_reference: Mapped[str] = mapped_column(String(40), nullable=False, unique=True, default=new_application_reference)
     invitation_id: Mapped[str | None] = mapped_column(ForeignKey("clinic_invitations.id", ondelete="SET NULL"), index=True)
     source: Mapped[str] = mapped_column(String(32), nullable=False, default="PUBLIC_PAGE")
     application_status: Mapped[str] = mapped_column(String(32), nullable=False, default="DRAFT", index=True)
-    status: Mapped[str] = mapped_column(String(32), nullable=False, default="DRAFT", index=True)  # legacy API alias
-    legal_name: Mapped[str | None] = mapped_column(String(255))
-    display_name: Mapped[str | None] = mapped_column(String(255))
-    contact_phone: Mapped[str | None] = mapped_column(String(40))
-    company_email: Mapped[str | None] = mapped_column(String(255), index=True)
-    contact_name: Mapped[str | None] = mapped_column(String(180))
-    contact_title: Mapped[str | None] = mapped_column(String(120))
+    legal_name: Mapped[str | None] = mapped_column("legal_entity_name", String(255))
+    display_name: Mapped[str | None] = mapped_column("trading_name", String(255))
+    contact_phone: Mapped[str | None] = mapped_column("main_phone", String(40))
+    company_email: Mapped[str | None] = mapped_column("official_email", String(255), index=True)
+    contact_name: Mapped[str | None] = mapped_column("contact_person_name", String(180))
+    contact_title: Mapped[str | None] = mapped_column("contact_person_title", String(120))
+
+    @property
+    def status(self) -> str:
+        return self.application_status
+
+    @status.setter
+    def status(self, val: str):
+        self.application_status = val
     facility_type: Mapped[str | None] = mapped_column(String(100))
     company_registration_number: Mapped[str | None] = mapped_column(String(100))
     trade_license_number: Mapped[str | None] = mapped_column(String(100))
@@ -102,9 +109,16 @@ class ClinicApplication(Base):
     authorized_representative_name: Mapped[str | None] = mapped_column(String(180))
     representative_email: Mapped[str | None] = mapped_column(String(255))
     representative_phone: Mapped[str | None] = mapped_column(String(40))
-    assigned_reviewer: Mapped[str | None] = mapped_column(String(180))
-    is_approved: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False)
-    extracted_data: Mapped[dict | None] = mapped_column(JSON)
+    assigned_reviewer_id: Mapped[str | None] = mapped_column(UUID(as_uuid=False), nullable=True)
+
+    @property
+    def is_approved(self) -> bool:
+        return self.application_status == "APPROVED"
+
+    @is_approved.setter
+    def is_approved(self, value: bool) -> None:
+        if value:
+            self.application_status = "APPROVED"
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
     submitted_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True))
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False)
@@ -122,7 +136,7 @@ class ClinicApplicationDocument(Base):
     __table_args__ = (UniqueConstraint("clinic_id", "document_type", "version", name="uq_application_document_version"),)
 
     document_id: Mapped[str] = mapped_column(String(80), primary_key=True)
-    clinic_id: Mapped[str] = mapped_column(ForeignKey("clinic_applications.clinic_id", ondelete="CASCADE"), nullable=False, index=True)
+    clinic_id: Mapped[str] = mapped_column(ForeignKey("clinic_applications.id", ondelete="CASCADE"), nullable=False, index=True)
     document_type: Mapped[str] = mapped_column(ForeignKey("document_types.code", ondelete="RESTRICT"), nullable=False)
     file_name: Mapped[str] = mapped_column(String(255), nullable=False)
     storage_key: Mapped[str] = mapped_column(Text, nullable=False)
@@ -143,7 +157,7 @@ class AIScanJob(Base):
     __tablename__ = "ai_scan_jobs"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
-    clinic_id: Mapped[str] = mapped_column(ForeignKey("clinic_applications.clinic_id", ondelete="CASCADE"), nullable=False, index=True)
+    clinic_id: Mapped[str] = mapped_column(ForeignKey("clinic_applications.id", ondelete="CASCADE"), nullable=False, index=True)
     provider: Mapped[str] = mapped_column(String(80), nullable=False, default="local")
     model_name: Mapped[str | None] = mapped_column(String(120))
     status: Mapped[str] = mapped_column(String(24), nullable=False, default="QUEUED")
@@ -181,7 +195,7 @@ class ClinicApplicationReview(Base):
     __tablename__ = "clinic_application_reviews"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
-    clinic_id: Mapped[str] = mapped_column(ForeignKey("clinic_applications.clinic_id", ondelete="CASCADE"), nullable=False, index=True)
+    clinic_id: Mapped[str] = mapped_column(ForeignKey("clinic_applications.id", ondelete="CASCADE"), nullable=False, index=True)
     reviewer: Mapped[str | None] = mapped_column(String(180))
     decision: Mapped[str] = mapped_column(String(32), nullable=False)
     review_notes: Mapped[str | None] = mapped_column(Text)
@@ -197,7 +211,7 @@ class ClinicApplicationInfoRequest(Base):
     __tablename__ = "clinic_application_info_requests"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
-    clinic_id: Mapped[str] = mapped_column(ForeignKey("clinic_applications.clinic_id", ondelete="CASCADE"), nullable=False, index=True)
+    clinic_id: Mapped[str] = mapped_column(ForeignKey("clinic_applications.id", ondelete="CASCADE"), nullable=False, index=True)
     requested_by: Mapped[str | None] = mapped_column(String(180))
     requested_fields: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
     request_message: Mapped[str] = mapped_column(Text, nullable=False)
@@ -213,7 +227,7 @@ class ApplicationHistory(Base):
     __tablename__ = "application_history"
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True, default=new_id)
-    clinic_id: Mapped[str] = mapped_column(ForeignKey("clinic_applications.clinic_id", ondelete="CASCADE"), nullable=False, index=True)
+    clinic_id: Mapped[str] = mapped_column(ForeignKey("clinic_applications.id", ondelete="CASCADE"), nullable=False, index=True)
     old_status: Mapped[str | None] = mapped_column(String(32))
     new_status: Mapped[str] = mapped_column(String(32), nullable=False)
     reason: Mapped[str | None] = mapped_column(Text)
