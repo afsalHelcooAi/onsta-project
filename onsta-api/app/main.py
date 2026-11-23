@@ -19,12 +19,15 @@ async def lifespan(_app: FastAPI):
             WHERE table_schema = 'public' AND table_type = 'BASE TABLE'
         """))
         present = set(rows.scalars().all())
-    required = {"users", "roles", "user_roles", "clinic_applications", "clinic_application_documents", "clinic_memberships"}
+    required = {
+        "users", "roles", "permissions", "role_permissions", "user_roles",
+        "clinic_applications", "clinic_application_documents", "clinic_memberships",
+    }
     missing = sorted(required - present)
     if missing:
         raise RuntimeError(
-            "The new standalone database schema is not installed. Run "
-            "app/db/standalone_schema.sql against onsta_platform_db. Missing tables: "
+            "The required database schema is incomplete. For a new empty database, run "
+            "app/db/standalone_schema.sql. Missing tables: "
             + ", ".join(missing)
         )
     yield

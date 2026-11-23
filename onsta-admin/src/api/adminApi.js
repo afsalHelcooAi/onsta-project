@@ -30,6 +30,51 @@ export async function fetchClinicDetail(clinicId) {
   return res.json();
 }
 
+export async function fetchRegisteredClinics({ search = '', emirate = '', tenantStatus = '', limit = 25, offset = 0 } = {}) {
+  const params = new URLSearchParams({ limit: String(limit), offset: String(offset) });
+  if (search.trim()) params.set('search', search.trim());
+  if (emirate) params.set('emirate', emirate);
+  if (tenantStatus) params.set('tenant_status', tenantStatus);
+  const res = await fetch(`${API_BASE}/clinics?${params.toString()}`, { headers: authHeaders() });
+  if (!res.ok) {
+    throw new Error(`Failed to fetch registered clinics: ${res.statusText}`);
+  }
+  return res.json();
+}
+
+export async function fetchRegisteredClinicDetail(clinicId) {
+  const res = await fetch(`${API_BASE}/clinics/${encodeURIComponent(clinicId)}`, { headers: authHeaders() });
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error.detail || `Failed to fetch clinic details: ${res.statusText}`);
+  }
+  return res.json();
+}
+
+export async function fetchUserRoles() {
+  const res = await fetch(`${API_BASE}/users/roles`, { headers: authHeaders() });
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error.detail || `Failed to fetch user roles (${res.status})`);
+  }
+  return res.json();
+}
+
+export async function fetchUsers({ search = '', accountType = '', status = '', role = '', clinic = '', limit = 25, offset = 0 } = {}) {
+  const params = new URLSearchParams({ limit: String(limit), offset: String(offset) });
+  if (search.trim()) params.set('search', search.trim());
+  if (accountType) params.set('account_type', accountType);
+  if (status) params.set('status', status);
+  if (role) params.set('role', role);
+  if (clinic.trim()) params.set('clinic', clinic.trim());
+  const res = await fetch(`${API_BASE}/users?${params.toString()}`, { headers: authHeaders() });
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error.detail || `Failed to fetch users (${res.status})`);
+  }
+  return res.json();
+}
+
 export async function downloadApplicationDocument(applicationId, documentId, fileName) {
   const res = await fetch(`${API_BASE}/applications/${encodeURIComponent(applicationId)}/documents/${encodeURIComponent(documentId)}`, { headers: authHeaders() });
   if (!res.ok) {

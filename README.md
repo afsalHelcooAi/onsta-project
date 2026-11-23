@@ -12,7 +12,7 @@ onsta-project/
 │   └── Clinic registration wizard, 3-doc AI ingestion, doctors, services, offers, leads, compliance.
 │
 ├── onsta-admin/     → Port 3001 (Owner: Software Admin Lead)
-│   └── Admin operations, compliance review queue, 1-click clinic verification, audit trail.
+│   └── Admin operations, clinic review queue, approved clinic directory, and all-users directory.
 │
 ├── onsta-api/       → Port 8000 (Shared Backend)
 │   └── FastAPI server, state machine, AI document parser (Gemini 2.0 Flash), PostgreSQL / Redis.
@@ -73,6 +73,7 @@ npm run dev
 3. The API stores the application as `SUBMITTED`. The clinic can sign in at `http://localhost:3000/login` to see its status; its operational dashboard remains locked.
 4. The Super Admin reviews the submitted clinic and documents in the review queue, then approves, rejects, or requests more information.
 5. Approval creates the clinic tenant and owner membership. On the clinic user's next sign-in, the API recognizes its membership and opens the Clinic Dashboard.
+6. The **All Users** directory lists platform and clinic accounts, with filters for account type, status, role, and clinic. Platform administration remains Super-Admin-only.
 
 The role is resolved by the API from the account's assignments; neither sign-in form asks the user to choose a role. See [onsta-api/README.md](onsta-api/README.md) for database and setup details. Do not run `onsta-api/app/db/step4_onboarding.sql` against the new full schema; it is only for the older starter database.
 

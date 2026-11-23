@@ -43,8 +43,7 @@ async def main() -> None:
         user = (await conn.execute(text("""
             INSERT INTO users(email, password_hash, full_name, status)
             VALUES (:email, :password_hash, :full_name, 'ACTIVE')
-            ON CONFLICT(email_normalized) DO UPDATE SET password_hash = EXCLUDED.password_hash,
-                full_name = EXCLUDED.full_name, status = 'ACTIVE', updated_at = now()
+            ON CONFLICT(email_normalized) DO UPDATE SET email = users.email
             RETURNING id::text AS id
         """), {"email": settings.SUPER_ADMIN_EMAIL.strip(), "password_hash": hash_password(settings.SUPER_ADMIN_PASSWORD), "full_name": settings.SUPER_ADMIN_NAME})).mappings().one()
         role_id = (await conn.execute(text("SELECT id::text FROM roles WHERE name = 'SUPER_ADMIN' AND scope = 'PLATFORM'"))).scalar_one()

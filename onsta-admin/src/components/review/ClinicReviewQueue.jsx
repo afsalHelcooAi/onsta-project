@@ -254,7 +254,6 @@ export default function ClinicReviewQueue() {
                   </p>
                 </div>
 
-                {/* Action Buttons */}
                 <div className="flex items-center gap-2">
                   <button
                     disabled={actionInProgress || selectedClinic.status === 'APPROVED'}
