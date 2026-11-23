@@ -21,7 +21,7 @@ export default function Sidebar({ onOpenPreview }) {
 
   const navItems = [
     { name: 'Overview', path: '/dashboard/overview', icon: LayoutDashboard },
-    { name: 'Clinic profile & media', path: '/dashboard/profile', icon: Building2 },
+    { name: 'Clinic profile', path: '/dashboard/profile', icon: Building2 },
     { name: 'Doctors', path: '/dashboard/doctors', icon: UserCheck },
     { name: 'Services & prices', path: '/dashboard/services', icon: Stethoscope },
     { name: 'Offers', path: '/dashboard/offers', icon: Tag },
