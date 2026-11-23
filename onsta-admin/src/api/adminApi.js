@@ -75,13 +75,33 @@ export async function fetchUsers({ search = '', accountType = '', status = '', r
   return res.json();
 }
 
+export async function fetchComplianceAudit({ search = '', emirate = '', complianceFilter = 'ALL', limit = 25, offset = 0 } = {}) {
+  const params = new URLSearchParams({ limit: String(limit), offset: String(offset) });
+  if (search.trim()) params.set('search', search.trim());
+  if (emirate) params.set('emirate', emirate);
+  if (complianceFilter && complianceFilter !== 'ALL') params.set('compliance_filter', complianceFilter);
+  const res = await fetch(`${API_BASE}/compliance?${params.toString()}`, { headers: authHeaders() });
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error.detail || `Failed to fetch compliance data (${res.status})`);
+  }
+  return res.json();
+}
+
 export async function fetchAdminOverview() {
-  const res = await fetch(`${API_BASE}/overview`, { headers: authHeaders() });
+  const [res, expiringLicenses] = await Promise.all([
+    fetch(`${API_BASE}/overview`, { headers: authHeaders() }),
+    fetchComplianceAudit({ complianceFilter: 'EXPIRING_30', limit: 5 }),
+  ]);
   if (!res.ok) {
     const error = await res.json().catch(() => ({}));
     throw new Error(error.detail || `Failed to fetch platform overview (${res.status})`);
   }
-  return res.json();
+  return {
+    ...(await res.json()),
+    expiring_licenses: expiringLicenses.items,
+    expiring_licenses_total: expiringLicenses.total,
+  };
 }
 
 export async function updateUserStatus(userId, status, reason) {
