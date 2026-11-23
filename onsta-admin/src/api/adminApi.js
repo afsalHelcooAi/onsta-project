@@ -88,6 +88,19 @@ export async function fetchComplianceAudit({ search = '', emirate = '', complian
   return res.json();
 }
 
+export async function fetchAuditLogs({ search = '', action = '', entityType = '', limit = 25, offset = 0 } = {}) {
+  const params = new URLSearchParams({ limit: String(limit), offset: String(offset) });
+  if (search.trim()) params.set('search', search.trim());
+  if (action && action !== 'ALL') params.set('action', action);
+  if (entityType && entityType !== 'ALL') params.set('entity_type', entityType);
+  const res = await fetch(`${API_BASE}/audit-logs?${params.toString()}`, { headers: authHeaders() });
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error.detail || `Failed to fetch audit logs (${res.status})`);
+  }
+  return res.json();
+}
+
 export async function fetchAdminOverview() {
   const [res, expiringLicenses] = await Promise.all([
     fetch(`${API_BASE}/overview`, { headers: authHeaders() }),

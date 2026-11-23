@@ -4,7 +4,7 @@ import {
   Building2,
   FileCheck,
   UserRound,
-  Settings,
+  ScrollText,
   LayoutDashboard,
   LogOut,
   Sparkles
@@ -17,7 +17,7 @@ export default function AdminSidebar({ activeTab, setActiveTab, pendingCount = 0
     { id: 'all-clinics', label: 'Registered Clinics', icon: Building2 },
     { id: 'compliance-audit', label: 'Compliance & Permits', icon: FileCheck },
     { id: 'all-users', label: 'All Users', icon: UserRound },
-    { id: 'settings', label: 'Platform Settings', icon: Settings },
+    { id: 'audit-logs', label: 'Audit Logs', icon: ScrollText },
   ];
 
   return (

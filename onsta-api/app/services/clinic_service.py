@@ -65,6 +65,11 @@ class ClinicService:
                 clinic.status = new_status.value
                 clinic.application_status = new_status.value
 
+    async def get_or_create_clinic(self, clinic_id: str) -> ClinicApplication:
+        async with SessionLocal() as session:
+            async with session.begin():
+                return await self._get_or_create(session, clinic_id)
+
     async def create_invitation(self, req: ClinicInvitationCreateRequest, created_by: str = "platform-admin") -> tuple[ClinicInvitation, str]:
         raw_token = secrets.token_urlsafe(32)
         invitation = ClinicInvitation(
