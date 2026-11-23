@@ -14,6 +14,7 @@ import {
 import { evaluateRuleEngine } from '../data/rules';
 import { loginAccount } from '../api/accountApi';
 import { fetchClinicProfile } from '../api/clinicProfileApi';
+import { fetchDoctors } from '../api/doctorApi';
 
 const ClinicContext = createContext(null);
 
@@ -63,7 +64,13 @@ export function ClinicProvider({ children }) {
   const [medicalDirector, setMedicalDirector] = useState(() => loadState('medicalDirector', INITIAL_MEDICAL_DIRECTOR));
   const [services, setServices] = useState(() => loadState('services', INITIAL_SERVICES));
   const [offers, setOffers] = useState(() => loadState('offers', INITIAL_OFFERS));
-  const [doctors, setDoctors] = useState(() => loadState('doctors', INITIAL_DOCTORS));
+  const [doctors, setDoctors] = useState(() => {
+    const loaded = loadState('doctors', INITIAL_DOCTORS);
+    if (Array.isArray(loaded)) {
+      return loaded.filter((d) => !d.id?.startsWith('DOC-0'));
+    }
+    return [];
+  });
   const [enquiries, setEnquiries] = useState(() => loadState('enquiries', INITIAL_ENQUIRIES));
   const [gallery, setGallery] = useState(() => loadState('gallery', INITIAL_GALLERY));
   const [verificationHistory, setVerificationHistory] = useState(() => loadState('history', INITIAL_VERIFICATION_HISTORY));
@@ -98,6 +105,9 @@ export function ClinicProvider({ children }) {
                 setGallery(profile.gallery);
               }
             }).catch(() => {});
+            fetchDoctors(token).then((docs) => {
+              setDoctors(docs || []);
+            }).catch(() => {});
           }
         } else if (session.user?.workspace === 'CLINIC') {
           applyClinicIdentity(session.clinic);
@@ -106,6 +116,9 @@ export function ClinicProvider({ children }) {
             if (profile.gallery && profile.gallery.length > 0) {
               setGallery(profile.gallery);
             }
+          }).catch(() => {});
+          fetchDoctors(token).then((docs) => {
+            setDoctors(docs || []);
           }).catch(() => {});
         }
       })
@@ -624,6 +637,7 @@ export function ClinicProvider({ children }) {
         services,
         offers,
         doctors,
+        setDoctors,
         enquiries,
         gallery,
         verificationHistory,

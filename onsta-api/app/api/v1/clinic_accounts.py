@@ -15,6 +15,7 @@ from app.api.v1.auth import Actor, get_current_actor
 from app.config import settings
 from app.core.security import create_access_token, hash_password
 from app.db.database import SessionLocal
+from app.services.document_verifier import classify_document as verifier_classify
 
 router = APIRouter(prefix="/registration", tags=["Clinic Registration"])
 MAX_FILE_SIZE = 15 * 1024 * 1024
@@ -31,9 +32,18 @@ def _extract_text(content: bytes, mime_type: str) -> str:
     except ImportError as exc:
         raise HTTPException(status_code=503, detail="OCR dependencies are missing. Install requirements.txt to analyze clinic documents.") from exc
     import os
-    tesseract_cmd = os.getenv("TESSERACT_CMD")
-    if tesseract_cmd:
-        pytesseract.pytesseract.tesseract_cmd = tesseract_cmd
+    import shutil
+    candidates = [
+        os.getenv("TESSERACT_CMD"),
+        r"C:\Program Files\Tesseract-OCR\tesseract.exe",
+        r"C:\Program Files (x86)\Tesseract-OCR\tesseract.exe",
+        os.path.expanduser(r"~\AppData\Local\Programs\Tesseract-OCR\tesseract.exe"),
+        shutil.which("tesseract"),
+    ]
+    for c in candidates:
+        if c and os.path.exists(c):
+            pytesseract.pytesseract.tesseract_cmd = c
+            break
     try:
         if mime_type == "application/pdf":
             pdf = fitz.open(stream=content, filetype="pdf")
@@ -57,19 +67,8 @@ def _label_value(text_value: str, labels: str) -> str | None:
 
 
 def _classify_document(text_value: str) -> str | None:
-    t = text_value.lower()
-    if re.search(r"advert(?:isement|ising)|medical\s+advert|healthcare\s+advert", t):
-        return "MOHAP_ADVERTISING"
-    # Check FACILITY_LICENSE before TRADE_LICENSE because healthcare facility licenses cite linked trade licenses
-    if re.search(r"facility\s+licen[cs]e|health(?:care)?\s+facility|health\s+licen[cs]e|medical\s+licen[cs]e|dha\s+licen[cs]e|doh\s+licen[cs]e|clinical\s+licen[cs]e", t):
-        return "FACILITY_LICENSE"
-    if re.search(r"trade licen[cs]e|commercial licen[cs]e|economic licen[cs]e|business licen[cs]e|professional licen[cs]e|commercial\s+register", t):
-        return "TRADE_LICENSE"
-    if re.search(r"health|medical|clinic|healthcare|dha|doh|mohap|facility", t) and re.search(r"licen[cs]e|permit", t):
-        return "FACILITY_LICENSE"
-    if re.search(r"licen[cs]e|department of economic|ded", t):
-        return "TRADE_LICENSE"
-    return None
+    doc_type, confidence, _ = verifier_classify(text_value)
+    return doc_type
 
 
 def _fields_from_text(text_value: str, doc_type: str | None) -> dict:
@@ -152,10 +151,29 @@ async def analyze_registration_documents(
         fields = _fields_from_text(text_value, kind)
         for key, value in fields.items():
             combined.setdefault(key, value)
-        documents.append({"file_index": file_index, "file_name": Path(file.filename or "document").name, "document_type": kind,
-                          "document_label": {"TRADE_LICENSE": "Trade license", "FACILITY_LICENSE": "Healthcare facility license", "MOHAP_ADVERTISING": "MOHAP Healthcare advertising permit"}.get(kind, "Unrecognized document"),
-                          "ocr_status": "TEXT_FOUND" if text_value.strip() else "NO_TEXT_FOUND", "extracted_fields": fields,
-                          "text_preview": text_value[:400]})
+        doc_label = {
+            "TRADE_LICENSE": "Trade license",
+            "FACILITY_LICENSE": "Healthcare facility license",
+            "MOHAP_ADVERTISING": "MOHAP Healthcare advertising permit",
+            "DOCTOR_LICENSE": "Doctor / Practitioner License (Not valid for clinic registration)",
+            "EMIRATES_ID": "Emirates ID card",
+        }.get(kind, "Unrecognized document")
+        warning = None
+        if kind == "DOCTOR_LICENSE":
+            warning = "This file is an individual Doctor / Practitioner License. Clinic registration requires a Commercial Trade License, Healthcare Facility License, and MOHAP Advertising Permit."
+
+        doc_entry = {
+            "file_index": file_index,
+            "file_name": Path(file.filename or "document").name,
+            "document_type": kind,
+            "document_label": doc_label,
+            "ocr_status": "TEXT_FOUND" if text_value.strip() else "NO_TEXT_FOUND",
+            "extracted_fields": fields,
+            "text_preview": text_value[:400]
+        }
+        if warning:
+            doc_entry["warning"] = warning
+        documents.append(doc_entry)
 
     # Check for duplicate license in DB right at parse time
     trade_no = combined.get("trade_license_number")
