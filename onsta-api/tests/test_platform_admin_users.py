@@ -204,6 +204,16 @@ class TestPlatformAdminUsers(unittest.IsolatedAsyncioTestCase):
             ExecuteResult(rows=[{"status": "SUBMITTED", "count": 2}]),
             ExecuteResult(scalar=3),
             ExecuteResult(rows=[{"status": "FAILED", "count": 1}]),
+            ExecuteResult(scalar=5),
+            ExecuteResult(scalar=2),
+            ExecuteResult(scalar=1),
+            ExecuteResult(scalar=1),
+            ExecuteResult(rows=[{
+                "clinic_id": "clinic-1",
+                "trading_name": "Care Clinic",
+                "trade_license_expiry_date": "2026-12-01",
+                "facility_license_expiry_date": "2026-12-15",
+            }]),
         ])
 
         with patch.object(platform_admin, "SessionLocal", return_value=session):
@@ -214,6 +224,12 @@ class TestPlatformAdminUsers(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result["registered_clinics"], 3)
         self.assertEqual(result["ai"]["scan_jobs"], {"FAILED": 1})
         self.assertEqual(result["system_health"]["database"], "HEALTHY")
+        self.assertEqual(result["open_info_requests"], 5)
+        self.assertEqual(result["clinics_awaiting_activation"], 2)
+        self.assertEqual(result["new_clinics_this_month"], 1)
+        self.assertEqual(result["expiring_licenses_total"], 1)
+        self.assertEqual(len(result["expiring_licenses"]), 1)
+        self.assertEqual(result["expiring_licenses"][0]["trading_name"], "Care Clinic")
 
 
 if __name__ == "__main__":

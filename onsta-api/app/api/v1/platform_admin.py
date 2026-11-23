@@ -63,6 +63,55 @@ async def get_platform_overview(actor: Actor = Depends(require_super_admin)):
             FROM ai_scan_jobs
             GROUP BY status
         """), {})).mappings().all()
+        open_info_request_count = (await session.execute(text("""
+            SELECT count(*)::integer
+            FROM clinic_application_info_requests
+            WHERE status = 'OPEN'
+        """), {})).scalar_one()
+        clinics_awaiting_activation = (await session.execute(text("""
+            SELECT count(*)::integer
+            FROM clinics c
+            JOIN tenants t ON t.id = c.tenant_id
+            WHERE t.status = 'PENDING_ACTIVATION'
+        """), {})).scalar_one()
+        new_clinics_this_month = (await session.execute(text("""
+            SELECT count(*)::integer
+            FROM clinics
+            WHERE created_at >= date_trunc('month', now())
+        """), {})).scalar_one()
+        expiring_licenses_total = (await session.execute(text("""
+            SELECT count(*)::integer
+            FROM clinics c
+            JOIN tenants t ON t.id = c.tenant_id
+            JOIN clinic_applications a ON a.id = c.approved_application_id
+            WHERE a.application_status = 'APPROVED'
+              AND (
+                (a.trade_license_expiry_date IS NOT NULL AND a.trade_license_expiry_date <= CURRENT_DATE + INTERVAL '30 days')
+                OR (a.facility_license_expiry_date IS NOT NULL AND a.facility_license_expiry_date <= CURRENT_DATE + INTERVAL '30 days')
+              )
+        """), {})).scalar_one()
+        expiring_licenses_rows = (await session.execute(text("""
+            SELECT
+                c.id::text AS clinic_id,
+                c.trading_name,
+                a.trade_license_expiry_date::text AS trade_license_expiry_date,
+                a.facility_license_expiry_date::text AS facility_license_expiry_date
+            FROM clinics c
+            JOIN tenants t ON t.id = c.tenant_id
+            JOIN clinic_applications a ON a.id = c.approved_application_id
+            WHERE a.application_status = 'APPROVED'
+              AND (
+                (a.trade_license_expiry_date IS NOT NULL AND a.trade_license_expiry_date <= CURRENT_DATE + INTERVAL '30 days')
+                OR (a.facility_license_expiry_date IS NOT NULL AND a.facility_license_expiry_date <= CURRENT_DATE + INTERVAL '30 days')
+              )
+            ORDER BY
+                LEAST(
+                    COALESCE(a.trade_license_expiry_date, '9999-12-31'),
+                    COALESCE(a.facility_license_expiry_date, '9999-12-31')
+                ) ASC,
+                c.trading_name ASC
+            LIMIT 5
+        """), {})).mappings().all()
 
     def status_counts(rows):
         return {row["status"]: row["count"] for row in rows}
@@ -84,6 +133,11 @@ async def get_platform_overview(actor: Actor = Depends(require_super_admin)):
         "users": status_counts(user_status_rows),
         "applications": status_counts(application_status_rows),
         "registered_clinics": clinic_count,
+        "open_info_requests": open_info_request_count,
+        "clinics_awaiting_activation": clinics_awaiting_activation,
+        "new_clinics_this_month": new_clinics_this_month,
+        "expiring_licenses_total": expiring_licenses_total,
+        "expiring_licenses": [dict(r) for r in expiring_licenses_rows],
     }
 
 
@@ -241,6 +295,115 @@ async def list_users(
             ORDER BY u.created_at DESC, u.full_name, u.id
             LIMIT :limit OFFSET :offset
         """), params)).mappings().all()
+    return {"items": [dict(row) for row in rows], "total": total, "limit": limit, "offset": offset}
+
+
+@router.get("/compliance")
+async def list_compliance_audit(
+    search: Optional[str] = Query(None, max_length=200),
+    emirate: Optional[str] = Query(None, max_length=60),
+    compliance_filter: Optional[str] = Query(None, max_length=24),
+    limit: int = Query(25, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+    actor: Actor = Depends(require_super_admin),
+):
+    valid_filters = {None, "ALL", "EXPIRED", "EXPIRING_30", "EXPIRING_90", "COMPLIANT"}
+    normalized_filter = compliance_filter.strip().upper() if compliance_filter and compliance_filter.strip() else None
+    if normalized_filter not in valid_filters:
+        raise HTTPException(status_code=400, detail="Unsupported compliance_filter value.")
+    if normalized_filter == "ALL":
+        normalized_filter = None
+
+    filters = ["a.application_status = 'APPROVED'"]
+    params: dict = {"limit": limit, "offset": offset}
+
+    if search and search.strip():
+        filters.append("""
+            (c.trading_name ILIKE :search OR c.legal_name ILIKE :search
+             OR t.tenant_code ILIKE :search OR a.application_reference ILIKE :search)
+        """)
+        params["search"] = f"%{search.strip()}%"
+
+    if emirate and emirate.strip():
+        filters.append("a.emirate = :emirate")
+        params["emirate"] = emirate.strip()
+
+    if normalized_filter == "EXPIRED":
+        filters.append("""
+            (a.trade_license_expiry_date < CURRENT_DATE
+             OR a.facility_license_expiry_date < CURRENT_DATE)
+        """)
+    elif normalized_filter == "EXPIRING_30":
+        filters.append("""
+            (
+                (a.trade_license_expiry_date >= CURRENT_DATE AND a.trade_license_expiry_date <= CURRENT_DATE + INTERVAL '30 days')
+                OR (a.facility_license_expiry_date >= CURRENT_DATE AND a.facility_license_expiry_date <= CURRENT_DATE + INTERVAL '30 days')
+            )
+            AND (a.trade_license_expiry_date >= CURRENT_DATE OR a.trade_license_expiry_date IS NULL)
+            AND (a.facility_license_expiry_date >= CURRENT_DATE OR a.facility_license_expiry_date IS NULL)
+        """)
+    elif normalized_filter == "EXPIRING_90":
+        filters.append("""
+            (
+                (a.trade_license_expiry_date >= CURRENT_DATE AND a.trade_license_expiry_date <= CURRENT_DATE + INTERVAL '90 days')
+                OR (a.facility_license_expiry_date >= CURRENT_DATE AND a.facility_license_expiry_date <= CURRENT_DATE + INTERVAL '90 days')
+            )
+            AND (a.trade_license_expiry_date >= CURRENT_DATE OR a.trade_license_expiry_date IS NULL)
+            AND (a.facility_license_expiry_date >= CURRENT_DATE OR a.facility_license_expiry_date IS NULL)
+        """)
+    elif normalized_filter == "COMPLIANT":
+        filters.append("""
+            (a.trade_license_expiry_date IS NULL OR a.trade_license_expiry_date > CURRENT_DATE + INTERVAL '90 days')
+            AND (a.facility_license_expiry_date IS NULL OR a.facility_license_expiry_date > CURRENT_DATE + INTERVAL '90 days')
+        """)
+
+    where_clause = " AND ".join(filters)
+    filter_params = {k: v for k, v in params.items() if k not in {"limit", "offset"}}
+
+    async with SessionLocal() as session:
+        total = (await session.execute(text(f"""
+            SELECT count(*)
+            FROM clinics c
+            JOIN tenants t ON t.id = c.tenant_id
+            JOIN clinic_applications a ON a.id = c.approved_application_id
+            WHERE {where_clause}
+        """), filter_params)).scalar_one()
+
+        rows = (await session.execute(text(f"""
+            SELECT
+                c.id::text AS clinic_id,
+                c.tenant_id::text AS tenant_id,
+                a.id::text AS application_id,
+                a.application_reference,
+                t.tenant_code,
+                t.status AS tenant_status,
+                c.legal_name,
+                c.trading_name,
+                c.facility_type,
+                c.verification_status,
+                a.emirate,
+                a.company_registration_number,
+                a.trade_license_number,
+                a.trade_license_authority,
+                a.trade_license_issue_date,
+                a.trade_license_expiry_date,
+                a.facility_license_number,
+                a.facility_license_authority,
+                a.facility_license_issue_date,
+                a.facility_license_expiry_date
+            FROM clinics c
+            JOIN tenants t ON t.id = c.tenant_id
+            JOIN clinic_applications a ON a.id = c.approved_application_id
+            WHERE {where_clause}
+            ORDER BY
+                LEAST(
+                    COALESCE(a.trade_license_expiry_date, '9999-12-31'),
+                    COALESCE(a.facility_license_expiry_date, '9999-12-31')
+                ) ASC,
+                c.trading_name ASC
+            LIMIT :limit OFFSET :offset
+        """), params)).mappings().all()
+
     return {"items": [dict(row) for row in rows], "total": total, "limit": limit, "offset": offset}
 
 
