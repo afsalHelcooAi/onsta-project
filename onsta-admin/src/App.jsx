@@ -3,10 +3,11 @@ import AdminSidebar from './components/layout/AdminSidebar';
 import ClinicReviewQueue from './components/review/ClinicReviewQueue';
 import RegisteredClinics from './components/clinics/RegisteredClinics';
 import AllUsers from './components/users/AllUsers';
+import Overview from './components/dashboard/Overview';
 import AdminLogin from './components/auth/AdminLogin';
 
 export default function App() {
-  const [activeTab, setActiveTab] = useState('review-queue');
+  const [activeTab, setActiveTab] = useState('overview');
   const [admin, setAdmin] = useState(null);
   const [checkingSession, setCheckingSession] = useState(true);
 
@@ -26,10 +27,11 @@ export default function App() {
   return (
     <div className="flex h-screen w-screen overflow-hidden bg-[#F7F4EE]">
       <AdminSidebar activeTab={activeTab} setActiveTab={setActiveTab} pendingCount={0} onSignOut={() => { localStorage.removeItem('onsta_access_token'); setAdmin(null); }} />
+      {activeTab === 'overview' && <Overview />}
       {activeTab === 'review-queue' && <ClinicReviewQueue />}
       {activeTab === 'all-clinics' && <RegisteredClinics />}
-      {activeTab === 'all-users' && <AllUsers />}
-      {!['review-queue', 'all-clinics', 'all-users'].includes(activeTab) && (
+      {activeTab === 'all-users' && <AllUsers currentUserId={admin.id} />}
+      {!['overview', 'review-queue', 'all-clinics', 'all-users'].includes(activeTab) && (
         <div className="flex-1 flex items-center justify-center text-gray-500 font-medium">
           Section under development. Switch to "Clinic Verifications" to review pending applications.
         </div>

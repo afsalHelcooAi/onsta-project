@@ -37,6 +37,56 @@ class InfoRequest(BaseModel):
     due_at: Optional[str] = None
 
 
+class UserStatusRequest(BaseModel):
+    status: str
+    reason: str = Field(min_length=3, max_length=4000)
+
+
+@router.get("/overview")
+async def get_platform_overview(actor: Actor = Depends(require_super_admin)):
+    async with SessionLocal() as session:
+        user_status_rows = (await session.execute(text("""
+            SELECT status, count(*)::integer AS count
+            FROM users
+            GROUP BY status
+        """), {})).mappings().all()
+        application_status_rows = (await session.execute(text("""
+            SELECT application_status AS status, count(*)::integer AS count
+            FROM clinic_applications
+            GROUP BY application_status
+        """), {})).mappings().all()
+        clinic_count = (await session.execute(text("""
+            SELECT count(*)::integer FROM clinics
+        """), {})).scalar_one()
+        ai_scan_status_rows = (await session.execute(text("""
+            SELECT status, count(*)::integer AS count
+            FROM ai_scan_jobs
+            GROUP BY status
+        """), {})).mappings().all()
+
+    def status_counts(rows):
+        return {row["status"]: row["count"] for row in rows}
+
+    return {
+        "system_health": {
+            "api": "HEALTHY",
+            "database": "HEALTHY",
+            "storage": {
+                "backend": settings.STORAGE_BACKEND.upper(),
+                "status": "CONFIGURED",
+            },
+        },
+        "ai": {
+            "configured": bool(settings.GEMINI_API_KEY),
+            "model": settings.AI_MODEL_NAME,
+            "scan_jobs": status_counts(ai_scan_status_rows),
+        },
+        "users": status_counts(user_status_rows),
+        "applications": status_counts(application_status_rows),
+        "registered_clinics": clinic_count,
+    }
+
+
 @router.get("/applications")
 async def list_applications(status_filter: Optional[str] = Query(None, alias="status"), actor: Actor = Depends(require_super_admin)):
     normalized_status = status_filter.strip().upper() if status_filter and status_filter.strip().upper() != "ALL" else None
@@ -375,6 +425,86 @@ async def get_registered_clinic(clinic_id: UUID, actor: Actor = Depends(require_
         "reviews": [dict(row) for row in reviews],
     })
     return result
+
+
+@router.patch("/users/{user_id}/status")
+async def update_user_status(
+    user_id: UUID,
+    payload: UserStatusRequest,
+    actor: Actor = Depends(require_super_admin),
+):
+    new_status = payload.status.strip().upper()
+    if new_status not in {"ACTIVE", "SUSPENDED", "DISABLED"}:
+        raise HTTPException(status_code=400, detail="Unsupported user status.")
+    reason = payload.reason.strip()
+    if len(reason) < 3:
+        raise HTTPException(status_code=400, detail="A reason of at least 3 characters is required.")
+    if str(user_id) == str(actor["id"]) and new_status != "ACTIVE":
+        raise HTTPException(status_code=400, detail="You cannot suspend or disable your own account.")
+
+    async with SessionLocal() as session:
+        user = (await session.execute(text("""
+            SELECT u.status,
+                EXISTS (
+                    SELECT 1 FROM user_roles ur
+                    JOIN roles r ON r.id = ur.role_id
+                    WHERE ur.user_id = u.id AND r.name = 'SUPER_ADMIN' AND r.scope = 'PLATFORM'
+                ) AS is_platform_admin
+            FROM users u
+            WHERE u.id = CAST(:user_id AS uuid)
+            FOR UPDATE
+        """), {"user_id": str(user_id)})).mappings().first()
+        if not user:
+            raise HTTPException(status_code=404, detail="User not found.")
+
+        old_status = user["status"]
+        allowed_transitions = {
+            "ACTIVE": {"SUSPENDED", "DISABLED"},
+            "INVITED": {"DISABLED"},
+            "SUSPENDED": {"ACTIVE", "DISABLED"},
+            "DISABLED": {"ACTIVE"},
+        }
+        if new_status not in allowed_transitions.get(old_status, set()):
+            raise HTTPException(
+                status_code=409,
+                detail=f"Cannot change a {old_status.lower()} account to {new_status.lower()}.",
+            )
+
+        if old_status == "ACTIVE" and new_status != "ACTIVE" and user["is_platform_admin"]:
+            active_admin_count = (await session.execute(text("""
+                SELECT count(*)
+                FROM users u
+                JOIN user_roles ur ON ur.user_id = u.id
+                JOIN roles r ON r.id = ur.role_id
+                WHERE u.status = 'ACTIVE' AND r.name = 'SUPER_ADMIN' AND r.scope = 'PLATFORM'
+            """), {})).scalar_one()
+            if active_admin_count <= 1:
+                raise HTTPException(
+                    status_code=409,
+                    detail="The last active Super Admin cannot be suspended or disabled.",
+                )
+
+        await session.execute(text("""
+            UPDATE users
+            SET status = :status, updated_at = now()
+            WHERE id = CAST(:user_id AS uuid)
+        """), {"status": new_status, "user_id": str(user_id)})
+        await session.execute(text("""
+            INSERT INTO audit_logs (actor_user_id, action, entity_type, entity_id, details)
+            VALUES (
+                CAST(:actor_id AS uuid), 'USER_STATUS_CHANGED', 'USER', CAST(:user_id AS uuid),
+                jsonb_build_object('old_status', :old_status, 'new_status', :new_status, 'reason', :reason)
+            )
+        """), {
+            "actor_id": str(actor["id"]),
+            "user_id": str(user_id),
+            "old_status": old_status,
+            "new_status": new_status,
+            "reason": reason,
+        })
+        await session.commit()
+
+    return {"user_id": str(user_id), "status": new_status}
 
 
 @router.get("/applications/{application_id}")

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { AlertCircle, ChevronLeft, ChevronRight, RefreshCw, Search, Users } from 'lucide-react';
-import { fetchUserRoles, fetchUsers } from '../../api/adminApi';
+import { AlertCircle, ChevronLeft, ChevronRight, RefreshCw, Search, Users, X } from 'lucide-react';
+import { fetchUserRoles, fetchUsers, updateUserStatus } from '../../api/adminApi';
 
 const PAGE_SIZE = 25;
 
@@ -25,7 +25,17 @@ function formatDate(value) {
   return value ? new Date(value).toLocaleDateString() : 'Never';
 }
 
-export default function AllUsers() {
+function statusActions(status) {
+  const actions = {
+    ACTIVE: [['SUSPENDED', 'Suspend'], ['DISABLED', 'Disable']],
+    INVITED: [['DISABLED', 'Disable']],
+    SUSPENDED: [['ACTIVE', 'Reactivate'], ['DISABLED', 'Disable']],
+    DISABLED: [['ACTIVE', 'Reactivate']],
+  };
+  return actions[status] || [];
+}
+
+export default function AllUsers({ currentUserId }) {
   const [users, setUsers] = useState([]);
   const [roles, setRoles] = useState([]);
   const [search, setSearch] = useState('');
@@ -39,6 +49,10 @@ export default function AllUsers() {
   const [error, setError] = useState('');
   const [roleError, setRoleError] = useState('');
   const [refreshIndex, setRefreshIndex] = useState(0);
+  const [statusDialog, setStatusDialog] = useState(null);
+  const [statusReason, setStatusReason] = useState('');
+  const [statusError, setStatusError] = useState('');
+  const [updatingStatus, setUpdatingStatus] = useState(false);
 
   useEffect(() => {
     fetchUserRoles()
@@ -68,6 +82,26 @@ export default function AllUsers() {
   const updateFilter = (setter) => (event) => {
     setter(event.target.value);
     setOffset(0);
+  };
+  const openStatusDialog = (user, nextStatus, actionLabel) => {
+    setStatusDialog({ user, nextStatus, actionLabel });
+    setStatusReason('');
+    setStatusError('');
+  };
+  const submitStatusChange = async (event) => {
+    event.preventDefault();
+    if (!statusDialog || statusReason.trim().length < 3) return;
+    setUpdatingStatus(true);
+    setStatusError('');
+    try {
+      await updateUserStatus(statusDialog.user.user_id, statusDialog.nextStatus, statusReason.trim());
+      setStatusDialog(null);
+      setRefreshIndex((current) => current + 1);
+    } catch (err) {
+      setStatusError(err.message);
+    } finally {
+      setUpdatingStatus(false);
+    }
   };
   const start = total === 0 ? 0 : offset + 1;
   const end = Math.min(offset + PAGE_SIZE, total);
@@ -142,7 +176,7 @@ export default function AllUsers() {
 
         <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[900px] text-left text-sm">
+            <table className="w-full min-w-[1050px] text-left text-sm">
               <thead className="bg-slate-50 text-xs uppercase tracking-wide text-slate-500">
                 <tr>
                   <th className="px-5 py-3 font-semibold">User</th>
@@ -151,14 +185,15 @@ export default function AllUsers() {
                   <th className="px-5 py-3 font-semibold">Roles</th>
                   <th className="px-5 py-3 font-semibold">Clinics</th>
                   <th className="px-5 py-3 font-semibold">Last sign-in</th>
+                  <th className="px-5 py-3 font-semibold">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {loading ? (
-                  <tr><td colSpan="6" className="px-5 py-12 text-center text-slate-500">Loading users…</td></tr>
+                  <tr><td colSpan="7" className="px-5 py-12 text-center text-slate-500">Loading users…</td></tr>
                 ) : users.length === 0 ? (
                   <tr>
-                    <td colSpan="6" className="px-5 py-12 text-center text-slate-500">
+                    <td colSpan="7" className="px-5 py-12 text-center text-slate-500">
                       <Users className="mx-auto mb-2 h-6 w-6 text-slate-300" />
                       No users match these filters.
                     </td>
@@ -171,11 +206,26 @@ export default function AllUsers() {
                     </td>
                     <td className="px-5 py-4 text-slate-700">{formatAccountType(user.account_type)}</td>
                     <td className="px-5 py-4">
-                      <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700">{formatLabel(user.status)}</span>
+                      <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${user.status === 'ACTIVE' ? 'bg-emerald-50 text-emerald-700' : user.status === 'SUSPENDED' ? 'bg-amber-50 text-amber-700' : user.status === 'DISABLED' ? 'bg-rose-50 text-rose-700' : 'bg-slate-100 text-slate-700'}`}>{formatLabel(user.status)}</span>
                     </td>
                     <td className="px-5 py-4 text-slate-700">{user.roles.length ? user.roles.map(formatLabel).join(', ') : '—'}</td>
                     <td className="px-5 py-4 text-slate-700">{user.clinics.length ? user.clinics.join(', ') : '—'}</td>
                     <td className="px-5 py-4 text-slate-500">{formatDate(user.last_login_at)}</td>
+                    <td className="px-5 py-4">
+                      <div className="flex flex-wrap gap-2">
+                        {statusActions(user.status).filter(() => user.user_id !== currentUserId).map(([nextStatus, actionLabel]) => (
+                          <button
+                            key={nextStatus}
+                            type="button"
+                            onClick={() => openStatusDialog(user, nextStatus, actionLabel)}
+                            className={`rounded-md border px-2.5 py-1.5 text-xs font-medium ${nextStatus === 'DISABLED' ? 'border-rose-200 text-rose-700 hover:bg-rose-50' : 'border-slate-200 text-slate-700 hover:bg-slate-50'}`}
+                          >
+                            {actionLabel}
+                          </button>
+                        ))}
+                        {(user.user_id === currentUserId || statusActions(user.status).length === 0) && <span className="text-xs text-slate-400">No actions</span>}
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -194,6 +244,52 @@ export default function AllUsers() {
           </div>
         </section>
       </div>
+      {statusDialog && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/40 p-4">
+          <form
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="user-status-title"
+            onSubmit={submitStatusChange}
+            className="w-full max-w-md rounded-xl bg-white p-6 shadow-xl"
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                <h2 id="user-status-title" className="text-lg font-semibold text-slate-900">{statusDialog.actionLabel} account?</h2>
+                <p className="mt-1 text-sm text-slate-500">{statusDialog.user.full_name} · {statusDialog.user.email}</p>
+              </div>
+              <button type="button" onClick={() => setStatusDialog(null)} aria-label="Close dialog" className="rounded-md p-1 text-slate-400 hover:bg-slate-100">
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+            <p className="mt-4 text-sm text-slate-600">
+              This will change the account status to <strong>{formatLabel(statusDialog.nextStatus)}</strong>. Add a reason for the audit log.
+            </p>
+            <label className="mt-4 block text-sm font-medium text-slate-700">
+              Reason
+              <textarea
+                autoFocus
+                required
+                minLength={3}
+                maxLength={4000}
+                value={statusReason}
+                onChange={(event) => setStatusReason(event.target.value)}
+                rows={3}
+                className="mt-1.5 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none focus:border-emerald-600"
+              />
+            </label>
+            {statusError && <p role="alert" className="mt-3 flex items-center gap-2 text-sm text-red-700"><AlertCircle className="h-4 w-4 shrink-0" />{statusError}</p>}
+            <div className="mt-5 flex justify-end gap-2">
+              <button type="button" disabled={updatingStatus} onClick={() => setStatusDialog(null)} className="rounded-lg border border-slate-200 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50">
+                Cancel
+              </button>
+              <button type="submit" disabled={updatingStatus || statusReason.trim().length < 3} className="rounded-lg bg-emerald-700 px-3 py-2 text-sm font-semibold text-white hover:bg-emerald-800 disabled:opacity-50">
+                {updatingStatus ? 'Saving…' : 'Confirm change'}
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
     </main>
   );
 }
