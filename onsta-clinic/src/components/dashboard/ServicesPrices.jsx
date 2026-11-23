@@ -1,24 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useClinic } from '../../context/ClinicContext';
 import {
   Stethoscope, Plus, Search, Filter, Edit2, Trash2, CheckCircle2,
   AlertCircle, ShieldAlert, Sparkles, X, Check, ArrowRight, FileText,
-  Upload, Cpu, CheckSquare, Loader2
+  Upload, Cpu, CheckSquare, Loader2, AlertTriangle, FileSpreadsheet
 } from 'lucide-react';
 import VerificationBadge from '../common/VerificationBadge';
+import { parseTariffSheet } from '../../api/serviceApi';
 
 export default function ServicesPrices() {
-  const { services, addService, batchAddServices, updateService, deleteService, toggleServiceActive } = useClinic();
+  const { services, addService, batchAddServices, updateService, deleteService, toggleServiceActive, showToast } = useClinic();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingService, setEditingService] = useState(null);
 
-  // PDF Batch Import States
+  // PDF / Image Batch Import States
   const [isPdfImportOpen, setIsPdfImportOpen] = useState(false);
   const [pdfParsingStep, setPdfParsingStep] = useState('upload'); // 'upload' | 'parsing' | 'review'
   const [parsedServices, setParsedServices] = useState([]);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [parseError, setParseError] = useState(null);
+  const [parseConfidence, setParseConfidence] = useState(0.95);
+  const [parsedFileName, setParsedFileName] = useState('');
+  const [duplicatesCount, setDuplicatesCount] = useState(0);
+  const fileInputRef = useRef(null);
 
   // Modal Form State
   const [formData, setFormData] = useState({
@@ -26,7 +33,7 @@ export default function ServicesPrices() {
     category: 'Dermatology',
     description: '',
     duration: '45 mins',
-    normalPrice: '',
+    normalPrice: '450',
     offerPrice: '',
     applicableSpecialty: 'Dermatology',
     scopeRequired: 'Dermatological Outpatient Scope',
@@ -35,9 +42,17 @@ export default function ServicesPrices() {
 
   const categories = ['All', 'Laser Clinic', 'Dermatology', 'Aesthetic Clinic', 'Wellness', 'Medical Clinic'];
 
+  const categoryScopes = {
+    'Laser Clinic': 'Class 4 Medical Laser Facility Scope',
+    'Dermatology': 'Dermatological Outpatient Scope',
+    'Aesthetic Clinic': 'Aesthetic Medicine Scope',
+    'Wellness': 'Outpatient Clinic Scope',
+    'Medical Clinic': 'General Medical Scope'
+  };
+
   const filteredServices = services.filter((srv) => {
-    const matchesSearch = srv.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                          srv.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = srv.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          (srv.description && srv.description.toLowerCase().includes(searchTerm.toLowerCase()));
     const matchesCategory = selectedCategory === 'All' || srv.category === selectedCategory;
     return matchesSearch && matchesCategory;
   });
@@ -62,96 +77,72 @@ export default function ServicesPrices() {
     setEditingService(srv);
     setFormData({
       name: srv.name,
-      category: srv.category,
-      description: srv.description,
-      duration: srv.duration,
-      normalPrice: srv.normalPrice.toString(),
+      category: srv.category || 'Dermatology',
+      description: srv.description || '',
+      duration: srv.duration || '45 mins',
+      normalPrice: (srv.normalPrice || '').toString(),
       offerPrice: srv.offerPrice ? srv.offerPrice.toString() : '',
-      applicableSpecialty: srv.applicableSpecialty,
-      scopeRequired: srv.scopeRequired,
-      isActive: srv.isActive
+      applicableSpecialty: srv.applicableSpecialty || srv.category || 'Dermatology',
+      scopeRequired: srv.scopeRequired || 'Dermatological Outpatient Scope',
+      isActive: srv.isActive !== false
     });
     setIsModalOpen(true);
   };
 
-  const handleFormSubmit = (e) => {
+  const handleCategoryChange = (cat) => {
+    setFormData((prev) => ({
+      ...prev,
+      category: cat,
+      applicableSpecialty: cat,
+      scopeRequired: categoryScopes[cat] || 'Outpatient Clinic Scope'
+    }));
+  };
+
+  const handleFormSubmit = async (e) => {
     e.preventDefault();
     if (editingService) {
-      updateService(editingService.id, formData);
+      await updateService(editingService.id, formData);
     } else {
-      addService(formData);
+      await addService(formData);
     }
     setIsModalOpen(false);
   };
 
-  // PDF Parser Simulation
-  const handleStartPdfScan = () => {
+  // PDF / Tariff Parser Flow
+  const handleFileSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setSelectedFile(file);
+      setParseError(null);
+    }
+  };
+
+  const executeTariffParse = async (useSample = false) => {
     setPdfParsingStep('parsing');
-    setTimeout(() => {
-      setParsedServices([
-        {
-          name: "Hydrafacial MD Deluxe Treatment",
-          category: "Aesthetic Clinic",
-          description: "Multi-step resurfacing treatment clearing pores and infusing hydrating peptides.",
-          duration: "45 mins",
-          normalPrice: 550,
-          offerPrice: null,
-          scopeRequired: "Dermatological Outpatient Scope"
-        },
-        {
-          name: "Candela GentleMax Pro Full Legs Laser",
-          category: "Laser Clinic",
-          description: "Dual wavelength medical laser for gentle hair reduction with dynamic cooling device.",
-          duration: "60 mins",
-          normalPrice: 850,
-          offerPrice: null,
-          scopeRequired: "Class 4 Medical Laser Facility Scope"
-        },
-        {
-          name: "PRP Vampire Facial with Micro-Needling",
-          category: "Dermatology",
-          description: "Autologous platelet-rich plasma infusion to stimulate collagen and skin renewal.",
-          duration: "50 mins",
-          normalPrice: 950,
-          offerPrice: null,
-          scopeRequired: "Clinical Dermatology Scope"
-        },
-        {
-          name: "SkinPen Precision Micro-Needling",
-          category: "Dermatology",
-          description: "FDA-cleared medical microneedling for acne scar repair and skin tightening.",
-          duration: "45 mins",
-          normalPrice: 700,
-          offerPrice: null,
-          scopeRequired: "Dermatological Outpatient Scope"
-        },
-        {
-          name: "ZO Skin Health Ultra Hydration Facial",
-          category: "Wellness",
-          description: "Medical-grade barrier repair facial with aloe, hyaluronic acid, and cooling masque.",
-          duration: "60 mins",
-          normalPrice: 400,
-          offerPrice: null,
-          scopeRequired: "Outpatient Clinic Scope"
-        },
-        {
-          name: "Carbon Spectra Laser Peel (Hollywood Peel)",
-          category: "Laser Clinic",
-          description: "Q-switched Nd:YAG laser treatment targeting enlarged pores and pigmentation.",
-          duration: "40 mins",
-          normalPrice: 650,
-          offerPrice: null,
-          scopeRequired: "Class 4 Medical Laser Facility Scope"
-        }
-      ]);
+    setParseError(null);
+
+    const token = localStorage.getItem('onsta_access_token');
+    try {
+      const data = await parseTariffSheet(useSample ? null : selectedFile, useSample, token);
+      setParsedServices(data.services || []);
+      setParseConfidence(data.confidence || 0.92);
+      setParsedFileName(data.fileName || (useSample ? 'sample-tariff.pdf' : selectedFile?.name));
+      setDuplicatesCount(data.duplicatesFound || 0);
       setPdfParsingStep('review');
-    }, 1500);
+    } catch (err) {
+      setParseError(err.message || 'Failed to parse tariff sheet.');
+      setPdfParsingStep('upload');
+      showToast('error', 'Parse Error', err.message);
+    }
   };
 
   const handleUpdateParsedItem = (index, field, value) => {
     setParsedServices(prev => {
       const updated = [...prev];
       updated[index] = { ...updated[index], [field]: value };
+      if (field === 'category' && categoryScopes[value]) {
+        updated[index].scopeRequired = categoryScopes[value];
+      }
       return updated;
     });
   };
@@ -160,10 +151,41 @@ export default function ServicesPrices() {
     setParsedServices(prev => prev.filter((_, i) => i !== index));
   };
 
-  const handleSaveAllParsedServices = () => {
-    batchAddServices(parsedServices);
+  const handleAddCustomParsedItem = () => {
+    setParsedServices(prev => [
+      ...prev,
+      {
+        name: 'New Aesthetic Treatment',
+        category: 'Aesthetic Clinic',
+        description: 'Clinical aesthetic procedure',
+        duration: '45 mins',
+        normalPrice: 500,
+        offerPrice: null,
+        scopeRequired: 'Aesthetic Medicine Scope',
+        isDuplicate: false,
+        warning: null
+      }
+    ]);
+  };
+
+  const handleSaveAllParsedServices = async () => {
+    // Filter or save all items
+    const toSave = parsedServices.map(item => ({
+      name: item.name,
+      category: item.category,
+      description: item.description,
+      duration: item.duration,
+      normalPrice: item.normalPrice,
+      offerPrice: item.offerPrice,
+      scopeRequired: item.scopeRequired,
+      applicableSpecialty: item.category,
+      isActive: true
+    }));
+
+    await batchAddServices(toSave);
     setIsPdfImportOpen(false);
     setPdfParsingStep('upload');
+    setSelectedFile(null);
   };
 
   return (
@@ -182,6 +204,8 @@ export default function ServicesPrices() {
         <div className="flex items-center gap-2 self-start sm:self-center">
           <button
             onClick={() => {
+              setSelectedFile(null);
+              setParseError(null);
               setPdfParsingStep('upload');
               setIsPdfImportOpen(true);
             }}
@@ -207,7 +231,7 @@ export default function ServicesPrices() {
           <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Search treatments by name, specialty, or description..."
+            placeholder="Search treatments by name, category, or clinical description..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full pl-9 pr-4 py-2 rounded-xl border border-gray-200 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0d281e]"
@@ -244,68 +268,97 @@ export default function ServicesPrices() {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-100">
-              {filteredServices.map((srv) => (
-                <tr key={srv.id} className="hover:bg-gray-50/80 transition-colors">
-                  <td className="py-3.5 px-5">
-                    <div className="font-bold text-gray-900 text-sm">{srv.name}</div>
-                    <div className="text-[11px] text-gray-500 truncate max-w-sm mt-0.5">{srv.description}</div>
-                  </td>
-                  <td className="py-3.5 px-4">
-                    <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#F7F4EE] text-gray-800 border border-[#e7e1d7]">
-                      {srv.category}
-                    </span>
-                  </td>
-                  <td className="py-3.5 px-4 text-gray-600 font-medium">
-                    {srv.duration}
-                  </td>
-                  <td className="py-3.5 px-4">
-                    <div className="font-bold text-[#0d281e] text-sm font-mono">
-                      AED {srv.normalPrice}
-                    </div>
-                  </td>
-                  <td className="py-3.5 px-4">
-                    <span className="text-[11px] text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                      {srv.scopeRequired || "Outpatient Scope"}
-                    </span>
-                  </td>
-                  <td className="py-3.5 px-4">
-                    <button
-                      onClick={() => toggleServiceActive(srv.id)}
-                      className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-colors ${
-                        srv.isActive
-                          ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
-                          : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
-                      }`}
-                    >
-                      {srv.isActive ? 'Active' : 'Inactive'}
-                    </button>
-                  </td>
-                  <td className="py-3.5 px-4 text-right">
-                    <div className="flex items-center justify-end gap-1">
-                      <button
-                        onClick={() => openEditModal(srv)}
-                        className="p-1.5 text-gray-400 hover:text-gray-700 rounded-lg"
-                        title="Edit service"
-                      >
-                        <Edit2 className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        onClick={() => deleteService(srv.id)}
-                        className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg"
-                        title="Delete service"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
+              {filteredServices.length === 0 ? (
+                <tr>
+                  <td colSpan={7} className="py-14 text-center text-gray-500">
+                    <Stethoscope className="w-10 h-10 text-gray-300 mx-auto mb-2.5" />
+                    <p className="font-semibold text-sm text-gray-700">
+                      {services.length === 0 ? 'No services in catalogue yet' : 'No services match your criteria'}
+                    </p>
+                    <p className="text-xs text-gray-400 mt-1 max-w-sm mx-auto">
+                      {services.length === 0
+                        ? 'Import your treatment price list from a PDF Tariff sheet or click "Add Single Service" above.'
+                        : 'Try another search keyword or select a different category filter.'}
+                    </p>
                   </td>
                 </tr>
-              ))}
+              ) : (
+                filteredServices.map((srv) => (
+                  <tr key={srv.id} className="hover:bg-gray-50/80 transition-colors">
+                    <td className="py-3.5 px-5">
+                      <div className="font-bold text-gray-900 text-sm">{srv.name}</div>
+                      {srv.description && (
+                        <div className="text-[11px] text-gray-500 truncate max-w-sm mt-0.5">{srv.description}</div>
+                      )}
+                    </td>
+                    <td className="py-3.5 px-4">
+                      <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#F7F4EE] text-gray-800 border border-[#e7e1d7]">
+                        {srv.category}
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-4 text-gray-600 font-medium">
+                      {srv.duration}
+                    </td>
+                    <td className="py-3.5 px-4">
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-bold text-[#0d281e] text-sm font-mono">
+                          AED {srv.offerPrice ? srv.offerPrice : srv.normalPrice}
+                        </span>
+                        {srv.offerPrice && (
+                          <span className="text-[10px] text-gray-400 line-through font-mono">
+                            AED {srv.normalPrice}
+                          </span>
+                        )}
+                      </div>
+                    </td>
+                    <td className="py-3.5 px-4">
+                      <span className="text-[11px] text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                        {srv.scopeRequired || "Outpatient Scope"}
+                      </span>
+                    </td>
+                    <td className="py-3.5 px-4">
+                      <button
+                        onClick={() => toggleServiceActive(srv.id)}
+                        className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-colors ${
+                          srv.isActive
+                            ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
+                            : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                        }`}
+                      >
+                        {srv.isActive ? 'Active' : 'Inactive'}
+                      </button>
+                    </td>
+                    <td className="py-3.5 px-4 text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        <button
+                          onClick={() => openEditModal(srv)}
+                          className="p-1.5 text-gray-400 hover:text-gray-700 rounded-lg hover:bg-gray-100"
+                          title="Edit service"
+                        >
+                          <Edit2 className="w-3.5 h-3.5" />
+                        </button>
+                        <button
+                          onClick={() => {
+                            if (window.confirm(`Delete service "${srv.name}"?`)) {
+                              deleteService(srv.id);
+                            }
+                          }}
+                          className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50"
+                          title="Delete service"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
       </div>
 
-      {/* PDF BATCH IMPORT MODAL & REVIEW WINDOW */}
+      {/* PDF BATCH IMPORT MODAL & STEP 2 REVIEW WINDOW */}
       {isPdfImportOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn">
           <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full overflow-hidden border border-[#e7e1d7] animate-scaleUp max-h-[90vh] flex flex-col">
@@ -317,10 +370,10 @@ export default function ServicesPrices() {
                 </div>
                 <div>
                   <h3 className="font-serif font-bold text-base">
-                    Import Services & Prices from PDF
+                    Import Services & Prices from PDF / Image Tariff
                   </h3>
                   <p className="text-emerald-200 text-xs">
-                    Upload clinic price list brochure. AI splits rows into individual services for review.
+                    Multimodal Vision AI extracts treatments, AED rates, and maps them to DHA regulatory scope.
                   </p>
                 </div>
               </div>
@@ -334,26 +387,81 @@ export default function ServicesPrices() {
 
             {/* Step 1: Upload */}
             {pdfParsingStep === 'upload' && (
-              <div className="p-8 text-center space-y-6">
-                <div className="border-2 border-dashed border-[#e7e1d7] rounded-2xl p-10 hover:border-[#137333] transition-colors bg-[#FAF8F5]">
+              <div className="p-8 text-center space-y-6 overflow-y-auto">
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  className="border-2 border-dashed border-[#e7e1d7] rounded-2xl p-8 hover:border-[#137333] transition-colors bg-[#FAF8F5] cursor-pointer"
+                >
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".pdf,.png,.jpg,.jpeg,.webp"
+                    className="hidden"
+                    onChange={handleFileSelect}
+                  />
                   <div className="w-16 h-16 bg-emerald-50 text-[#0d281e] rounded-2xl flex items-center justify-center mx-auto mb-4 border border-emerald-200">
                     <Upload className="w-8 h-8" />
                   </div>
                   <h4 className="font-serif font-bold text-gray-900 text-base">
-                    Drop your Clinic Price List or Treatment Menu (PDF)
+                    {selectedFile ? selectedFile.name : 'Drop your Clinic Price List or Treatment Menu'}
                   </h4>
                   <p className="text-xs text-gray-500 mt-1 max-w-md mx-auto">
-                    Supports multi-page PDFs, scanned price menus, or tariff sheets. AI will extract names, categories, durations, and AED pricing.
+                    {selectedFile
+                      ? `Selected ${(selectedFile.size / 1024).toFixed(1)} KB. Ready for AI extraction.`
+                      : 'Supports multi-page PDFs, scanned price menus, or tariff sheets (PDF, PNG, JPG).'}
                   </p>
-                  <div className="mt-5">
-                    <button
-                      onClick={handleStartPdfScan}
-                      className="px-6 py-2.5 bg-[#0d281e] hover:bg-[#153f2f] text-white rounded-xl text-xs font-semibold shadow-sm inline-flex items-center gap-2"
-                    >
-                      <Sparkles className="w-4 h-4 text-emerald-300" />
-                      <span>Parse Sample Clinic Price Sheet (al-noor-menu.pdf)</span>
-                    </button>
+
+                  <div className="mt-5 flex items-center justify-center gap-3">
+                    {selectedFile ? (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          executeTariffParse(false);
+                        }}
+                        className="px-6 py-2.5 bg-[#0d281e] hover:bg-[#153f2f] text-white rounded-xl text-xs font-semibold shadow-sm inline-flex items-center gap-2"
+                      >
+                        <Sparkles className="w-4 h-4 text-emerald-300" />
+                        <span>Run AI Extraction on Uploaded File</span>
+                      </button>
+                    ) : (
+                      <span className="px-4 py-2 bg-white border border-gray-300 rounded-xl text-xs font-semibold text-gray-700 hover:bg-gray-50">
+                        Choose File from Computer
+                      </span>
+                    )}
                   </div>
+                </div>
+
+                {parseError && (
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 flex items-center gap-2 text-left">
+                    <AlertCircle className="w-4 h-4 flex-shrink-0 text-red-600" />
+                    <span>{parseError}</span>
+                  </div>
+                )}
+
+                <div className="relative flex py-2 items-center">
+                  <div className="flex-grow border-t border-gray-200"></div>
+                  <span className="flex-shrink mx-4 text-gray-400 text-xs font-medium uppercase tracking-wider">
+                    Or Test Instantly
+                  </span>
+                  <div className="flex-grow border-t border-gray-200"></div>
+                </div>
+
+                <div className="p-4 bg-emerald-50/60 border border-emerald-200/80 rounded-2xl flex items-center justify-between">
+                  <div className="text-left">
+                    <p className="text-xs font-bold text-emerald-950">
+                      Sample UAE Aesthetic & Laser Clinic Tariff Sheet
+                    </p>
+                    <p className="text-[11px] text-emerald-800 mt-0.5">
+                      Extracts 6 real treatments (Hydrafacial, Candela GentleMax Laser, PRP, SkinPen, ZO Health, Carbon Peel).
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => executeTariffParse(true)}
+                    className="px-4 py-2 bg-emerald-800 hover:bg-emerald-900 text-white rounded-xl text-xs font-semibold shadow-sm inline-flex items-center gap-1.5 flex-shrink-0"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-emerald-200" />
+                    <span>Parse Sample Menu</span>
+                  </button>
                 </div>
               </div>
             )}
@@ -365,27 +473,34 @@ export default function ServicesPrices() {
                   <Loader2 className="w-8 h-8 animate-spin text-emerald-700" />
                 </div>
                 <h4 className="font-serif font-bold text-gray-900 text-lg">
-                  AI Reading & Structuring Services from PDF...
+                  AI Reading & Structuring Services from Tariff...
                 </h4>
                 <p className="text-xs text-gray-500 max-w-sm mx-auto">
-                  Detecting treatments, duration times, categories, and matching against permitted DHA facility scope.
+                  Detecting treatments, duration times, categories, and matching against permitted DHA facility scopes.
                 </p>
+                <div className="flex items-center justify-center gap-2 text-[11px] text-emerald-700 font-medium">
+                  <Cpu className="w-3.5 h-3.5" />
+                  <span>Multimodal Vision AI + UAE Regulatory Scope Engine</span>
+                </div>
               </div>
             )}
 
-            {/* Step 3: PRE-SAVE BATCH REVIEW WINDOW */}
+            {/* Step 3: PRE-SAVE BATCH REVIEW WINDOW (Human-in-the-Loop) */}
             {pdfParsingStep === 'review' && (
               <div className="flex flex-col flex-1 overflow-hidden">
-                <div className="p-4 bg-emerald-50 border-b border-emerald-200 flex items-center justify-between flex-shrink-0">
+                <div className="p-4 bg-emerald-50 border-b border-emerald-200 flex flex-wrap items-center justify-between gap-2 flex-shrink-0">
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-700" />
+                    <CheckCircle2 className="w-4 h-4 text-emerald-700 flex-shrink-0" />
                     <span className="text-xs font-bold text-emerald-950">
-                      AI Extracted {parsedServices.length} Services. Review and edit before saving to catalogue:
+                      AI Extracted {parsedServices.length} Treatments from {parsedFileName} (Confidence: {Math.round(parseConfidence * 100)}%)
                     </span>
                   </div>
-                  <span className="text-[11px] text-emerald-800 font-medium">
-                    All prices in AED
-                  </span>
+                  {duplicatesCount > 0 && (
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300 flex items-center gap-1">
+                      <AlertTriangle className="w-3 h-3" />
+                      {duplicatesCount} already in catalogue
+                    </span>
+                  )}
                 </div>
 
                 <div className="p-4 overflow-y-auto flex-1">
@@ -395,13 +510,15 @@ export default function ServicesPrices() {
                         <th className="py-2.5 px-3">Service Name</th>
                         <th className="py-2.5 px-3">Category</th>
                         <th className="py-2.5 px-3">Duration</th>
-                        <th className="py-2.5 px-3">Price (AED)</th>
-                        <th className="py-2.5 px-3">Action</th>
+                        <th className="py-2.5 px-3">Standard (AED)</th>
+                        <th className="py-2.5 px-3">Offer (AED)</th>
+                        <th className="py-2.5 px-3">Scope Required</th>
+                        <th className="py-2.5 px-3 text-center">Action</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-gray-100">
                       {parsedServices.map((item, idx) => (
-                        <tr key={idx} className="hover:bg-gray-50">
+                        <tr key={idx} className={`hover:bg-gray-50 ${item.isDuplicate ? 'bg-amber-50/50' : ''}`}>
                           <td className="py-2 px-3">
                             <input
                               type="text"
@@ -409,6 +526,12 @@ export default function ServicesPrices() {
                               onChange={(e) => handleUpdateParsedItem(idx, 'name', e.target.value)}
                               className="w-full px-2 py-1 border border-gray-200 rounded text-xs text-gray-900 focus:outline-none focus:border-[#0d281e]"
                             />
+                            {item.isDuplicate && (
+                              <div className="text-[10px] text-amber-700 font-semibold mt-0.5 flex items-center gap-1">
+                                <AlertTriangle className="w-2.5 h-2.5" />
+                                <span>Already in catalogue (will skip if duplicate)</span>
+                              </div>
+                            )}
                           </td>
                           <td className="py-2 px-3">
                             <select
@@ -436,10 +559,24 @@ export default function ServicesPrices() {
                               type="number"
                               value={item.normalPrice}
                               onChange={(e) => handleUpdateParsedItem(idx, 'normalPrice', e.target.value)}
-                              className="w-24 px-2 py-1 border border-gray-200 rounded text-xs font-mono font-bold text-[#0d281e] focus:outline-none focus:border-[#0d281e]"
+                              className="w-20 px-2 py-1 border border-gray-200 rounded text-xs font-mono font-bold text-[#0d281e] focus:outline-none focus:border-[#0d281e]"
                             />
                           </td>
                           <td className="py-2 px-3">
+                            <input
+                              type="number"
+                              placeholder="Optional"
+                              value={item.offerPrice ?? ''}
+                              onChange={(e) => handleUpdateParsedItem(idx, 'offerPrice', e.target.value ? parseFloat(e.target.value) : null)}
+                              className="w-20 px-2 py-1 border border-gray-200 rounded text-xs font-mono text-gray-700 focus:outline-none focus:border-[#0d281e]"
+                            />
+                          </td>
+                          <td className="py-2 px-3">
+                            <span className="text-[10px] text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 truncate block max-w-[140px]" title={item.scopeRequired}>
+                              {item.scopeRequired}
+                            </span>
+                          </td>
+                          <td className="py-2 px-3 text-center">
                             <button
                               onClick={() => handleDeleteParsedItem(idx)}
                               className="text-gray-400 hover:text-red-600 p-1 rounded"
@@ -452,6 +589,16 @@ export default function ServicesPrices() {
                       ))}
                     </tbody>
                   </table>
+
+                  <div className="mt-3">
+                    <button
+                      onClick={handleAddCustomParsedItem}
+                      className="text-xs text-emerald-700 hover:text-emerald-900 font-semibold inline-flex items-center gap-1"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Add another treatment row</span>
+                    </button>
+                  </div>
                 </div>
 
                 {/* Footer Controls */}
@@ -460,7 +607,7 @@ export default function ServicesPrices() {
                     onClick={() => setPdfParsingStep('upload')}
                     className="text-xs text-gray-600 hover:underline"
                   >
-                    ← Re-upload PDF
+                    ← Re-upload Tariff
                   </button>
 
                   <div className="flex items-center gap-2">
@@ -493,7 +640,7 @@ export default function ServicesPrices() {
               <div className="flex items-center gap-2">
                 <Stethoscope className="w-5 h-5 text-emerald-300" />
                 <h3 className="font-serif font-bold text-base">
-                  {editingService ? 'Edit Treatment' : 'Add Treatment Service'}
+                  {editingService ? 'Edit Treatment Offering' : 'Add Treatment Service'}
                 </h3>
               </div>
               <button
@@ -526,7 +673,7 @@ export default function ServicesPrices() {
                   </label>
                   <select
                     value={formData.category}
-                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    onChange={(e) => handleCategoryChange(e.target.value)}
                     className="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0d281e]"
                   >
                     <option value="Dermatology">Dermatology</option>
@@ -552,17 +699,45 @@ export default function ServicesPrices() {
                 </div>
               </div>
 
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">
+                    Standard Tariff (AED) *
+                  </label>
+                  <input
+                    type="number"
+                    required
+                    min="1"
+                    value={formData.normalPrice}
+                    onChange={(e) => setFormData({ ...formData, normalPrice: e.target.value })}
+                    className="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-xs font-mono font-bold text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0d281e]"
+                    placeholder="e.g. 450"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-gray-700 mb-1">
+                    Offer Price (AED) <span className="text-gray-400 font-normal">(Optional)</span>
+                  </label>
+                  <input
+                    type="number"
+                    value={formData.offerPrice}
+                    onChange={(e) => setFormData({ ...formData, offerPrice: e.target.value })}
+                    className="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-xs font-mono text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0d281e]"
+                    placeholder="e.g. 299"
+                  />
+                </div>
+              </div>
+
               <div>
                 <label className="block text-xs font-semibold text-gray-700 mb-1">
-                  Standard Price (AED) *
+                  Regulatory Scope (MOHAP / DHA Facility Compliance)
                 </label>
                 <input
-                  type="number"
-                  required
-                  value={formData.normalPrice}
-                  onChange={(e) => setFormData({ ...formData, normalPrice: e.target.value })}
-                  className="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-xs font-mono font-bold text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0d281e]"
-                  placeholder="e.g. 450"
+                  type="text"
+                  value={formData.scopeRequired}
+                  onChange={(e) => setFormData({ ...formData, scopeRequired: e.target.value })}
+                  className="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0d281e] bg-gray-50"
                 />
               </div>
 
