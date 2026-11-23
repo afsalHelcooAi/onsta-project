@@ -13,6 +13,7 @@ import {
 } from '../data/initialData';
 import { evaluateRuleEngine } from '../data/rules';
 import { loginAccount } from '../api/accountApi';
+import { fetchClinicProfile } from '../api/clinicProfileApi';
 
 const ClinicContext = createContext(null);
 
@@ -90,7 +91,23 @@ export function ClinicProvider({ children }) {
             localStorage.setItem('onsta_application_id', session.application.id);
           }
           setClinicData((current) => ({ ...current, id: session.application.id, status: session.application.application_status.toLowerCase() }));
-        } else if (session.user.workspace === 'CLINIC') applyClinicIdentity(session.clinic);
+          if (session.application.application_status === 'APPROVED') {
+            fetchClinicProfile(token).then((profile) => {
+              setClinicData((current) => ({ ...current, ...profile, status: 'approved' }));
+              if (profile.gallery && profile.gallery.length > 0) {
+                setGallery(profile.gallery);
+              }
+            }).catch(() => {});
+          }
+        } else if (session.user?.workspace === 'CLINIC') {
+          applyClinicIdentity(session.clinic);
+          fetchClinicProfile(token).then((profile) => {
+            setClinicData((current) => ({ ...current, ...profile, status: 'approved' }));
+            if (profile.gallery && profile.gallery.length > 0) {
+              setGallery(profile.gallery);
+            }
+          }).catch(() => {});
+        }
       })
       .catch(() => { localStorage.removeItem('onsta_access_token'); setAuth({ isAuthenticated: false, user: null }); })
       .finally(() => setAuthReady(true));
