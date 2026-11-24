@@ -1,14 +1,13 @@
 import React from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
-  LayoutDashboard, Building2, Stethoscope, Tag, Image,
-  ShieldCheck, ExternalLink, Sparkles, RotateCcw, LogOut,
-  UserCheck, MessageSquare
+  LayoutDashboard, Building2, Stethoscope, Tag,
+  ShieldCheck, LogOut, UserCheck, MessageSquare
 } from 'lucide-react';
 import { useClinic } from '../../context/ClinicContext';
 
 export default function Sidebar({ onOpenPreview }) {
-  const { clinicData, resetToDemoDefaults, logout, enquiries } = useClinic();
+  const { clinicData, logout, enquiries } = useClinic();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -88,52 +87,15 @@ export default function Sidebar({ onOpenPreview }) {
         </nav>
       </div>
 
-      {/* Bottom Actions */}
-      <div className="p-4 border-t border-white/10 space-y-2">
-        {/* Registration Wizard Demo Link */}
-        <NavLink
-          to="/register"
-          className="flex items-center justify-between w-full px-3 py-2 rounded-xl text-xs font-medium text-emerald-200 hover:text-white bg-white/5 hover:bg-white/10 transition-colors"
-        >
-          <div className="flex items-center gap-2">
-            <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Registration Wizard (5 Steps)</span>
-          </div>
-          <span className="text-[10px] bg-emerald-800 text-emerald-200 px-1.5 py-0.2 rounded font-mono">
-            Demo
-          </span>
-        </NavLink>
-
-        {/* Customer Profile Preview Button */}
+      {/* Bottom Actions: Clean, prominent Logout button */}
+      <div className="p-4 border-t border-white/10">
         <button
-          onClick={onOpenPreview}
-          className="flex items-center justify-center gap-2 w-full px-3 py-2 rounded-xl text-xs font-semibold text-white bg-[#194b37] hover:bg-[#205e45] transition-colors shadow-sm"
+          onClick={handleSignOut}
+          className="flex items-center justify-center gap-2.5 w-full px-4 py-2.5 rounded-xl text-xs font-semibold text-rose-200 bg-rose-950/40 hover:bg-rose-900/60 hover:text-white border border-rose-800/40 transition-all shadow-sm group"
         >
-          <ExternalLink className="w-3.5 h-3.5" />
-          <span>Customer App Preview</span>
+          <LogOut className="w-4 h-4 text-rose-400 group-hover:text-white transition-colors" />
+          <span>Log Out</span>
         </button>
-
-        <div className="flex items-center justify-between pt-1 px-1">
-          {/* Reset Demo Button */}
-          <button
-            onClick={resetToDemoDefaults}
-            title="Reset all mock data to presentation defaults"
-            className="flex items-center gap-1 text-[11px] text-[#8ea79c] hover:text-rose-300 py-1 transition-colors"
-          >
-            <RotateCcw className="w-3 h-3" />
-            <span>Reset Demo</span>
-          </button>
-
-          {/* Logout Button */}
-          <button
-            onClick={handleSignOut}
-            title="Sign Out to Login Page"
-            className="flex items-center gap-1 text-[11px] text-[#8ea79c] hover:text-white py-1 transition-colors"
-          >
-            <LogOut className="w-3 h-3" />
-            <span>Sign Out</span>
-          </button>
-        </div>
       </div>
     </aside>
   );
