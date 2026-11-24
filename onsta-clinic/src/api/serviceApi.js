@@ -2,6 +2,22 @@
  * Client API services for Clinic Services & Prices Catalogue & PDF Tariff AI Parsing.
  */
 
+export async function fetchMasterTreatments(token) {
+  const res = await fetch('/api/v1/clinic/services/master-treatments', {
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.detail || 'Failed to fetch master treatments.');
+  }
+
+  return res.json();
+}
+
 export async function fetchServices(token, category = null, search = null) {
   let url = '/api/v1/clinic/services';
   const params = new URLSearchParams();
@@ -35,6 +51,7 @@ export async function createService(payload, token) {
     body: JSON.stringify({
       name: payload.name,
       category: payload.category || 'Dermatology',
+      master_treatment_id: payload.masterTreatmentId || payload.master_treatment_id || null,
       description: payload.description || '',
       duration: payload.duration || '45 mins',
       normal_price: parseFloat(payload.normalPrice || payload.normal_price || 0),

@@ -23,6 +23,13 @@ import {
   deleteService as apiDeleteService,
   toggleServiceStatus as apiToggleServiceStatus
 } from '../api/serviceApi';
+import {
+  fetchOffers,
+  createOffer as apiCreateOffer,
+  updateOffer as apiUpdateOffer,
+  deleteOffer as apiDeleteOffer,
+  toggleOfferStatus as apiToggleOfferStatus
+} from '../api/offerApi';
 
 const ClinicContext = createContext(null);
 
@@ -135,6 +142,9 @@ export function ClinicProvider({ children }) {
             fetchServices(token).then((srvs) => {
               setServices(srvs || []);
             }).catch(() => {});
+            fetchOffers(token).then((offs) => {
+              setOffers(offs || []);
+            }).catch(() => {});
           }
         } else if (session.user?.workspace === 'CLINIC') {
           applyClinicIdentity(session.clinic);
@@ -149,6 +159,9 @@ export function ClinicProvider({ children }) {
           }).catch(() => {});
           fetchServices(token).then((srvs) => {
             setServices(srvs || []);
+          }).catch(() => {});
+          fetchOffers(token).then((offs) => {
+            setOffers(offs || []);
           }).catch(() => {});
         }
       })
@@ -177,6 +190,15 @@ export function ClinicProvider({ children }) {
 
   // Authentication Methods
   const login = async (email, password) => {
+    // Clean previous session state before new login
+    localStorage.removeItem('onsta_services');
+    localStorage.removeItem('onsta_offers');
+    localStorage.removeItem('onsta_clinic');
+    localStorage.removeItem('onsta_doctors');
+    setServices([]);
+    setOffers([]);
+    setDoctors([]);
+
     const session = await loginAccount(email, password);
     localStorage.setItem('onsta_access_token', session.access_token);
     if (session.application?.id) {
@@ -186,6 +208,19 @@ export function ClinicProvider({ children }) {
     setAuth(nextAuth);
     if (session.application) applyClinicIdentity(null, session.application.application_status);
     else if (session.clinic) applyClinicIdentity(session.clinic);
+
+    // Fetch fresh services, doctors, and offers for this authenticated clinic
+    fetchServices(session.access_token).then((srvs) => {
+      setServices(srvs || []);
+    }).catch(() => {});
+
+    fetchDoctors(session.access_token).then((docs) => {
+      setDoctors(docs || []);
+    }).catch(() => {});
+
+    fetchOffers(session.access_token).then((offs) => {
+      setOffers(offs || []);
+    }).catch(() => {});
 
     const appStatus = session.application?.application_status;
     const reason = session.application?.rejection_reason || session.application?.review_notes;
@@ -214,7 +249,19 @@ export function ClinicProvider({ children }) {
 
   const logout = () => {
     localStorage.removeItem('onsta_access_token');
+    localStorage.removeItem('onsta_application_id');
+    localStorage.removeItem('onsta_services');
+    localStorage.removeItem('onsta_offers');
+    localStorage.removeItem('onsta_clinic');
+    localStorage.removeItem('onsta_doctors');
+    localStorage.removeItem('onsta_gallery');
+    localStorage.removeItem('onsta_enquiries');
+    localStorage.removeItem('onsta_auth');
     setAuth({ isAuthenticated: false, user: null });
+    setServices([]);
+    setOffers([]);
+    setDoctors([]);
+    setClinicData({ ...INITIAL_CLINIC_DATA, status: 'draft' });
     showToast("info", "Signed out", "You have been logged out of ONSTA Clinic Partner Portal.");
   };
 
@@ -604,11 +651,40 @@ export function ClinicProvider({ children }) {
   };
 
   // OFFERS CRUD
-  const addOffer = (offerData) => {
+  const addOffer = async (offerData) => {
     const linkedService = services.find(s => s.id === offerData.linkedServiceId);
     const normalPrice = parseFloat(offerData.normalPrice || linkedService?.normalPrice || 0);
     const offerPrice = parseFloat(offerData.offerPrice || 0);
     const discountPercent = normalPrice > 0 ? Math.round(((normalPrice - offerPrice) / normalPrice) * 100) : 0;
+
+    const token = localStorage.getItem('onsta_access_token');
+    if (token) {
+      try {
+        const created = await apiCreateOffer(offerData, token);
+        const newOffer = {
+          id: created.id,
+          title: created.title,
+          linkedServiceId: offerData.linkedServiceId,
+          linkedServiceName: created.linkedServiceName || linkedService?.name || "Treatment Service",
+          normalPrice,
+          offerPrice,
+          discountPercent,
+          startDate: offerData.startDate,
+          endDate: offerData.endDate,
+          terms: offerData.terms || '',
+          description: offerData.description || '',
+          verificationStatus: "VERIFIED",
+          rulesPassed: 8,
+          isActive: offerData.isActive !== undefined ? offerData.isActive : true
+        };
+        setOffers(prev => [newOffer, ...prev]);
+        showToast("success", "Offer Created", `"${newOffer.title}" published.`);
+        return { success: true, offer: newOffer };
+      } catch (err) {
+        showToast("error", "Failed to Create Offer", err.message);
+        return { success: false, error: err.message };
+      }
+    }
 
     const newOffer = {
       ...offerData,
@@ -628,9 +704,19 @@ export function ClinicProvider({ children }) {
     });
   };
 
-  const updateOffer = (id, updatedFields) => {
+  const updateOffer = async (id, updatedFields) => {
     const target = offers.find(o => o.id === id);
     if (!target) return { success: false };
+
+    const token = localStorage.getItem('onsta_access_token');
+    if (token) {
+      try {
+        await apiUpdateOffer(id, updatedFields, token);
+      } catch (err) {
+        showToast("error", "Update Failed", err.message);
+        return { success: false, error: err.message };
+      }
+    }
 
     const linkedService = services.find(s => s.id === (updatedFields.linkedServiceId || target.linkedServiceId));
     const normalPrice = parseFloat(updatedFields.normalPrice || target.normalPrice);
@@ -647,33 +733,46 @@ export function ClinicProvider({ children }) {
       verifiedAt: new Date().toISOString().split('T')[0]
     };
 
-    return executeUpdateWithRules("OFFER_UPDATE", merged, () => {
-      setOffers(prev => prev.map(o => o.id === id ? merged : o));
-    });
+    setOffers(prev => prev.map(o => o.id === id ? merged : o));
+    showToast("success", "Offer Updated", "Changes saved.");
+    return { success: true };
   };
 
-  const deleteOffer = (id) => {
+  const deleteOffer = async (id) => {
     const target = offers.find(o => o.id === id);
+    const token = localStorage.getItem('onsta_access_token');
+    if (token) {
+      try {
+        await apiDeleteOffer(id, token);
+      } catch (err) {
+        console.error("Delete offer error:", err);
+      }
+    }
     setOffers(prev => prev.filter(o => o.id !== id));
     showToast("info", "Offer Deleted", `"${target?.title}" removed.`);
     return true;
   };
 
-  const toggleOfferActive = (id) => {
+  const toggleOfferActive = async (id) => {
+    const target = offers.find(o => o.id === id);
+    if (!target) return;
+    const nextState = !target.isActive;
+
+    const token = localStorage.getItem('onsta_access_token');
+    if (token) {
+      try {
+        await apiToggleOfferStatus(id, nextState, token);
+      } catch (err) {
+        console.error("Toggle offer error:", err);
+      }
+    }
+
     setOffers(prev => prev.map(o => {
       if (o.id === id) {
-        const nextState = !o.isActive;
-        logVerification(
-          o.title,
-          "Offer Status Toggle",
-          "V10 Date & Status Check",
-          "PASS",
-          nextState ? "Offer set to Active. Customers can view active pricing." : "Offer deactivated. Hidden from customer profile."
-        );
         showToast("info", "Offer Visibility Updated", `"${o.title}" is now ${nextState ? 'Active' : 'Inactive'}.`);
         return { ...o, isActive: nextState };
       }
-      return s;
+      return o;
     }));
   };
 

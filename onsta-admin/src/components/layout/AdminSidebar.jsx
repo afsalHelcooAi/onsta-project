@@ -7,12 +7,14 @@ import {
   ScrollText,
   LayoutDashboard,
   LogOut,
-  Sparkles
+  Sparkles,
+  Layers
 } from 'lucide-react';
 
 export default function AdminSidebar({ activeTab, setActiveTab, pendingCount = 0, onSignOut }) {
   const menuItems = [
     { id: 'overview', label: 'Overview', icon: LayoutDashboard },
+    { id: 'master-catalog', label: 'Master Treatments & AI', icon: Sparkles },
     { id: 'review-queue', label: 'Clinic Verifications', icon: ShieldCheck, badge: pendingCount },
     { id: 'all-clinics', label: 'Registered Clinics', icon: Building2 },
     { id: 'compliance-audit', label: 'Compliance & Permits', icon: FileCheck },

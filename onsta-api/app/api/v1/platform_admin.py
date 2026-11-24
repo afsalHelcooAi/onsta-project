@@ -1147,3 +1147,309 @@ async def reject_compliance_renewal(
         "adminNotes": payload.reason,
         "message": f"Renewal for {req['target_name']} rejected with modification request: '{payload.reason}'"
     }
+
+
+# ---------------------------------------------------------------------------
+# Master Treatments & Target Concerns (Aesthetic AI Taxonomy)
+# ---------------------------------------------------------------------------
+
+class TreatmentCategoryCreate(BaseModel):
+    name: str = Field(min_length=2, max_length=120)
+    code: Optional[str] = None
+    description: Optional[str] = None
+    icon_name: Optional[str] = "Sparkles"
+    display_order: Optional[int] = 0
+
+
+class MasterTreatmentCreate(BaseModel):
+    name: str = Field(min_length=2, max_length=160)
+    category: Optional[str] = None
+    category_id: Optional[str] = None
+    description: Optional[str] = None
+    medical_specialty: Optional[str] = "Aesthetic Medicine"
+    standard_duration_minutes: Optional[int] = 45
+    reference_price_min: Optional[float] = None
+    reference_price_max: Optional[float] = None
+    concern_ids: list[str] = []
+
+
+class MasterTreatmentUpdate(BaseModel):
+    name: Optional[str] = None
+    category: Optional[str] = None
+    category_id: Optional[str] = None
+    description: Optional[str] = None
+    medical_specialty: Optional[str] = None
+    standard_duration_minutes: Optional[int] = None
+    reference_price_min: Optional[float] = None
+    reference_price_max: Optional[float] = None
+    is_active: Optional[bool] = None
+    concern_ids: Optional[list[str]] = None
+
+
+class TargetConcernCreate(BaseModel):
+    code: str = Field(min_length=2, max_length=60)
+    name: str = Field(min_length=2, max_length=120)
+    category: str = "SKIN"
+    description: Optional[str] = None
+
+
+@router.get("/master-catalog")
+async def get_master_catalog(actor: Actor = Depends(require_super_admin)):
+    """Fetch categories, master treatments with their mapped target concerns, and the full list of concerns."""
+    async with SessionLocal() as session:
+        categories_rows = (await session.execute(text("""
+            SELECT id::text, code, name, description, icon_name, display_order, is_active, created_at,
+                   (SELECT count(*)::integer FROM master_treatments mt WHERE mt.category_id = tc.id) AS treatments_count
+            FROM treatment_categories tc
+            WHERE is_active = TRUE
+            ORDER BY display_order, name
+        """))).mappings().all()
+
+        concerns_rows = (await session.execute(text("""
+            SELECT id::text, code, name, category, description, severity_levels, is_active, created_at
+            FROM target_concerns
+            ORDER BY category, name
+        """))).mappings().all()
+
+        treatments_rows = (await session.execute(text("""
+            SELECT 
+                t.id::text,
+                t.name,
+                COALESCE(tc.name, t.category) AS category,
+                t.category_id::text AS category_id,
+                t.description,
+                t.medical_specialty,
+                t.standard_duration_minutes,
+                t.reference_price_min::float,
+                t.reference_price_max::float,
+                t.is_active,
+                t.created_at,
+                COALESCE(
+                    json_agg(
+                        json_build_object(
+                            'id', c.id::text,
+                            'code', c.code,
+                            'name', c.name,
+                            'efficacy_score', m.efficacy_score
+                        )
+                    ) FILTER (WHERE c.id IS NOT NULL),
+                    '[]'::json
+                ) AS mapped_concerns,
+                (SELECT count(*)::integer FROM services s WHERE s.master_treatment_id = t.id) AS clinic_services_count
+            FROM master_treatments t
+            LEFT JOIN treatment_categories tc ON tc.id = t.category_id
+            LEFT JOIN treatment_concern_mappings m ON m.treatment_id = t.id
+            LEFT JOIN target_concerns c ON c.id = m.concern_id
+            GROUP BY t.id, tc.name
+            ORDER BY category, t.name
+        """))).mappings().all()
+
+    return {
+        "categories": [dict(r) for r in categories_rows],
+        "concerns": [dict(r) for r in concerns_rows],
+        "treatments": [dict(r) for r in treatments_rows]
+    }
+
+
+@router.post("/master-catalog/categories")
+async def create_treatment_category(
+    payload: TreatmentCategoryCreate,
+    actor: Actor = Depends(require_super_admin)
+):
+    """Add a new dynamic treatment category."""
+    category_id = uuid4()
+    code = (payload.code or payload.name.strip().upper().replace(" ", "_").replace("&", "AND"))[:80]
+    async with SessionLocal() as session:
+        existing = (await session.execute(
+            text("SELECT 1 FROM treatment_categories WHERE lower(name) = lower(:name) OR code = :code"),
+            {"name": payload.name.strip(), "code": code}
+        )).first()
+        if existing:
+            raise HTTPException(status_code=409, detail="A category with this name or code already exists.")
+
+        await session.execute(text("""
+            INSERT INTO treatment_categories (id, code, name, description, icon_name, display_order)
+            VALUES (:id, :code, :name, :description, :icon, :order)
+        """), {
+            "id": category_id,
+            "code": code,
+            "name": payload.name.strip(),
+            "description": payload.description,
+            "icon": payload.icon_name or "Sparkles",
+            "order": payload.display_order or 0
+        })
+        await session.commit()
+
+    return {"id": str(category_id), "status": "CREATED", "message": "Treatment category created successfully."}
+
+
+@router.post("/master-catalog/treatments")
+async def create_master_treatment(
+    payload: MasterTreatmentCreate,
+    actor: Actor = Depends(require_super_admin)
+):
+    """Create a new master clinical treatment and map it to target concerns and category."""
+    treatment_id = uuid4()
+    async with SessionLocal() as session:
+        # Check duplicate name
+        existing = (await session.execute(
+            text("SELECT 1 FROM master_treatments WHERE lower(name) = lower(:name)"),
+            {"name": payload.name.strip()}
+        )).first()
+        if existing:
+            raise HTTPException(status_code=409, detail="A master treatment with this name already exists.")
+
+        # Determine category and category_id
+        cat_id = None
+        cat_name = payload.category.strip() if payload.category else "Facial & Skin Health"
+        if payload.category_id:
+            cat_row = (await session.execute(
+                text("SELECT id, name FROM treatment_categories WHERE id = CAST(:id AS uuid)"),
+                {"id": payload.category_id}
+            )).first()
+            if cat_row:
+                cat_id = cat_row.id
+                cat_name = cat_row.name
+        else:
+            # Look up or auto-assign by name
+            cat_row = (await session.execute(
+                text("SELECT id, name FROM treatment_categories WHERE lower(name) = lower(:name)"),
+                {"name": cat_name}
+            )).first()
+            if cat_row:
+                cat_id = cat_row.id
+
+        await session.execute(text("""
+            INSERT INTO master_treatments (
+                id, name, category, category_id, description, medical_specialty,
+                standard_duration_minutes, reference_price_min, reference_price_max
+            ) VALUES (
+                :id, :name, :category, :category_id, :description, :medical_specialty,
+                :duration, :price_min, :price_max
+            )
+        """), {
+            "id": treatment_id,
+            "name": payload.name.strip(),
+            "category": cat_name,
+            "category_id": cat_id,
+            "description": payload.description,
+            "medical_specialty": payload.medical_specialty,
+            "duration": payload.standard_duration_minutes,
+            "price_min": payload.reference_price_min,
+            "price_max": payload.reference_price_max,
+        })
+
+        for cid in payload.concern_ids:
+            try:
+                await session.execute(text("""
+                    INSERT INTO treatment_concern_mappings (treatment_id, concern_id, efficacy_score)
+                    VALUES (:tid, CAST(:cid AS uuid), 5)
+                    ON CONFLICT DO NOTHING
+                """), {"tid": treatment_id, "cid": cid})
+            except Exception:
+                pass
+
+        await session.commit()
+
+    return {"id": str(treatment_id), "status": "CREATED", "message": "Master treatment created successfully."}
+
+
+
+@router.patch("/master-catalog/treatments/{treatment_id}")
+async def update_master_treatment(
+    treatment_id: UUID,
+    payload: MasterTreatmentUpdate,
+    actor: Actor = Depends(require_super_admin)
+):
+    """Update a master treatment and its concern mappings."""
+    async with SessionLocal() as session:
+        treatment = (await session.execute(
+            text("SELECT id FROM master_treatments WHERE id = CAST(:id AS uuid)"),
+            {"id": treatment_id}
+        )).first()
+        if not treatment:
+            raise HTTPException(status_code=404, detail="Master treatment not found.")
+
+        updates = []
+        params = {"id": treatment_id}
+
+        if payload.name is not None:
+            updates.append("name = :name")
+            params["name"] = payload.name.strip()
+        if payload.category is not None:
+            updates.append("category = :category")
+            params["category"] = payload.category.strip()
+        if payload.description is not None:
+            updates.append("description = :description")
+            params["description"] = payload.description
+        if payload.medical_specialty is not None:
+            updates.append("medical_specialty = :specialty")
+            params["specialty"] = payload.medical_specialty
+        if payload.standard_duration_minutes is not None:
+            updates.append("standard_duration_minutes = :duration")
+            params["duration"] = payload.standard_duration_minutes
+        if payload.reference_price_min is not None:
+            updates.append("reference_price_min = :pmin")
+            params["pmin"] = payload.reference_price_min
+        if payload.reference_price_max is not None:
+            updates.append("reference_price_max = :pmax")
+            params["pmax"] = payload.reference_price_max
+        if payload.is_active is not None:
+            updates.append("is_active = :active")
+            params["active"] = payload.is_active
+
+        if updates:
+            await session.execute(
+                text(f"UPDATE master_treatments SET {', '.join(updates)} WHERE id = CAST(:id AS uuid)"),
+                params
+            )
+
+        if payload.concern_ids is not None:
+            await session.execute(
+                text("DELETE FROM treatment_concern_mappings WHERE treatment_id = CAST(:id AS uuid)"),
+                {"id": treatment_id}
+            )
+            for cid in payload.concern_ids:
+                try:
+                    await session.execute(text("""
+                        INSERT INTO treatment_concern_mappings (treatment_id, concern_id, efficacy_score)
+                        VALUES (CAST(:tid AS uuid), CAST(:cid AS uuid), 5)
+                        ON CONFLICT DO NOTHING
+                    """), {"tid": treatment_id, "cid": cid})
+                except Exception:
+                    pass
+
+        await session.commit()
+
+    return {"status": "UPDATED", "message": "Master treatment updated successfully."}
+
+
+@router.post("/master-catalog/concerns")
+async def create_target_concern(
+    payload: TargetConcernCreate,
+    actor: Actor = Depends(require_super_admin)
+):
+    """Add a new detectable facial or skin target concern."""
+    concern_id = uuid4()
+    async with SessionLocal() as session:
+        existing = (await session.execute(
+            text("SELECT 1 FROM target_concerns WHERE code = :code"),
+            {"code": payload.code.strip().upper()}
+        )).first()
+        if existing:
+            raise HTTPException(status_code=409, detail="A concern with this code already exists.")
+
+        await session.execute(text("""
+            INSERT INTO target_concerns (id, code, name, category, description)
+            VALUES (:id, :code, :name, :category, :description)
+        """), {
+            "id": concern_id,
+            "code": payload.code.strip().upper(),
+            "name": payload.name.strip(),
+            "category": payload.category.strip().upper(),
+            "description": payload.description
+        })
+        await session.commit()
+
+    return {"id": str(concern_id), "status": "CREATED", "message": "Target concern added successfully."}
+
