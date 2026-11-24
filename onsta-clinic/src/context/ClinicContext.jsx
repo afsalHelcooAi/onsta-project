@@ -657,66 +657,60 @@ export function ClinicProvider({ children }) {
     const offerPrice = parseFloat(offerData.offerPrice || 0);
     const discountPercent = normalPrice > 0 ? Math.round(((normalPrice - offerPrice) / normalPrice) * 100) : 0;
 
-    const token = localStorage.getItem('onsta_access_token');
-    if (token) {
-      try {
-        const created = await apiCreateOffer(offerData, token);
-        const newOffer = {
-          id: created.id,
-          title: created.title,
-          linkedServiceId: offerData.linkedServiceId,
-          linkedServiceName: created.linkedServiceName || linkedService?.name || "Treatment Service",
-          normalPrice,
-          offerPrice,
-          discountPercent,
-          startDate: offerData.startDate,
-          endDate: offerData.endDate,
-          terms: offerData.terms || '',
-          description: offerData.description || '',
-          verificationStatus: "VERIFIED",
-          rulesPassed: 8,
-          isActive: offerData.isActive !== undefined ? offerData.isActive : true
-        };
-        setOffers(prev => [newOffer, ...prev]);
-        showToast("success", "Offer Created", `"${newOffer.title}" published.`);
-        return { success: true, offer: newOffer };
-      } catch (err) {
-        showToast("error", "Failed to Create Offer", err.message);
-        return { success: false, error: err.message };
-      }
-    }
-
-    const newOffer = {
+    const offerPayload = {
       ...offerData,
-      id: `OFF-${Date.now()}`,
-      linkedServiceName: linkedService?.name || offerData.linkedServiceName || "Treatment Service",
       normalPrice,
       offerPrice,
       discountPercent,
-      verificationStatus: "VERIFIED",
-      verifiedAt: new Date().toISOString().split('T')[0],
-      rulesPassed: 8,
-      isActive: offerData.isActive !== undefined ? offerData.isActive : true
+      linkedServiceName: linkedService?.name || "Treatment Service"
     };
 
-    return executeUpdateWithRules("OFFER_ADD", newOffer, () => {
+    return executeUpdateWithRules("OFFER_ADD", offerPayload, async () => {
+      const token = localStorage.getItem('onsta_access_token');
+      if (token) {
+        try {
+          const created = await apiCreateOffer(offerPayload, token);
+          const newOffer = {
+            id: created.id,
+            title: created.title,
+            linkedServiceId: offerData.linkedServiceId,
+            linkedServiceName: created.linkedServiceName || linkedService?.name || "Treatment Service",
+            normalPrice,
+            offerPrice,
+            discountPercent,
+            startDate: offerData.startDate,
+            endDate: offerData.endDate,
+            terms: offerData.terms || '',
+            description: offerData.description || '',
+            verificationStatus: "VERIFIED",
+            rulesPassed: 8,
+            isActive: offerData.isActive !== undefined ? offerData.isActive : true
+          };
+          setOffers(prev => [newOffer, ...prev]);
+          showToast("success", "Offer Created", `"${newOffer.title}" verified and published.`);
+          return { success: true, offer: newOffer };
+        } catch (err) {
+          showToast("error", "Failed to Save Offer", err.message);
+          return { success: false, error: err.message };
+        }
+      }
+
+      const newOffer = {
+        ...offerPayload,
+        id: `OFF-${Date.now()}`,
+        verificationStatus: "VERIFIED",
+        verifiedAt: new Date().toISOString().split('T')[0],
+        rulesPassed: 8,
+        isActive: offerData.isActive !== undefined ? offerData.isActive : true
+      };
       setOffers(prev => [newOffer, ...prev]);
+      return { success: true, offer: newOffer };
     });
   };
 
   const updateOffer = async (id, updatedFields) => {
     const target = offers.find(o => o.id === id);
     if (!target) return { success: false };
-
-    const token = localStorage.getItem('onsta_access_token');
-    if (token) {
-      try {
-        await apiUpdateOffer(id, updatedFields, token);
-      } catch (err) {
-        showToast("error", "Update Failed", err.message);
-        return { success: false, error: err.message };
-      }
-    }
 
     const linkedService = services.find(s => s.id === (updatedFields.linkedServiceId || target.linkedServiceId));
     const normalPrice = parseFloat(updatedFields.normalPrice || target.normalPrice);
@@ -733,9 +727,21 @@ export function ClinicProvider({ children }) {
       verifiedAt: new Date().toISOString().split('T')[0]
     };
 
-    setOffers(prev => prev.map(o => o.id === id ? merged : o));
-    showToast("success", "Offer Updated", "Changes saved.");
-    return { success: true };
+    return executeUpdateWithRules("OFFER_UPDATE", merged, async () => {
+      const token = localStorage.getItem('onsta_access_token');
+      if (token) {
+        try {
+          await apiUpdateOffer(id, updatedFields, token);
+        } catch (err) {
+          showToast("error", "Update Failed", err.message);
+          return { success: false, error: err.message };
+        }
+      }
+
+      setOffers(prev => prev.map(o => o.id === id ? merged : o));
+      showToast("success", "Offer Updated", "Changes verified and saved.");
+      return { success: true };
+    });
   };
 
   const deleteOffer = async (id) => {

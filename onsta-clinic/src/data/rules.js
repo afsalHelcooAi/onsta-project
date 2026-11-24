@@ -192,19 +192,43 @@ export const ONSTA_RULES = [
     severity: "CRITICAL",
     aiRequired: false,
     validate: (data) => {
-      const normal = parseFloat(data.normalPrice);
-      const offer = data.offerPrice ? parseFloat(data.offerPrice) : null;
-      if (isNaN(normal) || normal <= 0) {
-        return { pass: false, message: "Normal price must be a positive number in AED.", correction: "Enter a valid positive number for normal price." };
+      // Helper to clean and parse price strings or numbers (handles 'AED 450', '450.00', numbers, etc.)
+      const parseVal = (val) => {
+        if (val === null || val === undefined || val === '') return null;
+        if (typeof val === 'number') return isNaN(val) ? null : val;
+        const cleaned = String(val).replace(/[^0-9.]/g, '');
+        const num = parseFloat(cleaned);
+        return isNaN(num) ? null : num;
+      };
+
+      const normal = parseVal(data.normalPrice ?? data.normal_price ?? data.price);
+      const offer = parseVal(data.offerPrice ?? data.offer_price);
+
+      if (normal === null || normal <= 0) {
+        return {
+          pass: false,
+          message: "Normal price must be a positive number in AED.",
+          correction: "Enter a valid positive number for normal price."
+        };
       }
-      if (offer !== null && !isNaN(offer)) {
+
+      if (offer !== null) {
         if (offer <= 0) {
-          return { pass: false, message: "Offer price must be greater than zero.", correction: "Provide a valid discounted price." };
+          return {
+            pass: false,
+            message: "Offer price must be greater than zero.",
+            correction: "Provide a valid discounted price."
+          };
         }
         if (offer >= normal) {
-          return { pass: false, message: `Offer price (AED ${offer}) must be strictly lower than normal price (AED ${normal}).`, correction: "Discounted price must provide savings for the customer." };
+          return {
+            pass: false,
+            message: `Offer price (AED ${offer}) must be strictly lower than normal price (AED ${normal}).`,
+            correction: "Discounted price must provide savings for the customer."
+          };
         }
       }
+
       return { pass: true };
     },
     failureMessage: "Pricing structure does not satisfy price validation rules.",
