@@ -1,7 +1,6 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
-import PresentationBar from './PresentationBar';
 import VerificationModal from '../common/VerificationModal';
 import CustomerPreviewModal from '../common/CustomerPreviewModal';
 import { useClinic } from '../../context/ClinicContext';
@@ -18,19 +17,14 @@ export default function DashboardLayout() {
   } = useClinic();
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#F7F4EE]">
-      {/* Top Presentation Bar */}
-      <PresentationBar />
+    <div className="flex min-h-screen bg-[#F7F4EE]">
+      {/* Dark Forest Green Left Sidebar */}
+      <Sidebar onOpenPreview={() => setShowCustomerPreview(true)} />
 
-      <div className="flex flex-1">
-        {/* Dark Forest Green Left Sidebar */}
-        <Sidebar onOpenPreview={() => setShowCustomerPreview(true)} />
-
-        {/* Main Content Area */}
-        <main className="flex-1 p-6 sm:p-10 max-w-7xl mx-auto w-full overflow-y-auto">
-          <Outlet />
-        </main>
-      </div>
+      {/* Main Content Area */}
+      <main className="flex-1 p-6 sm:p-10 max-w-7xl mx-auto w-full overflow-y-auto">
+        <Outlet />
+      </main>
 
       {/* Global Verification Result Modal */}
       <VerificationModal
