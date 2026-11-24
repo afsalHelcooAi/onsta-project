@@ -163,3 +163,26 @@ export async function uploadDoctorPhoto(doctorId, file, token) {
 
   return res.json();
 }
+
+export async function renewDoctorLicenseApi(doctorId, { newExpiryDate, licenceNumber, authority, file } = {}, token) {
+  const formData = new FormData();
+  if (newExpiryDate) formData.append('new_expiry_date', newExpiryDate);
+  if (licenceNumber) formData.append('licence_number', licenceNumber);
+  if (authority) formData.append('authority', authority);
+  if (file) formData.append('file', file);
+
+  const res = await fetch(`/api/v1/clinic/doctors/${encodeURIComponent(doctorId)}/renew-license`, {
+    method: 'POST',
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: formData,
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.detail || 'Failed to renew doctor license.');
+  }
+
+  return res.json();
+}

@@ -13,8 +13,13 @@ import {
   ShieldAlert,
   ShieldCheck,
   XCircle,
+  AlertCircle,
+  Check,
+  X,
+  Loader2,
+  FileText,
 } from 'lucide-react';
-import { fetchComplianceAudit } from '../../api/adminApi';
+import { fetchComplianceAudit, approveRenewalRequest, rejectRenewalRequest } from '../../api/adminApi';
 
 const PAGE_SIZE = 25;
 const EMIRATES = ['Abu Dhabi', 'Ajman', 'Dubai', 'Fujairah', 'Ras Al Khaimah', 'Sharjah', 'Umm Al Quwain'];
@@ -59,17 +64,27 @@ function ExpiryBadge({ date }) {
 function ClinicComplianceStatus({ clinic }) {
   const tradeDays = daysUntil(clinic.trade_license_expiry_date);
   const facilityDays = daysUntil(clinic.facility_license_expiry_date);
-  const hasExpired = (tradeDays !== null && tradeDays < 0) || (facilityDays !== null && facilityDays < 0);
-  const hasUrgent = !hasExpired && ((tradeDays !== null && tradeDays <= 30) || (facilityDays !== null && facilityDays <= 30));
+  const hasExpiredDoctor = (clinic.expired_doctors_count || 0) > 0;
+  const hasExpiringDoctor = (clinic.expiring_doctors_count || 0) > 0;
+
+  const hasExpired = (tradeDays !== null && tradeDays < 0) || (facilityDays !== null && facilityDays < 0) || hasExpiredDoctor;
+  const hasUrgent = !hasExpired && ((tradeDays !== null && tradeDays <= 30) || (facilityDays !== null && facilityDays <= 30) || hasExpiringDoctor);
   const hasWarning = !hasExpired && !hasUrgent && ((tradeDays !== null && tradeDays <= 90) || (facilityDays !== null && facilityDays <= 90));
 
-  if (hasExpired) return { icon: <ShieldAlert className="h-4 w-4 text-red-600" />, label: 'EXPIRED', tone: 'text-red-700 bg-red-50 border-red-200' };
+  if (hasExpired) {
+    const label = hasExpiredDoctor ? 'EXPIRED (Doc)' : 'EXPIRED';
+    return { icon: <ShieldAlert className="h-4 w-4 text-red-600" />, label, tone: 'text-red-700 bg-red-50 border-red-200' };
+  }
   if (hasUrgent) return { icon: <AlertTriangle className="h-4 w-4 text-amber-600" />, label: 'EXPIRING SOON', tone: 'text-amber-700 bg-amber-50 border-amber-200' };
   if (hasWarning) return { icon: <Clock className="h-4 w-4 text-yellow-600" />, label: 'REVIEW DUE', tone: 'text-yellow-700 bg-yellow-50 border-yellow-200' };
   return { icon: <ShieldCheck className="h-4 w-4 text-emerald-600" />, label: 'COMPLIANT', tone: 'text-emerald-700 bg-emerald-50 border-emerald-200' };
 }
 
-function ComplianceDetailPanel({ clinic }) {
+function ComplianceDetailPanel({ clinic, onRefresh }) {
+  const [actionLoading, setActionLoading] = useState(null);
+  const [rejectModalReq, setRejectModalReq] = useState(null);
+  const [rejectReason, setRejectReason] = useState('');
+
   if (!clinic) {
     return (
       <div className="flex min-h-64 flex-col items-center justify-center text-center text-slate-400">
@@ -81,8 +96,90 @@ function ComplianceDetailPanel({ clinic }) {
 
   const { icon, label, tone } = ClinicComplianceStatus({ clinic });
 
+  const handleApprove = async (requestId) => {
+    try {
+      setActionLoading(requestId);
+      await approveRenewalRequest(requestId, { reason: 'Approved by ONSTA compliance auditor' });
+      if (onRefresh) onRefresh();
+    } catch (err) {
+      alert(err.message || 'Failed to approve renewal');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleRejectSubmit = async (e) => {
+    e.preventDefault();
+    if (!rejectModalReq || !rejectReason.trim()) return;
+    try {
+      setActionLoading(rejectModalReq.id);
+      await rejectRenewalRequest(rejectModalReq.id, { reason: rejectReason.trim() });
+      setRejectModalReq(null);
+      setRejectReason('');
+      if (onRefresh) onRefresh();
+    } catch (err) {
+      alert(err.message || 'Failed to submit modification request');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   return (
     <div className="space-y-5">
+      {/* Modification Request Modal */}
+      {rejectModalReq && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn">
+          <div className="bg-white rounded-2xl p-5 max-w-md w-full shadow-2xl border border-slate-200 space-y-4">
+            <div className="flex items-start justify-between">
+              <div>
+                <h3 className="font-bold text-slate-900 text-sm">Request Modification / Re-upload</h3>
+                <p className="text-xs text-slate-500 mt-0.5">{rejectModalReq.target_name} ({rejectModalReq.document_code})</p>
+              </div>
+              <button
+                onClick={() => setRejectModalReq(null)}
+                className="text-slate-400 hover:text-slate-600 p-1"
+              >
+                <X size={16} />
+              </button>
+            </div>
+            <form onSubmit={handleRejectSubmit} className="space-y-3">
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                  Reason / Modification Note for Clinic
+                </label>
+                <textarea
+                  required
+                  rows={3}
+                  value={rejectReason}
+                  onChange={(e) => setRejectReason(e.target.value)}
+                  placeholder="e.g. Document image is blurry or truncated. Please re-upload a clear colour PDF of the renewed licence."
+                  className="w-full text-xs p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-rose-500 outline-none"
+                />
+              </div>
+              <p className="text-[11px] text-slate-500">
+                This message will be shown directly in the clinic's Compliance Centre with a button to re-upload.
+              </p>
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setRejectModalReq(null)}
+                  className="px-3 py-1.5 text-xs text-slate-600 hover:text-slate-800"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={actionLoading === rejectModalReq.id || !rejectReason.trim()}
+                  className="px-4 py-1.5 rounded-lg bg-rose-600 text-white text-xs font-semibold hover:bg-rose-700 disabled:opacity-50"
+                >
+                  {actionLoading === rejectModalReq.id ? 'Submitting...' : 'Send Modification Request'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-100 pb-4">
         <div className="min-w-0">
@@ -93,6 +190,108 @@ function ComplianceDetailPanel({ clinic }) {
           {icon} {label}
         </div>
       </div>
+
+      {/* Pending Regulatory Renewal Requests (Admin Action Required) */}
+      {clinic.renewal_requests && clinic.renewal_requests.length > 0 && (
+        <section className="rounded-2xl border-2 border-amber-300 bg-amber-50/40 p-4 space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="w-5 h-5 text-amber-700" />
+              <h3 className="font-bold text-slate-900 text-sm">
+                Regulatory Renewal Requests ({clinic.renewal_requests.filter(r => r.status === 'PENDING_REVIEW').length} Pending)
+              </h3>
+            </div>
+            <span className="text-[10px] font-bold uppercase tracking-wider bg-amber-200/80 text-amber-900 px-2 py-0.5 rounded-full">
+              Action Required
+            </span>
+          </div>
+          <p className="text-xs text-slate-600">
+            The clinic submitted updated licence credentials extracted via AI. Review and approve below to apply updates and restore public marketplace listing on onsta.ae.
+          </p>
+
+          <div className="space-y-3 pt-1">
+            {clinic.renewal_requests.map((req) => (
+              <div
+                key={req.id}
+                className="bg-white rounded-xl border border-amber-200 p-3.5 shadow-sm space-y-3"
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <strong className="text-slate-900 text-sm font-bold">{req.target_name}</strong>
+                      <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700">
+                        {req.document_code}
+                      </span>
+                    </div>
+                    <span className="text-xs text-slate-500 block mt-0.5">
+                      Licence No: <strong>{req.document_number}</strong> · Authority: <strong>{req.authority}</strong>
+                    </span>
+                  </div>
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                    req.status === 'PENDING_REVIEW'
+                      ? 'bg-blue-100 text-blue-800 border border-blue-200'
+                      : 'bg-rose-100 text-rose-800 border border-rose-200'
+                  }`}>
+                    {req.status === 'PENDING_REVIEW' ? 'Pending Review' : 'Modification Requested'}
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-xs bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                  <div>
+                    <span className="text-slate-400 block text-[10px] uppercase">Current Expiry</span>
+                    <span className="font-mono text-slate-700 font-semibold">{req.old_expiry_date || 'Expired'}</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block text-[10px] uppercase">New Requested Expiry</span>
+                    <span className="font-mono text-emerald-700 font-bold">{req.new_expiry_date}</span>
+                  </div>
+                </div>
+
+                {req.file_name && (
+                  <div className="text-[11px] text-slate-500 flex items-center gap-1.5">
+                    <FileText className="w-3.5 h-3.5 text-slate-400" />
+                    <span>Attached Document: <strong className="text-slate-700 font-mono">{req.file_name}</strong></span>
+                  </div>
+                )}
+
+                {req.status === 'PENDING_REVIEW' && (
+                  <div className="flex items-center justify-end gap-2 pt-1 border-t border-slate-100">
+                    <button
+                      onClick={() => {
+                        setRejectModalReq(req);
+                        setRejectReason('');
+                      }}
+                      disabled={actionLoading === req.id}
+                      className="px-3 py-1.5 rounded-lg border border-rose-300 text-rose-700 text-xs font-semibold hover:bg-rose-50 transition-colors flex items-center gap-1"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                      <span>Request Modification</span>
+                    </button>
+                    <button
+                      onClick={() => handleApprove(req.id)}
+                      disabled={actionLoading === req.id}
+                      className="px-3.5 py-1.5 rounded-lg bg-emerald-700 text-white text-xs font-semibold hover:bg-emerald-800 transition-colors flex items-center gap-1.5 shadow-sm"
+                    >
+                      {actionLoading === req.id ? (
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      ) : (
+                        <Check className="w-3.5 h-3.5" />
+                      )}
+                      <span>Approve & Restore Listing</span>
+                    </button>
+                  </div>
+                )}
+
+                {req.status === 'REJECTED' && req.admin_notes && (
+                  <div className="text-xs text-rose-700 bg-rose-50 p-2 rounded border border-rose-200">
+                    <strong>Admin Feedback Sent:</strong> {req.admin_notes}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Trade License */}
       <section className="rounded-2xl border border-slate-200 p-4">
@@ -168,6 +367,69 @@ function ComplianceDetailPanel({ clinic }) {
           </div>
         </dl>
       </section>
+
+      {/* Practitioner Licenses Watchdog */}
+      <section className="rounded-2xl border border-slate-200 p-4">
+        <div className="flex items-center justify-between gap-3 mb-3">
+          <div>
+            <h3 className="font-semibold text-slate-900">Practitioner Licences Watchdog</h3>
+            <p className="text-xs text-slate-500">Live credential status from practitioner_licenses table</p>
+          </div>
+          <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700">
+            {clinic.practitioners ? clinic.practitioners.length : 0} Doctor(s)
+          </span>
+        </div>
+
+        {(!clinic.practitioners || clinic.practitioners.length === 0) ? (
+          <div className="p-4 text-center text-xs text-slate-400 bg-slate-50 rounded-xl">
+            No practitioners currently registered to this facility.
+          </div>
+        ) : (
+          <div className="space-y-2.5">
+            {clinic.practitioners.map((doc) => {
+              const days = daysUntil(doc.expiry_date);
+              const isExpired = days !== null && days < 0;
+              const isCritical = days !== null && days >= 0 && days <= 30;
+
+              return (
+                <div
+                  key={doc.id}
+                  className={`p-3 rounded-xl border text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 transition-colors ${
+                    isExpired
+                      ? 'bg-red-50/50 border-red-200'
+                      : isCritical
+                      ? 'bg-amber-50/50 border-amber-200'
+                      : 'bg-white border-slate-200'
+                  }`}
+                >
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <strong className={isExpired ? 'text-red-950 font-bold' : 'text-slate-900 font-semibold'}>
+                        {doc.full_name}
+                      </strong>
+                      <span className="text-[10px] text-slate-400 font-mono">
+                        ({doc.authority || 'DHA'} · {doc.license_number})
+                      </span>
+                    </div>
+                    <span className="text-slate-500 text-[11px] block mt-0.5">
+                      {doc.specialty} · {doc.professional_title || 'Specialist'}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2 self-start sm:self-auto">
+                    <ExpiryBadge date={doc.expiry_date} />
+                    {isExpired && (
+                      <span className="text-[10px] font-bold text-red-700 bg-red-100 px-2 py-0.5 rounded-full">
+                        Delisted
+                      </span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </section>
     </div>
   );
 }
@@ -230,7 +492,7 @@ export default function ComplianceAudit() {
       <header className="flex flex-wrap items-center justify-between gap-4 border-b border-[#E5DFD5] bg-white px-6 py-5 shadow-sm sm:px-8">
         <div>
           <h1 className="font-serif text-xl font-bold text-[#0d281e]">Compliance & Permits</h1>
-          <p className="mt-1 text-xs text-slate-500">Monitor trade and facility license expiry across all registered clinics.</p>
+          <p className="mt-1 text-xs text-slate-500">Monitor trade, facility, and practitioner license expiry across all registered clinics.</p>
         </div>
         <button
           type="button"
@@ -330,9 +592,21 @@ export default function ComplianceAudit() {
                       <span>{clinic.facility_type}</span>
                       <span>{clinic.tenant_code}</span>
                     </div>
-                    <div className="mt-2 flex gap-3 text-[10px] text-slate-400">
+                    <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[10px] text-slate-400">
                       <span>Trade: {formatDate(clinic.trade_license_expiry_date)}</span>
                       <span>Facility: {formatDate(clinic.facility_license_expiry_date)}</span>
+                      {clinic.pending_renewals_count > 0 ? (
+                        <span className="text-blue-700 font-bold bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">
+                          Renewals: {clinic.pending_renewals_count} Pending
+                        </span>
+                      ) : null}
+                      {clinic.expired_doctors_count > 0 ? (
+                        <span className="text-red-600 font-bold">Docs: {clinic.expired_doctors_count} Expired</span>
+                      ) : clinic.expiring_doctors_count > 0 ? (
+                        <span className="text-amber-600 font-bold">Docs: {clinic.expiring_doctors_count} Expiring</span>
+                      ) : (
+                        <span>Docs: {clinic.practitioners ? clinic.practitioners.length : 0}</span>
+                      )}
                     </div>
                   </button>
                 );
@@ -368,7 +642,10 @@ export default function ComplianceAudit() {
 
         {/* Right: Detail Panel */}
         <section className="min-h-0 overflow-y-auto bg-white p-4 sm:p-6">
-          <ComplianceDetailPanel clinic={selectedClinic} />
+          <ComplianceDetailPanel
+            clinic={selectedClinic}
+            onRefresh={() => setRefreshKey((k) => k + 1)}
+          />
         </section>
       </div>
     </main>

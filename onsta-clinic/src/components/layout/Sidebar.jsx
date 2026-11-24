@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
-  LayoutDashboard, Building2, Stethoscope, Tag, Image, Clock,
+  LayoutDashboard, Building2, Stethoscope, Tag, Image,
   ShieldCheck, ExternalLink, Sparkles, RotateCcw, LogOut,
   UserCheck, MessageSquare
 } from 'lucide-react';
@@ -26,7 +26,6 @@ export default function Sidebar({ onOpenPreview }) {
     { name: 'Services & prices', path: '/dashboard/services', icon: Stethoscope },
     { name: 'Offers', path: '/dashboard/offers', icon: Tag },
     { name: 'Enquiries', path: '/dashboard/enquiries', icon: MessageSquare, badge: newEnquiriesCount > 0 ? newEnquiriesCount.toString() : null },
-    { name: 'Requests', path: '/dashboard/requests', icon: Clock, badge: '3' },
     { name: 'Compliance', path: '/dashboard/compliance', icon: ShieldCheck }
   ];
 
