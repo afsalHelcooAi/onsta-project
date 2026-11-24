@@ -298,6 +298,9 @@ async def list_users(
     return {"items": [dict(row) for row in rows], "total": total, "limit": limit, "offset": offset}
 
 
+
+
+
 @router.get("/compliance")
 async def list_compliance_audit(
     search: Optional[str] = Query(None, max_length=200),
@@ -331,13 +334,15 @@ async def list_compliance_audit(
     if normalized_filter == "EXPIRED":
         filters.append("""
             (a.trade_license_expiry_date < CURRENT_DATE
-             OR a.facility_license_expiry_date < CURRENT_DATE)
+             OR a.facility_license_expiry_date < CURRENT_DATE
+             OR EXISTS (SELECT 1 FROM practitioners p JOIN practitioner_licenses pl ON pl.practitioner_id = p.id WHERE p.clinic_id = c.id AND pl.expiry_date < CURRENT_DATE))
         """)
     elif normalized_filter == "EXPIRING_30":
         filters.append("""
             (
                 (a.trade_license_expiry_date >= CURRENT_DATE AND a.trade_license_expiry_date <= CURRENT_DATE + INTERVAL '30 days')
                 OR (a.facility_license_expiry_date >= CURRENT_DATE AND a.facility_license_expiry_date <= CURRENT_DATE + INTERVAL '30 days')
+                OR EXISTS (SELECT 1 FROM practitioners p JOIN practitioner_licenses pl ON pl.practitioner_id = p.id WHERE p.clinic_id = c.id AND pl.expiry_date >= CURRENT_DATE AND pl.expiry_date <= CURRENT_DATE + INTERVAL '30 days')
             )
             AND (a.trade_license_expiry_date >= CURRENT_DATE OR a.trade_license_expiry_date IS NULL)
             AND (a.facility_license_expiry_date >= CURRENT_DATE OR a.facility_license_expiry_date IS NULL)
@@ -347,6 +352,7 @@ async def list_compliance_audit(
             (
                 (a.trade_license_expiry_date >= CURRENT_DATE AND a.trade_license_expiry_date <= CURRENT_DATE + INTERVAL '90 days')
                 OR (a.facility_license_expiry_date >= CURRENT_DATE AND a.facility_license_expiry_date <= CURRENT_DATE + INTERVAL '90 days')
+                OR EXISTS (SELECT 1 FROM practitioners p JOIN practitioner_licenses pl ON pl.practitioner_id = p.id WHERE p.clinic_id = c.id AND pl.expiry_date >= CURRENT_DATE AND pl.expiry_date <= CURRENT_DATE + INTERVAL '90 days')
             )
             AND (a.trade_license_expiry_date >= CURRENT_DATE OR a.trade_license_expiry_date IS NULL)
             AND (a.facility_license_expiry_date >= CURRENT_DATE OR a.facility_license_expiry_date IS NULL)
@@ -355,6 +361,7 @@ async def list_compliance_audit(
         filters.append("""
             (a.trade_license_expiry_date IS NULL OR a.trade_license_expiry_date > CURRENT_DATE + INTERVAL '90 days')
             AND (a.facility_license_expiry_date IS NULL OR a.facility_license_expiry_date > CURRENT_DATE + INTERVAL '90 days')
+            AND NOT EXISTS (SELECT 1 FROM practitioners p JOIN practitioner_licenses pl ON pl.practitioner_id = p.id WHERE p.clinic_id = c.id AND pl.expiry_date <= CURRENT_DATE + INTERVAL '90 days')
         """)
 
     where_clause = " AND ".join(filters)
@@ -390,7 +397,51 @@ async def list_compliance_audit(
                 a.facility_license_number,
                 a.facility_license_authority,
                 a.facility_license_issue_date,
-                a.facility_license_expiry_date
+                a.facility_license_expiry_date,
+                COALESCE(
+                    (SELECT jsonb_agg(jsonb_build_object(
+                        'id', p.id::text,
+                        'full_name', p.full_name,
+                        'specialty', COALESCE(p.specialty, 'Medical Specialist'),
+                        'professional_title', p.professional_title,
+                        'license_number', COALESCE(pl.license_number, 'PENDING'),
+                        'authority', COALESCE(pl.authority, 'DHA'),
+                        'expiry_date', pl.expiry_date::text,
+                        'days_remaining', (pl.expiry_date - CURRENT_DATE),
+                        'status', p.status
+                    ) ORDER BY pl.expiry_date ASC)
+                     FROM practitioners p
+                     LEFT JOIN practitioner_licenses pl ON pl.practitioner_id = p.id
+                     WHERE p.clinic_id = c.id),
+                    '[]'::jsonb
+                ) AS practitioners,
+                (SELECT count(*)::integer FROM practitioners p
+                 JOIN practitioner_licenses pl ON pl.practitioner_id = p.id
+                 WHERE p.clinic_id = c.id AND pl.expiry_date < CURRENT_DATE) AS expired_doctors_count,
+                (SELECT count(*)::integer FROM practitioners p
+                 JOIN practitioner_licenses pl ON pl.practitioner_id = p.id
+                 WHERE p.clinic_id = c.id AND pl.expiry_date >= CURRENT_DATE AND pl.expiry_date <= CURRENT_DATE + INTERVAL '30 days') AS expiring_doctors_count,
+                COALESCE(
+                    (SELECT jsonb_agg(jsonb_build_object(
+                        'id', r.id::text,
+                        'request_type', r.request_type,
+                        'target_id', r.target_id::text,
+                        'target_name', r.target_name,
+                        'document_code', r.document_code,
+                        'document_number', r.document_number,
+                        'authority', r.authority,
+                        'old_expiry_date', r.old_expiry_date::text,
+                        'new_expiry_date', r.new_expiry_date::text,
+                        'file_name', r.file_name,
+                        'status', r.status,
+                        'admin_notes', r.admin_notes,
+                        'created_at', r.created_at::text
+                    ) ORDER BY r.created_at DESC)
+                     FROM compliance_renewal_requests r
+                     WHERE r.clinic_id = c.id AND r.status IN ('PENDING_REVIEW', 'REJECTED')),
+                    '[]'::jsonb
+                ) AS renewal_requests,
+                (SELECT count(*)::integer FROM compliance_renewal_requests r WHERE r.clinic_id = c.id AND r.status = 'PENDING_REVIEW') AS pending_renewals_count
             FROM clinics c
             JOIN tenants t ON t.id = c.tenant_id
             JOIN clinic_applications a ON a.id = c.approved_application_id
@@ -398,13 +449,17 @@ async def list_compliance_audit(
             ORDER BY
                 LEAST(
                     COALESCE(a.trade_license_expiry_date, '9999-12-31'),
-                    COALESCE(a.facility_license_expiry_date, '9999-12-31')
+                    COALESCE(a.facility_license_expiry_date, '9999-12-31'),
+                    COALESCE((SELECT min(pl.expiry_date) FROM practitioners p JOIN practitioner_licenses pl ON pl.practitioner_id = p.id WHERE p.clinic_id = c.id), '9999-12-31')
                 ) ASC,
                 c.trading_name ASC
             LIMIT :limit OFFSET :offset
         """), params)).mappings().all()
 
     return {"items": [dict(row) for row in rows], "total": total, "limit": limit, "offset": offset}
+
+
+
 
 
 @router.get("/clinics")
@@ -465,6 +520,9 @@ async def list_registered_clinics(
             LIMIT :limit OFFSET :offset
         """), params)).mappings().all()
     return {"items": [dict(row) for row in rows], "total": total, "limit": limit, "offset": offset}
+
+
+
 
 
 @router.get("/clinics/{clinic_id}")
@@ -902,3 +960,190 @@ async def list_audit_logs(
         """), params)).mappings().all()
 
     return {"items": [dict(row) for row in rows], "total": total, "limit": limit, "offset": offset}
+
+
+@router.post("/compliance/renewals/{request_id}/approve")
+async def approve_compliance_renewal(
+    request_id: str,
+    payload: Optional[DecisionRequest] = None,
+    actor: Actor = Depends(require_super_admin),
+):
+    """
+    Approve a pending document or practitioner license renewal request.
+    Applies new expiry date and details directly to live database records, restoring onsta.ae listing.
+    """
+    async with SessionLocal() as session:
+        async with session.begin():
+            req = (await session.execute(text("""
+                SELECT * FROM compliance_renewal_requests
+                WHERE id = CAST(:id AS uuid) FOR UPDATE
+            """), {"id": request_id})).mappings().first()
+            if not req:
+                raise HTTPException(status_code=404, detail="Renewal request not found.")
+            if req["status"] == "APPROVED":
+                return {"status": "APPROVED", "message": "Renewal already approved."}
+
+            # 1. Update compliance_renewal_requests status
+            await session.execute(text("""
+                UPDATE compliance_renewal_requests
+                SET status = 'APPROVED',
+                    reviewed_by = CAST(:admin_id AS uuid),
+                    reviewed_at = now(),
+                    updated_at = now()
+                WHERE id = CAST(:id AS uuid)
+            """), {"admin_id": str(actor["id"]), "id": request_id})
+
+            # Supersede any prior requests for the same target
+            if req.get("target_id"):
+                await session.execute(text("""
+                    UPDATE compliance_renewal_requests
+                    SET status = 'SUPERSEDED', updated_at = now()
+                    WHERE clinic_id = CAST(:cid AS uuid)
+                      AND target_id = CAST(:tid AS uuid)
+                      AND id != CAST(:rid AS uuid)
+                      AND status IN ('PENDING_REVIEW', 'REJECTED')
+                """), {"cid": str(req["clinic_id"]), "tid": str(req["target_id"]), "rid": str(req["id"])})
+            elif req.get("document_code"):
+                await session.execute(text("""
+                    UPDATE compliance_renewal_requests
+                    SET status = 'SUPERSEDED', updated_at = now()
+                    WHERE clinic_id = CAST(:cid AS uuid)
+                      AND document_code = :dcode
+                      AND id != CAST(:rid AS uuid)
+                      AND status IN ('PENDING_REVIEW', 'REJECTED')
+                """), {"cid": str(req["clinic_id"]), "dcode": req["document_code"], "rid": str(req["id"])})
+
+            # 2. Apply updates to the live entities
+            if req["request_type"] == "DOCTOR_LICENSE" and req["target_id"]:
+                await session.execute(text("""
+                    UPDATE practitioner_licenses
+                    SET expiry_date = :exp,
+                        license_number = COALESCE(:lic_num, license_number),
+                        authority = COALESCE(:auth, authority),
+                        verification_status = 'VERIFIED'
+                    WHERE practitioner_id = CAST(:pid AS uuid)
+                """), {
+                    "exp": req["new_expiry_date"],
+                    "lic_num": req["document_number"],
+                    "auth": req["authority"],
+                    "pid": str(req["target_id"])
+                })
+                # Reactivate practitioner
+                await session.execute(text("""
+                    UPDATE practitioners
+                    SET status = 'ACTIVE'
+                    WHERE id = CAST(:pid AS uuid)
+                """), {"pid": str(req["target_id"])})
+
+            elif req["request_type"] == "INSTITUTIONAL_DOCUMENT":
+                if req["document_code"] == "FACILITY_LICENSE":
+                    await session.execute(text("""
+                        UPDATE clinic_applications
+                        SET facility_license_expiry_date = :exp,
+                            facility_license_number = COALESCE(:lic_num, facility_license_number),
+                            facility_license_authority = COALESCE(:auth, facility_license_authority),
+                            updated_at = now()
+                        WHERE id IN (
+                            SELECT c.approved_application_id FROM clinics c
+                            WHERE c.id = CAST(:cid AS uuid) AND c.approved_application_id IS NOT NULL
+                        )
+                    """), {
+                        "exp": req["new_expiry_date"],
+                        "lic_num": req["document_number"],
+                        "auth": req["authority"],
+                        "cid": str(req["clinic_id"])
+                    })
+                elif req["document_code"] == "TRADE_LICENSE":
+                    await session.execute(text("""
+                        UPDATE clinic_applications
+                        SET trade_license_expiry_date = :exp,
+                            trade_license_number = COALESCE(:lic_num, trade_license_number),
+                            trade_license_authority = COALESCE(:auth, trade_license_authority),
+                            updated_at = now()
+                        WHERE id IN (
+                            SELECT c.approved_application_id FROM clinics c
+                            WHERE c.id = CAST(:cid AS uuid) AND c.approved_application_id IS NOT NULL
+                        )
+                    """), {
+                        "exp": req["new_expiry_date"],
+                        "lic_num": req["document_number"],
+                        "auth": req["authority"],
+                        "cid": str(req["clinic_id"])
+                    })
+
+            # Audit log
+            audit_details = json.dumps({
+                "request_id": request_id,
+                "target_name": req["target_name"],
+                "document_code": req["document_code"],
+                "new_expiry_date": str(req["new_expiry_date"]),
+                "clinic_id": str(req["clinic_id"]),
+            })
+            await session.execute(text("""
+                INSERT INTO audit_logs (actor_user_id, action, entity_type, entity_id, details)
+                VALUES (
+                    CAST(:actor_id AS uuid), 'COMPLIANCE_RENEWAL_APPROVED', 'COMPLIANCE_RENEWAL', CAST(:req_id AS uuid),
+                    CAST(:details AS jsonb)
+                )
+            """), {"actor_id": str(actor["id"]), "req_id": request_id, "details": audit_details})
+
+    return {
+        "status": "APPROVED",
+        "requestId": request_id,
+        "message": f"Renewal for {req['target_name']} approved successfully. Live status restored on onsta.ae."
+    }
+
+
+@router.post("/compliance/renewals/{request_id}/reject")
+async def reject_compliance_renewal(
+    request_id: str,
+    payload: DecisionRequest,
+    actor: Actor = Depends(require_super_admin),
+):
+    """
+    Reject or request modification for a document or practitioner license renewal request.
+    Stores the feedback reason and signals the clinic portal to allow re-uploading.
+    """
+    async with SessionLocal() as session:
+        async with session.begin():
+            req = (await session.execute(text("""
+                SELECT * FROM compliance_renewal_requests
+                WHERE id = CAST(:id AS uuid) FOR UPDATE
+            """), {"id": request_id})).mappings().first()
+            if not req:
+                raise HTTPException(status_code=404, detail="Renewal request not found.")
+
+            await session.execute(text("""
+                UPDATE compliance_renewal_requests
+                SET status = 'REJECTED',
+                    admin_notes = :reason,
+                    reviewed_by = CAST(:admin_id AS uuid),
+                    reviewed_at = now(),
+                    updated_at = now()
+                WHERE id = CAST(:id AS uuid)
+            """), {
+                "reason": payload.reason,
+                "admin_id": str(actor["id"]),
+                "id": request_id
+            })
+
+            audit_details = json.dumps({
+                "request_id": request_id,
+                "target_name": req["target_name"],
+                "reason": payload.reason,
+                "clinic_id": str(req["clinic_id"]),
+            })
+            await session.execute(text("""
+                INSERT INTO audit_logs (actor_user_id, action, entity_type, entity_id, details)
+                VALUES (
+                    CAST(:actor_id AS uuid), 'COMPLIANCE_RENEWAL_REJECTED', 'COMPLIANCE_RENEWAL', CAST(:req_id AS uuid),
+                    CAST(:details AS jsonb)
+                )
+            """), {"actor_id": str(actor["id"]), "req_id": request_id, "details": audit_details})
+
+    return {
+        "status": "REJECTED",
+        "requestId": request_id,
+        "adminNotes": payload.reason,
+        "message": f"Renewal for {req['target_name']} rejected with modification request: '{payload.reason}'"
+    }

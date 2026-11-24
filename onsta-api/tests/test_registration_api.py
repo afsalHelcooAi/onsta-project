@@ -103,14 +103,14 @@ class TestRegistrationAPI(unittest.IsolatedAsyncioTestCase):
         self.assertFalse(submit_res.dashboard_unlocked)
 
         # 5. Dashboard Gate: Access remains locked until admin approves
-        gate_pending = await await self.service.check_dashboard_access(clinic_id)
+        gate_pending = await self.service.check_dashboard_access(clinic_id)
         self.assertFalse(gate_pending.access_granted)
 
     async def test_idempotent_duplicate_submission(self):
         clinic_id = "22222222-2222-2222-2222-222222222222"
         
         # Prepare clinic in READY_FOR_REVIEW
-        await await self.service.set_clinic_status(clinic_id, ClinicStatus.READY_FOR_REVIEW)
+        await self.service.set_clinic_status(clinic_id, ClinicStatus.READY_FOR_REVIEW)
 
         # First submit
         sub1 = await self.service.submit_registration(
@@ -137,7 +137,7 @@ class TestRegistrationAPI(unittest.IsolatedAsyncioTestCase):
 
     async def test_mismatched_documents_stay_locked_in_under_review(self):
         clinic_id = "33333333-3333-3333-3333-333333333333"
-        await await self.service.set_clinic_status(clinic_id, ClinicStatus.READY_FOR_REVIEW)
+        await self.service.set_clinic_status(clinic_id, ClinicStatus.READY_FOR_REVIEW)
         # Has discrepancy flag - test submission goes to UNDER_REVIEW
 
         sub = await self.service.submit_registration(

@@ -65,9 +65,14 @@ class TestClinicDoctorsE2E(unittest.IsolatedAsyncioTestCase):
             self.token = create_access_token(self.user_id)
             self.headers = {"Authorization": f"Bearer {self.token}"}
 
+            # Clean up any leftover test practitioners
+            await s.execute(text("DELETE FROM practitioner_licenses WHERE license_number IN ('DHA-P-0044812', 'DHA-P-0044812-R', 'DHA-P-9999999')"))
+            await s.execute(text("DELETE FROM practitioners WHERE full_name IN ('Dr. Fatima Al Nuaimi', 'Dr. Omar Al Mansoori')"))
+            await s.commit()
+
     async def asyncTearDown(self):
         from app.db.database import engine
-        await engine.dispose()
+        await engine.dispose(close=False)
 
     async def test_doctor_lifecycle(self):
         async with AsyncClient(transport=self.transport, base_url="http://test") as ac:
@@ -128,6 +133,17 @@ class TestClinicDoctorsE2E(unittest.IsolatedAsyncioTestCase):
             }
             res_up = await ac.put(f"/api/v1/clinic/doctors/{doctor_id}", headers=self.headers, json=update_payload)
             self.assertEqual(res_up.status_code, 200)
+
+            # 3b. Test Doctor License Renewal
+            renew_payload = {
+                "new_expiry_date": "2028-12-31",
+                "licence_number": "DHA-P-0044812-R",
+                "authority": "DHA"
+            }
+            res_renew = await ac.post(f"/api/v1/clinic/doctors/{doctor_id}/renew-license", headers=self.headers, json=renew_payload)
+            self.assertEqual(res_renew.status_code, 200)
+            self.assertEqual(res_renew.json()["status"], "success")
+            self.assertGreater(res_renew.json()["days_remaining"], 0)
 
             # 3b. Create a 2nd doctor and test updating the 2nd doctor with 1st doctor's license (should return 409)
             doc2_payload = {

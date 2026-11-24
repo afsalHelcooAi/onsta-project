@@ -10,7 +10,6 @@ import OffersManagement from './components/dashboard/OffersManagement';
 import DoctorsManagement from './components/dashboard/DoctorsManagement';
 import EnquiriesManagement from './components/dashboard/EnquiriesManagement';
 import GalleryManagement from './components/dashboard/GalleryManagement';
-import RequestsReview from './components/dashboard/RequestsReview';
 import ComplianceCentre from './components/dashboard/ComplianceCentre';
 import ClinicRegistrationPage from './components/auth/ClinicRegistrationPage';
 import ApplicationStatusPage from './components/auth/ApplicationStatusPage';
@@ -107,7 +106,7 @@ function AppRoutes() {
         <Route path="offers" element={<OffersManagement onOpenPreview={() => setShowCustomerPreview(true)} />} />
         <Route path="enquiries" element={<EnquiriesManagement />} />
         <Route path="gallery" element={<Navigate to="/dashboard/profile" replace />} />
-        <Route path="requests" element={<RequestsReview />} />
+        <Route path="requests" element={<Navigate to="/dashboard/compliance" replace />} />
         <Route path="analytics" element={<Navigate to="/dashboard/overview" replace />} />
         <Route path="compliance" element={<ComplianceCentre />} />
       </Route>
@@ -120,7 +119,7 @@ function AppRoutes() {
       <Route path="/offers" element={<Navigate to="/dashboard/offers" replace />} />
       <Route path="/enquiries" element={<Navigate to="/dashboard/enquiries" replace />} />
       <Route path="/gallery" element={<Navigate to="/dashboard/gallery" replace />} />
-      <Route path="/requests" element={<Navigate to="/dashboard/requests" replace />} />
+      <Route path="/requests" element={<Navigate to="/dashboard/compliance" replace />} />
       <Route path="/analytics" element={<Navigate to="/dashboard/overview" replace />} />
       <Route path="/compliance" element={<Navigate to="/dashboard/compliance" replace />} />
 

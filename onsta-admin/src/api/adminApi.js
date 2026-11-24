@@ -88,6 +88,32 @@ export async function fetchComplianceAudit({ search = '', emirate = '', complian
   return res.json();
 }
 
+export async function approveRenewalRequest(requestId, { reason = 'Approved by compliance audit' } = {}) {
+  const res = await fetch(`${API_BASE}/compliance/renewals/${encodeURIComponent(requestId)}/approve`, {
+    method: 'POST',
+    headers: authHeaders(true),
+    body: JSON.stringify({ reason }),
+  });
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error.detail || `Failed to approve renewal (${res.status})`);
+  }
+  return res.json();
+}
+
+export async function rejectRenewalRequest(requestId, { reason = 'Modification requested' } = {}) {
+  const res = await fetch(`${API_BASE}/compliance/renewals/${encodeURIComponent(requestId)}/reject`, {
+    method: 'POST',
+    headers: authHeaders(true),
+    body: JSON.stringify({ reason }),
+  });
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error.detail || `Failed to reject renewal (${res.status})`);
+  }
+  return res.json();
+}
+
 export async function fetchAuditLogs({ search = '', action = '', entityType = '', limit = 25, offset = 0 } = {}) {
   const params = new URLSearchParams({ limit: String(limit), offset: String(offset) });
   if (search.trim()) params.set('search', search.trim());

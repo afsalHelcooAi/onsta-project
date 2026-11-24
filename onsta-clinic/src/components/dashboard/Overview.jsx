@@ -291,10 +291,10 @@ export default function Overview({ onOpenPreview }) {
 
           <div className="pt-3 border-t border-gray-100">
             <button
-              onClick={() => navigate('/dashboard/requests')}
+              onClick={() => navigate('/dashboard/compliance')}
               className="px-4 py-2 rounded-xl bg-[#0d281e] text-white text-xs font-semibold hover:bg-[#153f2f] transition-colors"
             >
-              Open verification history
+              Open Compliance Center
             </button>
           </div>
         </div>

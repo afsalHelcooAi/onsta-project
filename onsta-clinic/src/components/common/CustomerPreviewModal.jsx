@@ -14,7 +14,22 @@ export default function CustomerPreviewModal({ isOpen, onClose }) {
 
   if (!isOpen) return null;
 
-  const activeDoctors = doctors.filter((d) => d.isActive !== false);
+  // Filter active doctors and exclude any practitioner whose license has expired (statutory delisting on onsta.ae)
+  const activeDoctors = doctors.filter((d) => {
+    if (d.isActive === false) return false;
+    const expiry = d.licenceExpiry || d.license_expiry || d.expiryDate;
+    if (expiry) {
+      try {
+        const expDate = new Date(expiry.split('T')[0]);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        if (expDate < today) return false; // Expired license -> Delisted from public onsta.ae listing
+      } catch {
+        // retain on parse error
+      }
+    }
+    return true;
+  });
 
   // Active services & offers from context
   const activeServices = services.filter((s) => s.isActive && s.verificationStatus === 'VERIFIED');
