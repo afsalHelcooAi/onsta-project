@@ -113,6 +113,55 @@ async def get_platform_overview(actor: Actor = Depends(require_super_admin)):
             LIMIT 5
         """), {})).mappings().all()
 
+        # --- Option C Additions: Catalog, AI Taxonomy, Offers, and Clinic Readiness ---
+        master_treatments_count = (await session.execute(text("""
+            SELECT count(*)::integer FROM master_treatments WHERE is_active = TRUE
+        """), {})).scalar_one()
+
+        categories_count = (await session.execute(text("""
+            SELECT count(*)::integer FROM treatment_categories WHERE is_active = TRUE
+        """), {})).scalar_one()
+
+        target_concerns_count = (await session.execute(text("""
+            SELECT count(*)::integer FROM target_concerns WHERE is_active = TRUE
+        """), {})).scalar_one()
+
+        active_offers_count = (await session.execute(text("""
+            SELECT count(*)::integer FROM clinic_offers WHERE is_active = TRUE
+        """), {})).scalar_one()
+
+        avg_discount = (await session.execute(text("""
+            SELECT COALESCE(ROUND(AVG(discount_percentage)), 0)::integer 
+            FROM clinic_offers 
+            WHERE is_active = TRUE AND discount_percentage > 0
+        """), {})).scalar_one()
+
+        # Clinic catalog readiness
+        clinics_with_services = (await session.execute(text("""
+            SELECT count(DISTINCT clinic_id)::integer FROM services WHERE status = 'ACTIVE'
+        """), {})).scalar_one()
+
+        clinics_with_offers = (await session.execute(text("""
+            SELECT count(DISTINCT clinic_id)::integer FROM clinic_offers WHERE is_active = TRUE
+        """), {})).scalar_one()
+
+        # Recent Platform Activity Feed (Latest 6 events across audit logs)
+        recent_activity_rows = (await session.execute(text("""
+            SELECT 
+                al.id::text,
+                al.action,
+                al.entity_type,
+                al.details,
+                al.created_at,
+                COALESCE(u.full_name, u.email, 'System') AS actor_name,
+                COALESCE(t.name, 'Platform') AS tenant_name
+            FROM audit_logs al
+            LEFT JOIN users u ON u.id = al.actor_user_id
+            LEFT JOIN tenants t ON t.id = al.tenant_id
+            ORDER BY al.created_at DESC
+            LIMIT 6
+        """), {})).mappings().all()
+
     def status_counts(rows):
         return {row["status"]: row["count"] for row in rows}
 
@@ -138,6 +187,17 @@ async def get_platform_overview(actor: Actor = Depends(require_super_admin)):
         "new_clinics_this_month": new_clinics_this_month,
         "expiring_licenses_total": expiring_licenses_total,
         "expiring_licenses": [dict(r) for r in expiring_licenses_rows],
+        "catalog_summary": {
+            "master_treatments": master_treatments_count,
+            "categories": categories_count,
+            "target_concerns": target_concerns_count,
+            "active_offers": active_offers_count,
+            "avg_discount_percent": avg_discount,
+            "clinics_with_services": clinics_with_services,
+            "clinics_with_offers": clinics_with_offers,
+            "total_clinics": clinic_count,
+        },
+        "recent_activity": [dict(r) for r in recent_activity_rows],
     }
 
 
