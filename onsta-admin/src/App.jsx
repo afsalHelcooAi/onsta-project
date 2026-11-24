@@ -7,6 +7,7 @@ import Overview from './components/dashboard/Overview';
 import AdminLogin from './components/auth/AdminLogin';
 import ComplianceAudit from './components/compliance/ComplianceAudit';
 import AuditLogs from './components/audit/AuditLogs';
+import MasterCatalog from './components/treatments/MasterCatalog';
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -33,9 +34,10 @@ export default function App() {
       {activeTab === 'review-queue' && <ClinicReviewQueue />}
       {activeTab === 'all-clinics' && <RegisteredClinics />}
       {activeTab === 'compliance-audit' && <ComplianceAudit />}
+      {activeTab === 'master-catalog' && <MasterCatalog />}
       {activeTab === 'all-users' && <AllUsers currentUserId={admin.id} />}
       {activeTab === 'audit-logs' && <AuditLogs />}
-      {!['overview', 'review-queue', 'all-clinics', 'compliance-audit', 'all-users', 'audit-logs'].includes(activeTab) && (
+      {!['overview', 'review-queue', 'all-clinics', 'compliance-audit', 'master-catalog', 'all-users', 'audit-logs'].includes(activeTab) && (
         <div className="flex-1 flex items-center justify-center text-gray-500 font-medium">
           Section under development.
         </div>

@@ -7,11 +7,14 @@ import {
 import VerificationBadge from '../common/VerificationBadge';
 
 export default function OffersManagement({ onOpenPreview }) {
-  const { offers, services, addOffer, updateOffer, deleteOffer, toggleOfferActive } = useClinic();
+  const { offers, services, clinicData, addOffer, updateOffer, deleteOffer, toggleOfferActive } = useClinic();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingOffer, setEditingOffer] = useState(null);
   const [deleteConfirmId, setDeleteConfirmId] = useState(null);
+
+  const clinicDisplayName = clinicData?.displayName || clinicData?.legalName || 'Your Clinic';
+  const clinicDisplayArea = clinicData?.cityArea ? `${clinicData.cityArea}, ${clinicData?.emirate || 'Dubai'}` : (clinicData?.emirate || 'Dubai, UAE');
 
   // Form State matching Screenshot 1
   const [formData, setFormData] = useState({
@@ -39,14 +42,14 @@ export default function OffersManagement({ onOpenPreview }) {
     setEditingOffer(null);
     const defaultSrv = services[0] || {};
     setFormData({
-      title: 'Hydrafacial Glow & Deep Extraction Special',
+      title: defaultSrv.name ? `${defaultSrv.name} Special Promotion` : 'Special Treatment Promotion',
       linkedServiceId: defaultSrv.id || '',
       normalPrice: defaultSrv.normalPrice || 450,
-      offerPrice: 299,
-      startDate: '2026-11-01',
-      endDate: '2027-01-31',
-      terms: 'Valid for new & returning clients. Advance appointment required. DHA ST-21 terms apply.',
-      description: 'Medical grade 45-minute revitalizing extraction and antioxidant infusion treatment.',
+      offerPrice: defaultSrv.normalPrice ? Math.round(defaultSrv.normalPrice * 0.75) : 299,
+      startDate: new Date().toISOString().split('T')[0],
+      endDate: new Date(Date.now() + 60 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      terms: 'Valid for new & returning clients. Advance appointment required.',
+      description: defaultSrv.description || 'Promotional treatment package with verified clinical practitioner oversight.',
       declaration: true,
       isActive: true
     });
@@ -125,7 +128,8 @@ export default function OffersManagement({ onOpenPreview }) {
           <button
             type="button"
             onClick={handleTriggerBestWording}
-            className="px-3 py-2 rounded-xl bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 text-xs font-semibold flex items-center gap-1.5 transition-colors"
+            disabled={services.length === 0}
+            className="px-3 py-2 rounded-xl bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 text-xs font-semibold flex items-center gap-1.5 transition-colors disabled:opacity-50"
           >
             <Sparkles className="w-3.5 h-3.5 text-rose-600" />
             <span>Test "Best" Claim Wording Warning</span>
@@ -134,13 +138,27 @@ export default function OffersManagement({ onOpenPreview }) {
           <button
             type="button"
             onClick={openAddModal}
-            className="px-4 py-2 rounded-xl bg-[#0d281e] text-white hover:bg-[#153f2f] text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-sm"
+            disabled={services.length === 0}
+            className="px-4 py-2 rounded-xl bg-[#0d281e] text-white hover:bg-[#153f2f] text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-sm disabled:opacity-50"
           >
             <Plus className="w-4 h-4" />
             <span>Create New Offer</span>
           </button>
         </div>
       </div>
+
+      {/* No Services Added Warning Banner */}
+      {services.length === 0 && (
+        <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-start gap-3">
+          <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+          <div className="text-xs text-amber-900">
+            <p className="font-bold">No Services Found in Your Clinic Directory</p>
+            <p className="mt-0.5 text-amber-800">
+              Promotional offers must be attached to an existing clinical treatment service. Please go to <strong>Services & Prices</strong> to add your treatments first before creating offers.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Multiple Active Offers Statistics Strip */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -486,8 +504,8 @@ export default function OffersManagement({ onOpenPreview }) {
                     <h5 className="text-sm font-bold text-gray-900">
                       {formData.title || "[Offer title]"}
                     </h5>
-                    <p className="text-[11px] text-gray-400 mt-0.5">
-                      Al Noor Clinic • Jumeirah 1, Dubai
+                    <p className="text-[11px] text-gray-500 mt-0.5">
+                      {clinicDisplayName} • {clinicDisplayArea}
                     </p>
                     <div className="mt-2 flex items-baseline gap-2">
                       <span className="text-base font-bold text-[#0d281e]">

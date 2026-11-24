@@ -38,6 +38,7 @@ CATEGORY_SCOPE_MAP = {
 class ServiceCreateRequest(BaseModel):
     name: str = Field(..., min_length=2, max_length=180)
     category: Optional[str] = Field("Dermatology", max_length=120)
+    master_treatment_id: Optional[str] = None
     description: Optional[str] = None
     duration: Optional[str] = Field("45 mins", max_length=60)
     normal_price: float = Field(..., ge=0)
@@ -50,6 +51,7 @@ class ServiceCreateRequest(BaseModel):
 class ServiceUpdateRequest(BaseModel):
     name: Optional[str] = None
     category: Optional[str] = None
+    master_treatment_id: Optional[str] = None
     description: Optional[str] = None
     duration: Optional[str] = None
     normal_price: Optional[float] = None
@@ -319,6 +321,54 @@ def extract_services_from_tariff_text(raw_text: str) -> List[dict]:
 # Endpoints
 # ==========================================
 
+@router.get("/master-treatments")
+async def get_available_master_treatments(
+    actor: Actor = Depends(get_current_actor),
+    db: AsyncSession = Depends(get_db)
+):
+    """Fetch active master clinical treatments and categories so clinics can easily pick when adding services."""
+    categories_rows = (await db.execute(text("""
+        SELECT id::text, code, name, description, icon_name, display_order
+        FROM treatment_categories
+        WHERE is_active = TRUE
+        ORDER BY display_order, name
+    """))).mappings().all()
+
+    treatments_rows = (await db.execute(text("""
+        SELECT 
+            t.id::text,
+            t.name,
+            COALESCE(tc.name, t.category) AS category,
+            t.category_id::text AS category_id,
+            t.description,
+            t.medical_specialty,
+            t.standard_duration_minutes,
+            t.reference_price_min::float,
+            t.reference_price_max::float,
+            COALESCE(
+                json_agg(
+                    json_build_object(
+                        'id', c.id::text,
+                        'name', c.name,
+                        'code', c.code
+                    )
+                ) FILTER (WHERE c.id IS NOT NULL),
+                '[]'::json
+            ) AS target_concerns
+        FROM master_treatments t
+        LEFT JOIN treatment_categories tc ON tc.id = t.category_id
+        LEFT JOIN treatment_concern_mappings m ON m.treatment_id = t.id
+        LEFT JOIN target_concerns c ON c.id = m.concern_id
+        WHERE t.is_active = TRUE
+        GROUP BY t.id, tc.name
+        ORDER BY category, t.name
+    """))).mappings().all()
+
+    return {
+        "categories": [dict(r) for r in categories_rows],
+        "treatments": [dict(r) for r in treatments_rows]
+    }
+
 @router.get("")
 async def get_clinic_services(
     category: Optional[str] = Query(None),
@@ -334,6 +384,8 @@ async def get_clinic_services(
             s.id::text,
             s.name,
             COALESCE(s.category, 'Dermatology') AS "category",
+            s.master_treatment_id::text AS "masterTreatmentId",
+            mt.name AS "masterTreatmentName",
             COALESCE(s.description, '') AS "description",
             COALESCE(s.duration_display, s.duration_minutes::text || ' mins', '45 mins') AS "duration",
             COALESCE(s.price, 0.0)::float AS "normalPrice",
@@ -346,6 +398,7 @@ async def get_clinic_services(
             s.created_at AS "createdAt",
             s.updated_at AS "updatedAt"
         FROM services s
+        LEFT JOIN master_treatments mt ON mt.id = s.master_treatment_id
         WHERE s.clinic_id = CAST(:clinic_id AS uuid)
     """
     params = {"clinic_id": ctx["clinic_id"]}
@@ -396,13 +449,13 @@ async def create_service(
 
     await db.execute(text("""
         INSERT INTO services (
-            id, tenant_id, clinic_id, name, category, description,
+            id, tenant_id, clinic_id, name, category, master_treatment_id, description,
             price, offer_price, currency, duration_minutes, duration_display,
             applicable_specialty, scope_required, status, visibility_status,
             rules_passed, verification_status, created_at, updated_at
         ) VALUES (
             CAST(:id AS uuid), CAST(:tenant_id AS uuid), CAST(:clinic_id AS uuid),
-            :name, :category, :description,
+            :name, :category, CAST(:master_treatment_id AS uuid), :description,
             :price, :offer_price, 'AED', :duration_minutes, :duration_display,
             :applicable_specialty, :scope_required, :status, 'PUBLISHED',
             8, 'VERIFIED', now(), now()
@@ -413,6 +466,7 @@ async def create_service(
         "clinic_id": ctx["clinic_id"],
         "name": name_clean,
         "category": cat,
+        "master_treatment_id": payload.master_treatment_id if payload.master_treatment_id else None,
         "description": payload.description or "",
         "price": payload.normal_price,
         "offer_price": payload.offer_price,

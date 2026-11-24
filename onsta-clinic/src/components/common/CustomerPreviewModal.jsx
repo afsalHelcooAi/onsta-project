@@ -40,13 +40,13 @@ export default function CustomerPreviewModal({ isOpen, onClose }) {
 
   const activeGallery = gallery.filter((g) => g.isActive);
 
-  const clinicName = clinicData.displayName || clinicData.legalName || 'Atlas Medical Beauty';
-  const clinicCity = clinicData.cityArea || 'JBR';
+  const clinicName = clinicData.displayName || clinicData.legalName || 'Your Clinic';
+  const clinicCity = clinicData.cityArea || 'Downtown';
   const clinicEmirate = clinicData.emirate || 'Dubai';
-  const clinicPhone = clinicData.contactPhone || '+971-50-1000006';
-  const clinicRating = clinicData.rating || 3.9;
-  const clinicReviewsCount = clinicData.reviewCount || 52;
-  const clinicDescription = clinicData.description || 'Experts in medical aesthetics and laser';
+  const clinicPhone = clinicData.contactPhone || clinicData.primaryPhone || '+971 4 000 0000';
+  const clinicRating = clinicData.rating || 4.5;
+  const clinicReviewsCount = clinicData.reviewCount || 0;
+  const clinicDescription = clinicData.description || 'Premium certified aesthetic clinic on Onsta.';
   const clinicCover = clinicData.coverImage || 'https://images.unsplash.com/photo-1629909615184-74f495363b67?w=1200&auto=format&fit=crop&q=80';
 
   return (

@@ -1,12 +1,13 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useClinic } from '../../context/ClinicContext';
 import {
   Stethoscope, Plus, Search, Filter, Edit2, Trash2, CheckCircle2,
   AlertCircle, ShieldAlert, Sparkles, X, Check, ArrowRight, FileText,
-  Upload, Cpu, CheckSquare, Loader2, AlertTriangle, FileSpreadsheet
+  Upload, Cpu, CheckSquare, Loader2, AlertTriangle, FileSpreadsheet,
+  Layers
 } from 'lucide-react';
 import VerificationBadge from '../common/VerificationBadge';
-import { parseTariffSheet } from '../../api/serviceApi';
+import { parseTariffSheet, fetchMasterTreatments } from '../../api/serviceApi';
 
 export default function ServicesPrices() {
   const { services, addService, batchAddServices, updateService, deleteService, toggleServiceActive, showToast } = useClinic();
@@ -15,6 +16,22 @@ export default function ServicesPrices() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingService, setEditingService] = useState(null);
+
+  // Master Treatments from Platform Super Admin
+  const [masterTreatments, setMasterTreatments] = useState([]);
+  const [masterCategories, setMasterCategories] = useState([]);
+
+  useEffect(() => {
+    const token = localStorage.getItem('onsta_access_token');
+    fetchMasterTreatments(token)
+      .then(data => {
+        setMasterTreatments(data.treatments || []);
+        setMasterCategories(data.categories || []);
+      })
+      .catch(err => {
+        console.warn('Could not load master treatments:', err);
+      });
+  }, []);
 
   // PDF / Image Batch Import States
   const [isPdfImportOpen, setIsPdfImportOpen] = useState(false);
@@ -30,13 +47,14 @@ export default function ServicesPrices() {
   // Modal Form State
   const [formData, setFormData] = useState({
     name: '',
-    category: 'Dermatology',
+    masterTreatmentId: '',
+    category: 'Facial & Skin Health',
     description: '',
     duration: '45 mins',
     normalPrice: '450',
     offerPrice: '',
-    applicableSpecialty: 'Dermatology',
-    scopeRequired: 'Dermatological Outpatient Scope',
+    applicableSpecialty: 'Aesthetic Medicine',
+    scopeRequired: 'Aesthetic Medicine Scope',
     isActive: true
   });
 
@@ -61,13 +79,14 @@ export default function ServicesPrices() {
     setEditingService(null);
     setFormData({
       name: '',
-      category: 'Dermatology',
+      masterTreatmentId: '',
+      category: masterCategories[0]?.name || 'Facial & Skin Health',
       description: '',
       duration: '45 mins',
       normalPrice: '450',
       offerPrice: '',
-      applicableSpecialty: 'Dermatology',
-      scopeRequired: 'Dermatological Outpatient Scope',
+      applicableSpecialty: 'Aesthetic Medicine',
+      scopeRequired: 'Aesthetic Medicine Scope',
       isActive: true
     });
     setIsModalOpen(true);
@@ -77,16 +96,36 @@ export default function ServicesPrices() {
     setEditingService(srv);
     setFormData({
       name: srv.name,
-      category: srv.category || 'Dermatology',
+      masterTreatmentId: srv.masterTreatmentId || '',
+      category: srv.category || 'Facial & Skin Health',
       description: srv.description || '',
       duration: srv.duration || '45 mins',
       normalPrice: (srv.normalPrice || '').toString(),
       offerPrice: srv.offerPrice ? srv.offerPrice.toString() : '',
-      applicableSpecialty: srv.applicableSpecialty || srv.category || 'Dermatology',
-      scopeRequired: srv.scopeRequired || 'Dermatological Outpatient Scope',
+      applicableSpecialty: srv.applicableSpecialty || srv.category || 'Aesthetic Medicine',
+      scopeRequired: srv.scopeRequired || 'Aesthetic Medicine Scope',
       isActive: srv.isActive !== false
     });
     setIsModalOpen(true);
+  };
+
+  const handleMasterTreatmentSelect = (treatmentId) => {
+    const selected = masterTreatments.find(t => t.id === treatmentId);
+    if (selected) {
+      setFormData(prev => ({
+        ...prev,
+        masterTreatmentId: selected.id,
+        name: prev.name || selected.name,
+        category: selected.category || prev.category,
+        description: prev.description || selected.description || '',
+        duration: `${selected.standard_duration_minutes || 45} mins`,
+        normalPrice: prev.normalPrice || (selected.reference_price_min ? selected.reference_price_min.toString() : '450'),
+        applicableSpecialty: selected.medical_specialty || 'Aesthetic Medicine',
+        scopeRequired: `${selected.category} Clinical Scope`
+      }));
+    } else {
+      setFormData(prev => ({ ...prev, masterTreatmentId: '' }));
+    }
   };
 
   const handleCategoryChange = (cat) => {
@@ -652,6 +691,38 @@ export default function ServicesPrices() {
             </div>
 
             <form onSubmit={handleFormSubmit} className="p-6 space-y-4">
+              {/* Master Treatment Selection */}
+              <div className="bg-emerald-50/70 p-3.5 rounded-xl border border-emerald-200/70">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-900 mb-1">
+                  <Sparkles className="w-3.5 h-3.5 text-emerald-700" />
+                  <span>Map to Onsta Master Treatment (AI Face Detection)</span>
+                </div>
+                <p className="text-[11px] text-emerald-800/80 mb-2">
+                  Selecting a standard treatment links your clinic's service to patient face scan recommendations automatically.
+                </p>
+                <select
+                  value={formData.masterTreatmentId}
+                  onChange={(e) => handleMasterTreatmentSelect(e.target.value)}
+                  className="w-full px-3 py-2 bg-white rounded-lg border border-emerald-300 text-xs text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                >
+                  <option value="">-- Custom / Other Clinic Service --</option>
+                  {masterTreatments.map((mt) => (
+                    <option key={mt.id} value={mt.id}>
+                      {mt.name} ({mt.category})
+                    </option>
+                  ))}
+                </select>
+                {formData.masterTreatmentId && (
+                  <div className="mt-2 flex flex-wrap gap-1">
+                    {masterTreatments.find(t => t.id === formData.masterTreatmentId)?.target_concerns?.map((c) => (
+                      <span key={c.id} className="text-[10px] bg-white border border-amber-300 text-amber-900 px-2 py-0.5 rounded-full font-medium">
+                        ✓ Treats: {c.name}
+                      </span>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               <div>
                 <label className="block text-xs font-semibold text-gray-700 mb-1">
                   Service / Treatment Name *
@@ -673,14 +744,23 @@ export default function ServicesPrices() {
                   </label>
                   <select
                     value={formData.category}
-                    onChange={(e) => handleCategoryChange(e.target.value)}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
                     className="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0d281e]"
                   >
-                    <option value="Dermatology">Dermatology</option>
-                    <option value="Laser Clinic">Laser Clinic</option>
-                    <option value="Aesthetic Clinic">Aesthetic Clinic</option>
-                    <option value="Wellness">Wellness</option>
-                    <option value="Medical Clinic">Medical Clinic</option>
+                    {masterCategories.length > 0 ? (
+                      masterCategories.map(cat => (
+                        <option key={cat.id} value={cat.name}>{cat.name}</option>
+                      ))
+                    ) : (
+                      <>
+                        <option value="Facial & Skin Health">Facial & Skin Health</option>
+                        <option value="Laser & Light Therapy">Laser & Light Therapy</option>
+                        <option value="Skin Rejuvenation">Skin Rejuvenation</option>
+                        <option value="Injectables & Neuromodulators">Injectables & Neuromodulators</option>
+                        <option value="Lifting & Contouring">Lifting & Contouring</option>
+                        <option value="Dermatology">Dermatology</option>
+                      </>
+                    )}
                   </select>
                 </div>
 
