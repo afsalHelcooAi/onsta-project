@@ -4,28 +4,51 @@
 
 @layer base {
   body {
-    background-color: #F7F4EE;
-    color: #1F2937;
-    font-family: 'Inter', system-ui, sans-serif;
+    background-color: #F6F0FA;
+    color: #1E1B2E;
+    font-family: 'Plus Jakarta Sans', 'Alata', system-ui, sans-serif;
   }
 
-  h1, h2, h3, .font-serif {
-    font-family: 'Playfair Display', Georgia, serif;
+  h1, h2, h3, h4, .font-serif, .alata-regular {
+    font-family: "Alata", sans-serif;
+    font-weight: 400;
+    font-style: normal;
   }
 }
 
-/* Custom scrollbars */
+.alata-regular {
+  font-family: "Alata", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.25s ease-out forwards;
+}
+
+/* Custom subtle scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #f1ede4;
+  background: #F6F0FA;
 }
 ::-webkit-scrollbar-thumb {
-  background: #d4ccbd;
+  background: #D7C6E3;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #b5aa96;
+  background: #B99CCB;
 }

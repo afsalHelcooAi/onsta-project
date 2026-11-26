@@ -1,8 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import {
-  FileText, Cpu, CheckCircle2, AlertTriangle, XCircle, ArrowRight,
-  X, Loader2, Sparkles, Upload, ShieldCheck, Check, Calendar, Hash, Building, User
-} from 'lucide-react';
+import FaIcon from './FaIcon';
 import { scanComplianceDocumentApi, submitRenewalRequestApi, renewDocumentCredential } from '../../api/complianceApi';
 import { scanDoctorLicense, renewDoctorLicenseApi } from '../../api/doctorApi';
 
@@ -157,68 +154,68 @@ export default function AIDocumentScanModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-xl w-full overflow-hidden border border-[#e7e1d7] animate-scaleUp">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A1320]/60 backdrop-blur-sm animate-fadeIn">
+      <div className="bg-white rounded-3xl shadow-2xl max-w-xl w-full overflow-hidden border border-[#EAE0F2]">
         {/* Header */}
-        <div className="p-6 bg-[#0d281e] text-white flex items-start justify-between">
+        <div className="p-6 bg-[#1A1320] text-white flex items-start justify-between">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-white/10 text-emerald-300">
-              <Cpu className="w-6 h-6 animate-pulse" />
+            <div className="w-10 h-10 rounded-xl bg-[#6B3B66] text-white flex items-center justify-center">
+              <FaIcon icon="fa-solid fa-microchip" className="text-base" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[11px] font-semibold uppercase tracking-wider text-emerald-300 flex items-center gap-1">
-                  <Sparkles className="w-3.5 h-3.5" /> UAE Regulatory Vision Engine
+                <span className="text-[11px] alata-regular uppercase tracking-wider text-[#DECBE9] flex items-center gap-1.5">
+                  <FaIcon icon="fa-solid fa-wand-magic-sparkles" /> UAE Regulatory Vision Engine
                 </span>
               </div>
-              <h3 className="text-xl font-bold font-serif">
+              <h3 className="text-xl alata-regular mt-0.5">
                 Renew {documentTitle}
               </h3>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-white/60 hover:text-white transition-colors p-1 rounded-lg"
+            className="text-white/70 hover:text-white transition-colors w-8 h-8 rounded-xl flex items-center justify-center hover:bg-white/10"
           >
-            <X className="w-5 h-5" />
+            <FaIcon icon="fa-solid fa-xmark" className="text-base" />
           </button>
         </div>
 
         {/* 4-Tier Pipeline Indicator */}
-        <div className="px-6 py-3 bg-[#F7F4EE] border-b border-[#e7e1d7]">
+        <div className="px-6 py-3.5 bg-[#F6F0FA] border-b border-[#EAE0F2]">
           <div className="grid grid-cols-4 gap-2 text-center text-[10px]">
-            <div className={`flex flex-col items-center ${pipelineStep >= 1 ? 'text-[#0d281e] font-bold' : 'text-gray-400'}`}>
+            <div className={`flex flex-col items-center ${pipelineStep >= 1 ? 'text-[#6B3B66] alata-regular' : 'text-[#94A3B8]'}`}>
               <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs mb-1 ${
-                pipelineStep > 1 ? 'bg-[#137333] text-white' : pipelineStep === 1 ? 'bg-[#0d281e] text-white ring-2 ring-emerald-300' : 'bg-gray-200 text-gray-500'
+                pipelineStep > 1 ? 'bg-[#16A34A] text-white' : pipelineStep === 1 ? 'bg-[#6B3B66] text-white ring-2 ring-[#DECBE9]' : 'bg-[#E2E8F0] text-[#64748B]'
               }`}>
-                {pipelineStep > 1 ? <Check className="w-3.5 h-3.5" /> : "1"}
+                {pipelineStep > 1 ? <FaIcon icon="fa-solid fa-check" className="text-[10px]" /> : '1'}
               </div>
               <span>Upload Doc</span>
             </div>
 
-            <div className={`flex flex-col items-center ${pipelineStep >= 2 ? 'text-[#0d281e] font-bold' : 'text-gray-400'}`}>
+            <div className={`flex flex-col items-center ${pipelineStep >= 2 ? 'text-[#6B3B66] alata-regular' : 'text-[#94A3B8]'}`}>
               <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs mb-1 ${
-                pipelineStep > 2 ? 'bg-[#137333] text-white' : pipelineStep === 2 ? 'bg-[#0d281e] text-white ring-2 ring-emerald-300' : 'bg-gray-200 text-gray-500'
+                pipelineStep > 2 ? 'bg-[#16A34A] text-white' : pipelineStep === 2 ? 'bg-[#6B3B66] text-white ring-2 ring-[#DECBE9]' : 'bg-[#E2E8F0] text-[#64748B]'
               }`}>
-                {pipelineStep > 2 ? <Check className="w-3.5 h-3.5" /> : "2"}
+                {pipelineStep > 2 ? <FaIcon icon="fa-solid fa-check" className="text-[10px]" /> : '2'}
               </div>
               <span>Multimodal AI</span>
             </div>
 
-            <div className={`flex flex-col items-center ${pipelineStep >= 2 ? 'text-[#0d281e] font-bold' : 'text-gray-400'}`}>
+            <div className={`flex flex-col items-center ${pipelineStep >= 2 ? 'text-[#6B3B66] alata-regular' : 'text-[#94A3B8]'}`}>
               <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs mb-1 ${
-                pipelineStep > 2 ? 'bg-[#137333] text-white' : pipelineStep === 2 ? 'bg-[#0d281e] text-white ring-2 ring-emerald-300' : 'bg-gray-200 text-gray-500'
+                pipelineStep > 2 ? 'bg-[#16A34A] text-white' : pipelineStep === 2 ? 'bg-[#6B3B66] text-white ring-2 ring-[#DECBE9]' : 'bg-[#E2E8F0] text-[#64748B]'
               }`}>
-                {pipelineStep > 2 ? <Check className="w-3.5 h-3.5" /> : "3"}
+                {pipelineStep > 2 ? <FaIcon icon="fa-solid fa-check" className="text-[10px]" /> : '3'}
               </div>
               <span>Sanity Checks</span>
             </div>
 
-            <div className={`flex flex-col items-center ${pipelineStep === 3 ? 'text-[#0d281e] font-bold' : 'text-gray-400'}`}>
+            <div className={`flex flex-col items-center ${pipelineStep === 3 ? 'text-[#6B3B66] alata-regular' : 'text-[#94A3B8]'}`}>
               <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs mb-1 ${
-                pipelineStep === 3 ? 'bg-[#0d281e] text-white ring-2 ring-emerald-300' : 'bg-gray-200 text-gray-500'
+                pipelineStep === 3 ? 'bg-[#6B3B66] text-white ring-2 ring-[#DECBE9]' : 'bg-[#E2E8F0] text-[#64748B]'
               }`}>
-                {"4"}
+                {'4'}
               </div>
               <span>Step 2 Review</span>
             </div>
@@ -228,16 +225,15 @@ export default function AIDocumentScanModal({
         {/* Modal Body */}
         <div className="p-6">
           {errorMsg && (
-            <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-xl flex items-center gap-2 text-xs text-red-700">
-              <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+            <div className="mb-4 p-3.5 bg-[#FEE2E2] border border-[#FECACA] rounded-2xl flex items-center gap-2 text-xs text-[#991B1B]">
+              <FaIcon icon="fa-solid fa-triangle-exclamation" className="flex-shrink-0 text-[#DC2626]" />
               <span>{errorMsg}</span>
             </div>
           )}
 
-          {/* STAGE 1: Upload Document */}
           {pipelineStep === 1 && (
             <div className="space-y-4">
-              <div className="border-2 border-dashed border-[#d1c7b7] hover:border-[#0d281e] rounded-2xl p-8 text-center transition-colors bg-white">
+              <div className="border-2 border-dashed border-[#DECBE9] hover:border-[#6B3B66] rounded-3xl p-8 text-center transition-colors bg-[#F8FAFC]">
                 <input
                   type="file"
                   id="renewal-doc-file"
@@ -246,158 +242,157 @@ export default function AIDocumentScanModal({
                   onChange={handleFileChange}
                 />
                 <label htmlFor="renewal-doc-file" className="cursor-pointer block space-y-3">
-                  <div className="w-14 h-14 rounded-2xl bg-[#F7F4EE] flex items-center justify-center mx-auto text-[#0d281e]">
-                    <Upload className="w-7 h-7" />
+                  <div className="w-14 h-14 rounded-2xl bg-[#F0E6F6] flex items-center justify-center mx-auto text-[#6B3B66] border border-[#DECBE9]">
+                    <FaIcon icon="fa-solid fa-cloud-arrow-up" className="text-2xl" />
                   </div>
                   <div>
-                    <span className="text-sm font-semibold text-gray-900 block">
+                    <span className="text-sm alata-regular text-[#1E1B2E] block">
                       Click to upload renewed licence file
                     </span>
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-[#64748B]">
                       Supports PDF original, colour JPEG, or PNG scans (Max 15MB)
                     </span>
                   </div>
-                  <span className="inline-block px-4 py-2 bg-[#0d281e] text-white text-xs font-semibold rounded-xl hover:bg-[#153f2f] transition-colors shadow-sm">
+                  <span className="inline-block px-5 py-2 bg-[#6B3B66] text-white text-xs alata-regular rounded-full hover:bg-[#552B51] transition-colors shadow-sm">
                     Select File
                   </span>
                 </label>
               </div>
 
-              <div className="p-3 bg-gray-50 rounded-xl border border-gray-200 text-xs text-gray-600 flex items-center justify-between">
+              <div className="p-3.5 bg-[#F6F0FA] rounded-2xl border border-[#EAE0F2] text-xs text-[#64748B] flex items-center justify-between">
                 <span>Current registered licence number:</span>
-                <span className="font-mono font-bold text-gray-900">{currentLicenceNumber}</span>
+                <span className="alata-regular text-[#1E1B2E]">{currentLicenceNumber}</span>
               </div>
             </div>
           )}
 
-          {/* STAGE 2: Multimodal AI Processing Animation */}
           {pipelineStep === 2 && (
             <div className="py-8 text-center space-y-5">
               <div className="relative inline-block">
-                <div className="w-16 h-16 rounded-2xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-[#0d281e] mx-auto shadow-sm">
-                  <FileText className="w-8 h-8 animate-bounce" />
+                <div className="w-16 h-16 rounded-2xl bg-[#F0E6F6] border border-[#DECBE9] flex items-center justify-center text-[#6B3B66] mx-auto shadow-sm">
+                  <FaIcon icon="fa-solid fa-file-contract" className="text-2xl animate-pulse" />
                 </div>
-                <Loader2 className="w-6 h-6 text-[#137333] animate-spin absolute -bottom-1 -right-1 bg-white rounded-full p-0.5" />
+                <div className="w-7 h-7 rounded-full bg-white border border-[#EAE0F2] flex items-center justify-center text-[#6B3B66] absolute -bottom-1 -right-1 shadow-xs">
+                  <FaIcon icon="fa-solid fa-spinner fa-spin" className="text-xs" />
+                </div>
               </div>
               <div className="space-y-1">
-                <h4 className="text-sm font-bold text-gray-900">
+                <h4 className="text-sm alata-regular text-[#1E1B2E]">
                   Multimodal Vision AI Extracting Credentials
                 </h4>
-                <p className="text-xs text-gray-500 max-w-sm mx-auto">
+                <p className="text-xs text-[#64748B] max-w-sm mx-auto">
                   Running multimodal layout OCR, classifying certified subject entity, and checking authority issue stamps...
                 </p>
               </div>
-              <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-left text-xs text-emerald-800 space-y-1.5 max-w-md mx-auto">
+              <div className="p-3.5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl text-left text-xs text-[#1E1B2E] space-y-2 max-w-md mx-auto">
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                  <FaIcon icon="fa-solid fa-circle-check" className="text-[#16A34A]" />
                   <span>1. Multimodal Vision AI: Parsed header & issuing authority</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                  <FaIcon icon="fa-solid fa-circle-check" className="text-[#16A34A]" />
                   <span>2. Certified Subject: Health Facility verified</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                  <FaIcon icon="fa-solid fa-circle-check" className="text-[#16A34A]" />
                   <span>3. Sanity Rules & Duplicate Pre-Check: Active horizon verified</span>
                 </div>
               </div>
             </div>
           )}
 
-          {/* STAGE 3: Step 2 UI (Human-in-the-Loop Confirmation) */}
           {pipelineStep === 3 && (
             <div className="space-y-4 animate-fadeIn">
-              <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center justify-between">
-                <div className="flex items-center gap-2 text-emerald-800 text-xs font-semibold">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <div className="p-3.5 bg-[#DCFCE7] border border-[#BBF7D0] rounded-2xl flex items-center justify-between">
+                <div className="flex items-center gap-2 text-[#166534] text-xs alata-regular">
+                  <FaIcon icon="fa-solid fa-circle-check" />
                   <span>AI Extraction Complete • Ready for Confirmation</span>
                 </div>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+                <span className="px-2.5 py-0.5 rounded-full text-[10px] alata-regular bg-white text-[#166534] border border-[#BBF7D0]">
                   Confidence: {Math.round(extractedData.confidence * 100)}%
                 </span>
               </div>
 
-              {/* Soft Warning if detected by AI */}
               {extractedData.warning && (
-                <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-900 flex items-start gap-2.5">
-                  <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0 mt-0.5" />
+                <div className="p-3.5 bg-[#FFEDD5] border border-[#FED7AA] rounded-2xl text-xs text-[#9A3412] flex items-start gap-2.5">
+                  <FaIcon icon="fa-solid fa-triangle-exclamation" className="text-[#EA580C] flex-shrink-0 mt-0.5" />
                   <div>
-                    <strong className="block font-semibold">AI Extraction Notice:</strong>
+                    <strong className="block alata-regular">AI Extraction Notice:</strong>
                     <span>{extractedData.warning}</span>
                   </div>
                 </div>
               )}
 
-              <div className="border border-[#e7e1d7] rounded-xl p-4 bg-white space-y-3">
+              <div className="border border-[#EAE0F2] rounded-2xl p-4 bg-[#F8FAFC] space-y-3">
                 {extractedData.doctorName && (
                   <div>
-                    <label className="block text-xs font-semibold text-gray-700 mb-1 flex items-center gap-1.5">
-                      <User className="w-3.5 h-3.5 text-gray-500" />
+                    <label className="block text-xs font-semibold text-[#1E1B2E] mb-1 flex items-center gap-1.5">
+                      <FaIcon icon="fa-solid fa-user-doctor" className="text-[#6B3B66]" />
                       <span>Doctor / Professional Full Name</span>
                     </label>
                     <input
                       type="text"
                       value={extractedData.doctorName}
                       onChange={(e) => setExtractedData({ ...extractedData, doctorName: e.target.value })}
-                      className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg font-medium focus:ring-1 focus:ring-[#0d281e]"
+                      className="w-full px-3 py-2 text-xs border border-[#E2E8F0] bg-white rounded-xl font-medium focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/30"
                     />
                   </div>
                 )}
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1 flex items-center gap-1.5">
-                    <Hash className="w-3.5 h-3.5 text-gray-500" />
+                  <label className="block text-xs font-semibold text-[#1E1B2E] mb-1 flex items-center gap-1.5">
+                    <FaIcon icon="fa-solid fa-hashtag" className="text-[#6B3B66]" />
                     <span>Licence Number</span>
                   </label>
                   <input
                     type="text"
                     value={extractedData.documentNumber}
                     onChange={(e) => setExtractedData({ ...extractedData, documentNumber: e.target.value })}
-                    className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg font-mono font-medium focus:ring-1 focus:ring-[#0d281e]"
+                    className="w-full px-3 py-2 text-xs border border-[#E2E8F0] bg-white rounded-xl alata-regular focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/30"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-gray-700 mb-1 flex items-center gap-1.5">
-                      <Building className="w-3.5 h-3.5 text-gray-500" />
+                    <label className="block text-xs font-semibold text-[#1E1B2E] mb-1 flex items-center gap-1.5">
+                      <FaIcon icon="fa-solid fa-building" className="text-[#6B3B66]" />
                       <span>Issuing Authority</span>
                     </label>
                     <input
                       type="text"
                       value={extractedData.authority}
                       onChange={(e) => setExtractedData({ ...extractedData, authority: e.target.value })}
-                      className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg font-medium focus:ring-1 focus:ring-[#0d281e]"
+                      className="w-full px-3 py-2 text-xs border border-[#E2E8F0] bg-white rounded-xl font-medium focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/30"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-gray-700 mb-1 flex items-center gap-1.5">
-                      <Calendar className="w-3.5 h-3.5 text-gray-500" />
+                    <label className="block text-xs font-semibold text-[#1E1B2E] mb-1 flex items-center gap-1.5">
+                      <FaIcon icon="fa-regular fa-calendar" className="text-[#6B3B66]" />
                       <span>New Expiry Date</span>
                     </label>
                     <input
                       type="date"
                       value={extractedData.expiryDate}
                       onChange={(e) => setExtractedData({ ...extractedData, expiryDate: e.target.value })}
-                      className="w-full px-3 py-2 text-xs border border-gray-300 rounded-lg font-mono font-medium focus:ring-1 focus:ring-[#0d281e]"
+                      className="w-full px-3 py-2 text-xs border border-[#E2E8F0] bg-white rounded-xl alata-regular focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/30"
                     />
                   </div>
                 </div>
               </div>
 
-              <p className="text-[11px] text-gray-500">
-                Review the fields extracted by the backend AI model above. Confirming will submit your renewal to ONSTA Compliance Administration for verification. Upon admin approval, your active status and public listing on onsta.ae will be restored.
+              <p className="text-[11px] text-[#64748B] leading-relaxed">
+                Review the fields extracted by the backend AI model above. Confirming will submit your renewal to ONSTA Compliance Administration for verification.
               </p>
             </div>
           )}
         </div>
 
         {/* Footer */}
-        <div className="p-4 bg-gray-50 border-t border-gray-200 flex justify-between items-center">
+        <div className="p-4 bg-[#F8FAFC] border-t border-[#EAE0F2] flex justify-between items-center">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-xs font-medium text-gray-600 hover:text-gray-900 transition-colors"
+            className="px-4 py-2 text-xs font-medium text-[#64748B] hover:text-[#1E1B2E] transition-colors"
           >
             Cancel
           </button>
@@ -406,16 +401,16 @@ export default function AIDocumentScanModal({
             <button
               onClick={handleConfirmRenewal}
               disabled={isSubmitting}
-              className="px-5 py-2 rounded-xl bg-[#0d281e] text-white text-xs font-semibold hover:bg-[#153f2f] transition-colors flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+              className="px-5 py-2.5 rounded-full bg-[#6B3B66] text-white text-xs alata-regular hover:bg-[#552B51] transition-colors flex items-center gap-2 shadow-sm disabled:opacity-50"
             >
               {isSubmitting ? (
                 <>
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <FaIcon icon="fa-solid fa-spinner fa-spin" />
                   <span>Submitting to Admin...</span>
                 </>
               ) : (
                 <>
-                  <Check className="w-3.5 h-3.5 text-emerald-300" />
+                  <FaIcon icon="fa-solid fa-circle-check" />
                   <span>Confirm & Submit for Review</span>
                 </>
               )}

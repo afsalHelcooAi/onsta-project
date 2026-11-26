@@ -3,8 +3,8 @@ import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import VerificationModal from '../common/VerificationModal';
 import CustomerPreviewModal from '../common/CustomerPreviewModal';
+import FaIcon from '../common/FaIcon';
 import { useClinic } from '../../context/ClinicContext';
-import { CheckCircle2, AlertTriangle, XCircle, Info } from 'lucide-react';
 
 export default function DashboardLayout() {
   const {
@@ -17,8 +17,8 @@ export default function DashboardLayout() {
   } = useClinic();
 
   return (
-    <div className="flex min-h-screen bg-[#F7F4EE]">
-      {/* Dark Forest Green Left Sidebar */}
+    <div className="flex min-h-screen bg-[#F6F0FA] text-[#1E1B2E]">
+      {/* Luxury Deep Aubergine Sidebar */}
       <Sidebar onOpenPreview={() => setShowCustomerPreview(true)} />
 
       {/* Main Content Area */}
@@ -41,28 +41,28 @@ export default function DashboardLayout() {
 
       {/* Toast Notification Container */}
       {toast && (
-        <div className="fixed bottom-6 right-6 z-50 animate-slideUp">
+        <div className="fixed bottom-6 right-6 z-50 animate-fadeIn">
           <div className={`p-4 rounded-2xl shadow-xl border flex items-start gap-3 max-w-md ${
             toast.type === 'success'
-              ? 'bg-emerald-950 text-white border-emerald-700'
+              ? 'bg-[#1A1320] text-white border-[#6B3B66]'
               : toast.type === 'error'
-              ? 'bg-red-950 text-white border-red-700'
+              ? 'bg-[#3F1622] text-white border-rose-500/40'
               : toast.type === 'warning'
-              ? 'bg-amber-950 text-white border-amber-700'
-              : 'bg-gray-900 text-white border-gray-700'
+              ? 'bg-[#332215] text-white border-amber-500/40'
+              : 'bg-[#1E1B2E] text-white border-slate-700'
           }`}>
-            <div className="mt-0.5">
-              {toast.type === 'success' && <CheckCircle2 className="w-5 h-5 text-emerald-400" />}
-              {toast.type === 'error' && <XCircle className="w-5 h-5 text-red-400" />}
-              {toast.type === 'warning' && <AlertTriangle className="w-5 h-5 text-amber-400" />}
-              {toast.type === 'info' && <Info className="w-5 h-5 text-blue-400" />}
+            <div className="mt-0.5 text-base">
+              {toast.type === 'success' && <FaIcon icon="fa-solid fa-circle-check" className="text-emerald-400" />}
+              {toast.type === 'error' && <FaIcon icon="fa-solid fa-circle-xmark" className="text-rose-400" />}
+              {toast.type === 'warning' && <FaIcon icon="fa-solid fa-triangle-exclamation" className="text-amber-400" />}
+              {toast.type === 'info' && <FaIcon icon="fa-solid fa-circle-info" className="text-purple-300" />}
             </div>
 
             <div className="space-y-0.5">
-              <h5 className="font-bold text-xs uppercase tracking-wider">
+              <h5 className="alata-regular text-xs uppercase tracking-wider text-white">
                 {toast.title}
               </h5>
-              <p className="text-xs text-gray-200 leading-relaxed">
+              <p className="text-xs text-slate-200 leading-relaxed">
                 {toast.message}
               </p>
             </div>

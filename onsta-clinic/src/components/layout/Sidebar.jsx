@@ -1,12 +1,9 @@
 import React from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
-import {
-  LayoutDashboard, Building2, Stethoscope, Tag,
-  ShieldCheck, LogOut, UserCheck, MessageSquare
-} from 'lucide-react';
 import { useClinic } from '../../context/ClinicContext';
+import FaIcon from '../common/FaIcon';
 
-export default function Sidebar({ onOpenPreview }) {
+export default function Sidebar() {
   const { clinicData, logout, enquiries } = useClinic();
   const location = useLocation();
   const navigate = useNavigate();
@@ -19,64 +16,81 @@ export default function Sidebar({ onOpenPreview }) {
   const newEnquiriesCount = enquiries ? enquiries.filter(e => e.status === 'new').length : 0;
 
   const navItems = [
-    { name: 'Overview', path: '/dashboard/overview', icon: LayoutDashboard },
-    { name: 'Clinic profile', path: '/dashboard/profile', icon: Building2 },
-    { name: 'Doctors', path: '/dashboard/doctors', icon: UserCheck },
-    { name: 'Services & prices', path: '/dashboard/services', icon: Stethoscope },
-    { name: 'Offers', path: '/dashboard/offers', icon: Tag },
-    { name: 'Enquiries', path: '/dashboard/enquiries', icon: MessageSquare, badge: newEnquiriesCount > 0 ? newEnquiriesCount.toString() : null },
-    { name: 'Compliance', path: '/dashboard/compliance', icon: ShieldCheck }
+    { name: 'Overview', path: '/dashboard/overview', icon: 'fa-solid fa-table-columns' },
+    { name: 'Clinic profile', path: '/dashboard/profile', icon: 'fa-solid fa-hospital' },
+    { name: 'Doctors', path: '/dashboard/doctors', icon: 'fa-solid fa-user-doctor' },
+    { name: 'Services & prices', path: '/dashboard/services', icon: 'fa-solid fa-stethoscope' },
+    { name: 'Offers', path: '/dashboard/offers', icon: 'fa-solid fa-tags' },
+    {
+      name: 'Enquiries',
+      path: '/dashboard/enquiries',
+      icon: 'fa-solid fa-calendar-check',
+      badge: newEnquiriesCount > 0 ? newEnquiriesCount.toString() : null
+    },
+    { name: 'Compliance', path: '/dashboard/compliance', icon: 'fa-solid fa-shield-halved' }
   ];
 
   return (
-    <aside className="w-64 bg-[#0d281e] text-white flex flex-col justify-between h-screen sticky top-0 flex-shrink-0 select-none border-r border-[#153f2f]">
-      {/* Brand & Clinic Header */}
+    <aside className="w-64 bg-[#1A1320] text-white flex flex-col justify-between h-screen sticky top-0 flex-shrink-0 select-none border-r border-[#2E2238]">
+      {/* Brand & Clinic Identity */}
       <div>
         <div className="p-6 pb-4">
           <div className="flex items-center gap-2.5">
-            <span className="bg-[#1b4334] text-white font-bold px-2.5 py-1 rounded-md text-xs tracking-wider border border-white/10 uppercase">
+            <span className="bg-[#6B3B66] text-white alata-regular px-2.5 py-1 rounded-lg text-xs tracking-widest border border-white/15 uppercase shadow-sm">
               ONSTA
             </span>
-            <span className="font-semibold text-sm tracking-wide text-gray-200">
+            <span className="alata-regular text-sm tracking-wide text-[#EFE8F6]">
               Clinic Partner
             </span>
           </div>
 
-          <div className="mt-4 pt-3 border-t border-white/10">
-            <p className="text-xs text-emerald-300 font-medium">Logged in clinic</p>
-            <h2 className="text-sm font-serif font-bold text-white truncate">
+          <div className="mt-5 p-3.5 rounded-2xl bg-[#241B2E] border border-[#352842]">
+            <p className="text-[10px] uppercase tracking-wider text-[#C7B0D8] font-semibold">
+              Active Medical Facility
+            </p>
+            <h2 className="text-sm alata-regular text-white truncate mt-0.5">
               {clinicData.displayName || clinicData.legalName}
             </h2>
-            <div className="flex items-center gap-1.5 mt-1">
+            <div className="flex items-center gap-1.5 mt-1.5">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              <span className="text-[11px] text-emerald-200">DHA Licensed • Approved</span>
+              <span className="text-[11px] text-emerald-200 font-medium">
+                DHA Licensed • Approved
+              </span>
             </div>
           </div>
         </div>
 
         {/* Main Navigation Links */}
-        <nav className="px-3 space-y-1 mt-2">
+        <nav className="px-3.5 space-y-1.5 mt-1">
           {navItems.map((item) => {
-            const isActive = location.pathname === item.path || (item.path === '/dashboard/overview' && location.pathname === '/');
-            const Icon = item.icon;
+            const isActive =
+              location.pathname === item.path ||
+              (item.path === '/dashboard/overview' && location.pathname === '/');
 
             return (
               <NavLink
                 key={item.name}
                 to={item.path}
-                className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm font-medium transition-all ${
+                className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm transition-all duration-150 ${
                   isActive
-                    ? 'bg-white text-[#0d281e] font-semibold shadow-md'
-                    : 'text-[#9db3a8] hover:text-white hover:bg-white/5'
+                    ? 'bg-[#FFFFFF] text-[#1E1B2E] alata-regular shadow-md'
+                    : 'text-[#BDB1C9] hover:text-white hover:bg-[#2A1F35] font-medium'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-[#0d281e]' : 'text-[#9db3a8]'}`} />
-                  <span>{item.name}</span>
+                  <FaIcon
+                    icon={item.icon}
+                    className={`w-4 text-center text-sm ${
+                      isActive ? 'text-[#6B3B66]' : 'text-[#9F8FB0]'
+                    }`}
+                  />
+                  <span className={isActive ? 'alata-regular' : ''}>{item.name}</span>
                 </div>
                 {item.badge && (
-                  <span className={`px-2 py-0.5 rounded-full text-xs font-bold ${
-                    isActive ? 'bg-[#b06000] text-white' : 'bg-[#e59b22] text-[#0d281e]'
+                  <span className={`px-2 py-0.5 rounded-full text-[11px] alata-regular ${
+                    isActive
+                      ? 'bg-[#6B3B66] text-white'
+                      : 'bg-[#F0E6F6] text-[#6B3B66]'
                   }`}>
                     {item.badge}
                   </span>
@@ -87,13 +101,16 @@ export default function Sidebar({ onOpenPreview }) {
         </nav>
       </div>
 
-      {/* Bottom Actions: Clean, prominent Logout button */}
-      <div className="p-4 border-t border-white/10">
+      {/* Bottom Actions: Clean Prominent Log Out Button */}
+      <div className="p-4 border-t border-[#2E2238]">
         <button
           onClick={handleSignOut}
-          className="flex items-center justify-center gap-2.5 w-full px-4 py-2.5 rounded-xl text-xs font-semibold text-rose-200 bg-rose-950/40 hover:bg-rose-900/60 hover:text-white border border-rose-800/40 transition-all shadow-sm group"
+          className="flex items-center justify-center gap-2.5 w-full px-4 py-2.5 rounded-xl text-xs alata-regular tracking-wide text-[#F4D9E6] bg-[#2D1F34] hover:bg-[#6B3B66] hover:text-white border border-[#422E4B] transition-all shadow-sm group"
         >
-          <LogOut className="w-4 h-4 text-rose-400 group-hover:text-white transition-colors" />
+          <FaIcon
+            icon="fa-solid fa-arrow-right-from-bracket"
+            className="text-sm text-[#E09CB8] group-hover:text-white transition-colors"
+          />
           <span>Log Out</span>
         </button>
       </div>

@@ -1,24 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import {
-  AlertTriangle,
-  Building2,
-  CheckCircle2,
-  ChevronLeft,
-  ChevronRight,
-  Clock,
-  FileCheck,
-  MapPin,
-  RefreshCw,
-  Search,
-  ShieldAlert,
-  ShieldCheck,
-  XCircle,
-  AlertCircle,
-  Check,
-  X,
-  Loader2,
-  FileText,
-} from 'lucide-react';
+import FaIcon from '../common/FaIcon';
 import { fetchComplianceAudit, approveRenewalRequest, rejectRenewalRequest } from '../../api/adminApi';
 
 const PAGE_SIZE = 25;
@@ -38,25 +19,25 @@ function daysUntil(value) {
 
 function ExpiryBadge({ date }) {
   const days = daysUntil(date);
-  if (days === null) return <span className="text-slate-400 text-xs">No expiry</span>;
+  if (days === null) return <span className="text-[#64748B] text-xs">No expiry</span>;
   if (days < 0) return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-red-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-red-800">
-      <XCircle className="h-3 w-3" /> Expired {Math.abs(days)}d ago
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-50 border border-rose-200 px-2.5 py-0.5 text-[10px] alata-regular uppercase tracking-wide text-rose-700">
+      <FaIcon icon="fa-solid fa-circle-xmark" className="text-[11px]" /> Expired {Math.abs(days)}d ago
     </span>
   );
   if (days <= 30) return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-amber-800">
-      <AlertTriangle className="h-3 w-3" /> Expires in {days}d
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 border border-amber-200 px-2.5 py-0.5 text-[10px] alata-regular uppercase tracking-wide text-amber-700">
+      <FaIcon icon="fa-solid fa-triangle-exclamation" className="text-[11px]" /> Expires in {days}d
     </span>
   );
   if (days <= 90) return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-yellow-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-yellow-700">
-      <Clock className="h-3 w-3" /> {days}d left
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-yellow-50 border border-yellow-200 px-2.5 py-0.5 text-[10px] alata-regular uppercase tracking-wide text-yellow-700">
+      <FaIcon icon="fa-regular fa-clock" className="text-[11px]" /> {days}d left
     </span>
   );
   return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide text-emerald-800">
-      <CheckCircle2 className="h-3 w-3" /> Valid · {formatDate(date)}
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-[10px] alata-regular uppercase tracking-wide text-emerald-700">
+      <FaIcon icon="fa-solid fa-circle-check" className="text-[11px]" /> Valid · {formatDate(date)}
     </span>
   );
 }
@@ -73,11 +54,31 @@ function ClinicComplianceStatus({ clinic }) {
 
   if (hasExpired) {
     const label = hasExpiredDoctor ? 'EXPIRED (Doc)' : 'EXPIRED';
-    return { icon: <ShieldAlert className="h-4 w-4 text-red-600" />, label, tone: 'text-red-700 bg-red-50 border-red-200' };
+    return {
+      icon: <FaIcon icon="fa-solid fa-shield-halved" className="text-rose-600 text-xs" />,
+      label,
+      tone: 'text-rose-700 bg-rose-50 border-rose-200',
+    };
   }
-  if (hasUrgent) return { icon: <AlertTriangle className="h-4 w-4 text-amber-600" />, label: 'EXPIRING SOON', tone: 'text-amber-700 bg-amber-50 border-amber-200' };
-  if (hasWarning) return { icon: <Clock className="h-4 w-4 text-yellow-600" />, label: 'REVIEW DUE', tone: 'text-yellow-700 bg-yellow-50 border-yellow-200' };
-  return { icon: <ShieldCheck className="h-4 w-4 text-emerald-600" />, label: 'COMPLIANT', tone: 'text-emerald-700 bg-emerald-50 border-emerald-200' };
+  if (hasUrgent) {
+    return {
+      icon: <FaIcon icon="fa-solid fa-triangle-exclamation" className="text-amber-600 text-xs" />,
+      label: 'EXPIRING SOON',
+      tone: 'text-amber-700 bg-amber-50 border-amber-200',
+    };
+  }
+  if (hasWarning) {
+    return {
+      icon: <FaIcon icon="fa-regular fa-clock" className="text-yellow-600 text-xs" />,
+      label: 'REVIEW DUE',
+      tone: 'text-yellow-700 bg-yellow-50 border-yellow-200',
+    };
+  }
+  return {
+    icon: <FaIcon icon="fa-solid fa-shield-halved" className="text-emerald-600 text-xs" />,
+    label: 'COMPLIANT',
+    tone: 'text-emerald-700 bg-emerald-50 border-emerald-200',
+  };
 }
 
 function ComplianceDetailPanel({ clinic, onRefresh }) {
@@ -87,9 +88,11 @@ function ComplianceDetailPanel({ clinic, onRefresh }) {
 
   if (!clinic) {
     return (
-      <div className="flex min-h-64 flex-col items-center justify-center text-center text-slate-400">
-        <FileCheck size={36} className="mb-3 text-slate-300" />
-        <p className="text-sm">Select a clinic to view its compliance details.</p>
+      <div className="flex min-h-64 flex-col items-center justify-center text-center text-[#64748B] py-16">
+        <div className="w-16 h-16 rounded-2xl bg-[#F0E6F6] text-[#6B3B66] flex items-center justify-center mb-3 border border-[#DECBE9]">
+          <FaIcon icon="fa-solid fa-file-shield" className="text-2xl" />
+        </div>
+        <p className="text-sm alata-regular text-[#1E1B2E]">Select a clinic to view its compliance details.</p>
       </div>
     );
   }
@@ -128,23 +131,24 @@ function ComplianceDetailPanel({ clinic, onRefresh }) {
     <div className="space-y-5">
       {/* Modification Request Modal */}
       {rejectModalReq && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn">
-          <div className="bg-white rounded-2xl p-5 max-w-md w-full shadow-2xl border border-slate-200 space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A1320]/50 backdrop-blur-sm animate-fadeIn">
+          <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border border-[#EAE0F2] space-y-4">
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="font-bold text-slate-900 text-sm">Request Modification / Re-upload</h3>
-                <p className="text-xs text-slate-500 mt-0.5">{rejectModalReq.target_name} ({rejectModalReq.document_code})</p>
+                <h3 className="alata-regular text-[#1E1B2E] text-base">Request Modification / Re-upload</h3>
+                <p className="text-xs text-[#64748B] mt-0.5">{rejectModalReq.target_name} ({rejectModalReq.document_code})</p>
               </div>
               <button
                 onClick={() => setRejectModalReq(null)}
-                className="text-slate-400 hover:text-slate-600 p-1"
+                className="text-[#64748B] hover:text-[#1E1B2E] p-1.5 rounded-full hover:bg-[#F6F0FA] transition"
+                aria-label="Close modal"
               >
-                <X size={16} />
+                <FaIcon icon="fa-solid fa-xmark" className="text-sm" />
               </button>
             </div>
             <form onSubmit={handleRejectSubmit} className="space-y-3">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">
+                <label className="block text-xs font-semibold text-[#1E1B2E] mb-1.5">
                   Reason / Modification Note for Clinic
                 </label>
                 <textarea
@@ -153,24 +157,24 @@ function ComplianceDetailPanel({ clinic, onRefresh }) {
                   value={rejectReason}
                   onChange={(e) => setRejectReason(e.target.value)}
                   placeholder="e.g. Document image is blurry or truncated. Please re-upload a clear colour PDF of the renewed licence."
-                  className="w-full text-xs p-2.5 border border-slate-300 rounded-xl focus:ring-2 focus:ring-rose-500 outline-none"
+                  className="w-full text-xs p-3 bg-[#F8FAFC] border border-[#EAE0F2] rounded-xl focus:border-[#6B3B66] focus:ring-2 focus:ring-[#6B3B66]/20 outline-none text-[#1E1B2E]"
                 />
               </div>
-              <p className="text-[11px] text-slate-500">
-                This message will be shown directly in the clinic's Compliance Centre with a button to re-upload.
+              <p className="text-[11px] text-[#64748B]">
+                This message will be shown directly in the clinic&apos;s Compliance Centre with a button to re-upload.
               </p>
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-[#EAE0F2]">
                 <button
                   type="button"
                   onClick={() => setRejectModalReq(null)}
-                  className="px-3 py-1.5 text-xs text-slate-600 hover:text-slate-800"
+                  className="px-4 py-2 rounded-full border border-[#EAE0F2] text-xs font-medium text-[#64748B] hover:bg-[#F6F0FA] hover:text-[#1E1B2E] transition"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={actionLoading === rejectModalReq.id || !rejectReason.trim()}
-                  className="px-4 py-1.5 rounded-lg bg-rose-600 text-white text-xs font-semibold hover:bg-rose-700 disabled:opacity-50"
+                  className="px-5 py-2 rounded-full bg-rose-600 text-white text-xs alata-regular hover:bg-rose-700 disabled:opacity-50 shadow-sm transition"
                 >
                   {actionLoading === rejectModalReq.id ? 'Submitting...' : 'Send Modification Request'}
                 </button>
@@ -181,31 +185,35 @@ function ComplianceDetailPanel({ clinic, onRefresh }) {
       )}
 
       {/* Header */}
-      <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-100 pb-4">
+      <div className="flex flex-wrap items-start justify-between gap-3 border-b border-[#EAE0F2] pb-4">
         <div className="min-w-0">
-          <h2 className="font-serif text-xl font-bold text-[#0d281e]">{clinic.trading_name}</h2>
-          <p className="mt-1 text-xs text-slate-500">{clinic.legal_name} · {clinic.tenant_code}</p>
+          <h2 className="alata-regular text-2xl text-[#1E1B2E]">{clinic.trading_name}</h2>
+          <p className="mt-1 text-xs text-[#64748B]">
+            {clinic.legal_name} · <span className="alata-regular text-[#6B3B66]">{clinic.tenant_code}</span>
+          </p>
         </div>
-        <div className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-bold ${tone}`}>
+        <div className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs alata-regular ${tone}`}>
           {icon} {label}
         </div>
       </div>
 
       {/* Pending Regulatory Renewal Requests (Admin Action Required) */}
       {clinic.renewal_requests && clinic.renewal_requests.length > 0 && (
-        <section className="rounded-2xl border-2 border-amber-300 bg-amber-50/40 p-4 space-y-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <AlertCircle className="w-5 h-5 text-amber-700" />
-              <h3 className="font-bold text-slate-900 text-sm">
+        <section className="rounded-3xl border border-[#DECBE9] bg-[#F6F0FA]/70 p-5 space-y-3 shadow-sm">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-full bg-[#6B3B66] text-white flex items-center justify-center shrink-0">
+                <FaIcon icon="fa-solid fa-circle-exclamation" className="text-sm" />
+              </div>
+              <h3 className="alata-regular text-[#1E1B2E] text-sm">
                 Regulatory Renewal Requests ({clinic.renewal_requests.filter(r => r.status === 'PENDING_REVIEW').length} Pending)
               </h3>
             </div>
-            <span className="text-[10px] font-bold uppercase tracking-wider bg-amber-200/80 text-amber-900 px-2 py-0.5 rounded-full">
+            <span className="text-[10px] alata-regular uppercase tracking-wider bg-[#F0E6F6] text-[#6B3B66] border border-[#DECBE9] px-3 py-1 rounded-full">
               Action Required
             </span>
           </div>
-          <p className="text-xs text-slate-600">
+          <p className="text-xs text-[#64748B]">
             The clinic submitted updated licence credentials extracted via AI. Review and approve below to apply updates and restore public marketplace listing on onsta.ae.
           </p>
 
@@ -213,69 +221,69 @@ function ComplianceDetailPanel({ clinic, onRefresh }) {
             {clinic.renewal_requests.map((req) => (
               <div
                 key={req.id}
-                className="bg-white rounded-xl border border-amber-200 p-3.5 shadow-sm space-y-3"
+                className="bg-white rounded-2xl border border-[#EAE0F2] p-4 shadow-sm space-y-3"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
-                    <div className="flex items-center gap-2">
-                      <strong className="text-slate-900 text-sm font-bold">{req.target_name}</strong>
-                      <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-slate-100 text-slate-700">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <strong className="text-[#1E1B2E] text-sm alata-regular">{req.target_name}</strong>
+                      <span className="text-[10px] alata-regular px-2.5 py-0.5 rounded-full bg-[#F0E6F6] text-[#6B3B66] border border-[#DECBE9]">
                         {req.document_code}
                       </span>
                     </div>
-                    <span className="text-xs text-slate-500 block mt-0.5">
-                      Licence No: <strong>{req.document_number}</strong> · Authority: <strong>{req.authority}</strong>
+                    <span className="text-xs text-[#64748B] block mt-1">
+                      Licence No: <strong className="text-[#1E1B2E]">{req.document_number}</strong> · Authority: <strong className="text-[#1E1B2E]">{req.authority}</strong>
                     </span>
                   </div>
-                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                  <span className={`px-2.5 py-0.5 rounded-full text-[10px] alata-regular border ${
                     req.status === 'PENDING_REVIEW'
-                      ? 'bg-blue-100 text-blue-800 border border-blue-200'
-                      : 'bg-rose-100 text-rose-800 border border-rose-200'
+                      ? 'bg-[#F0E6F6] text-[#6B3B66] border-[#DECBE9]'
+                      : 'bg-rose-50 text-rose-700 border-rose-200'
                   }`}>
                     {req.status === 'PENDING_REVIEW' ? 'Pending Review' : 'Modification Requested'}
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 text-xs bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                <div className="grid grid-cols-2 gap-3 text-xs bg-[#F8FAFC] p-3 rounded-xl border border-[#EAE0F2]">
                   <div>
-                    <span className="text-slate-400 block text-[10px] uppercase">Current Expiry</span>
-                    <span className="font-mono text-slate-700 font-semibold">{req.old_expiry_date || 'Expired'}</span>
+                    <span className="text-[#64748B] block text-[10px] uppercase tracking-wider">Current Expiry</span>
+                    <span className="alata-regular text-[#1E1B2E] text-sm">{req.old_expiry_date || 'Expired'}</span>
                   </div>
                   <div>
-                    <span className="text-slate-400 block text-[10px] uppercase">New Requested Expiry</span>
-                    <span className="font-mono text-emerald-700 font-bold">{req.new_expiry_date}</span>
+                    <span className="text-[#64748B] block text-[10px] uppercase tracking-wider">New Requested Expiry</span>
+                    <span className="alata-regular text-emerald-700 text-sm">{req.new_expiry_date}</span>
                   </div>
                 </div>
 
                 {req.file_name && (
-                  <div className="text-[11px] text-slate-500 flex items-center gap-1.5">
-                    <FileText className="w-3.5 h-3.5 text-slate-400" />
-                    <span>Attached Document: <strong className="text-slate-700 font-mono">{req.file_name}</strong></span>
+                  <div className="text-[11px] text-[#64748B] flex items-center gap-1.5">
+                    <FaIcon icon="fa-solid fa-file-lines" className="text-[#6B3B66]" />
+                    <span>Attached Document: <strong className="text-[#1E1B2E] font-mono">{req.file_name}</strong></span>
                   </div>
                 )}
 
                 {req.status === 'PENDING_REVIEW' && (
-                  <div className="flex items-center justify-end gap-2 pt-1 border-t border-slate-100">
+                  <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-[#EAE0F2]">
                     <button
                       onClick={() => {
                         setRejectModalReq(req);
                         setRejectReason('');
                       }}
                       disabled={actionLoading === req.id}
-                      className="px-3 py-1.5 rounded-lg border border-rose-300 text-rose-700 text-xs font-semibold hover:bg-rose-50 transition-colors flex items-center gap-1"
+                      className="px-4 py-1.5 rounded-full border border-rose-200 bg-rose-50/40 text-rose-700 text-xs alata-regular hover:bg-rose-50 transition-colors flex items-center gap-1.5"
                     >
-                      <X className="w-3.5 h-3.5" />
+                      <FaIcon icon="fa-solid fa-xmark" className="text-[11px]" />
                       <span>Request Modification</span>
                     </button>
                     <button
                       onClick={() => handleApprove(req.id)}
                       disabled={actionLoading === req.id}
-                      className="px-3.5 py-1.5 rounded-lg bg-emerald-700 text-white text-xs font-semibold hover:bg-emerald-800 transition-colors flex items-center gap-1.5 shadow-sm"
+                      className="px-4 py-1.5 rounded-full bg-[#6B3B66] hover:bg-[#552B51] text-white text-xs alata-regular transition-colors flex items-center gap-1.5 shadow-sm"
                     >
                       {actionLoading === req.id ? (
-                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <FaIcon icon="fa-solid fa-spinner fa-spin" className="text-xs" />
                       ) : (
-                        <Check className="w-3.5 h-3.5" />
+                        <FaIcon icon="fa-solid fa-check" className="text-xs" />
                       )}
                       <span>Approve & Restore Listing</span>
                     </button>
@@ -283,7 +291,7 @@ function ComplianceDetailPanel({ clinic, onRefresh }) {
                 )}
 
                 {req.status === 'REJECTED' && req.admin_notes && (
-                  <div className="text-xs text-rose-700 bg-rose-50 p-2 rounded border border-rose-200">
+                  <div className="text-xs text-rose-700 bg-rose-50 p-2.5 rounded-xl border border-rose-200">
                     <strong>Admin Feedback Sent:</strong> {req.admin_notes}
                   </div>
                 )}
@@ -294,94 +302,94 @@ function ComplianceDetailPanel({ clinic, onRefresh }) {
       )}
 
       {/* Trade License */}
-      <section className="rounded-2xl border border-slate-200 p-4">
-        <div className="flex items-center justify-between gap-3 mb-3">
-          <h3 className="font-semibold text-slate-900">Trade License</h3>
+      <section className="rounded-3xl border border-[#EAE0F2] bg-white p-5">
+        <div className="flex items-center justify-between gap-3 mb-3.5">
+          <h3 className="alata-regular text-base text-[#1E1B2E]">Trade License</h3>
           <ExpiryBadge date={clinic.trade_license_expiry_date} />
         </div>
         <dl className="grid gap-x-5 gap-y-3 sm:grid-cols-2 text-sm">
           <div>
-            <dt className="text-[11px] font-medium uppercase tracking-wide text-slate-400">License Number</dt>
-            <dd className="mt-1 font-medium text-slate-800">{clinic.trade_license_number || 'Not provided'}</dd>
+            <dt className="text-[11px] font-medium uppercase tracking-wide text-[#64748B]">License Number</dt>
+            <dd className="mt-1 font-medium text-[#1E1B2E]">{clinic.trade_license_number || 'Not provided'}</dd>
           </div>
           <div>
-            <dt className="text-[11px] font-medium uppercase tracking-wide text-slate-400">Issuing Authority</dt>
-            <dd className="mt-1 font-medium text-slate-800">{clinic.trade_license_authority || 'Not provided'}</dd>
+            <dt className="text-[11px] font-medium uppercase tracking-wide text-[#64748B]">Issuing Authority</dt>
+            <dd className="mt-1 font-medium text-[#1E1B2E]">{clinic.trade_license_authority || 'Not provided'}</dd>
           </div>
           <div>
-            <dt className="text-[11px] font-medium uppercase tracking-wide text-slate-400">Issue Date</dt>
-            <dd className="mt-1 font-medium text-slate-800">{formatDate(clinic.trade_license_issue_date)}</dd>
+            <dt className="text-[11px] font-medium uppercase tracking-wide text-[#64748B]">Issue Date</dt>
+            <dd className="mt-1 font-medium text-[#1E1B2E]">{formatDate(clinic.trade_license_issue_date)}</dd>
           </div>
           <div>
-            <dt className="text-[11px] font-medium uppercase tracking-wide text-slate-400">Expiry Date</dt>
-            <dd className="mt-1 font-medium text-slate-800">{formatDate(clinic.trade_license_expiry_date)}</dd>
+            <dt className="text-[11px] font-medium uppercase tracking-wide text-[#64748B]">Expiry Date</dt>
+            <dd className="mt-1 font-medium text-[#1E1B2E]">{formatDate(clinic.trade_license_expiry_date)}</dd>
           </div>
         </dl>
       </section>
 
       {/* Facility License */}
-      <section className="rounded-2xl border border-slate-200 p-4">
-        <div className="flex items-center justify-between gap-3 mb-3">
-          <h3 className="font-semibold text-slate-900">Facility License</h3>
+      <section className="rounded-3xl border border-[#EAE0F2] bg-white p-5">
+        <div className="flex items-center justify-between gap-3 mb-3.5">
+          <h3 className="alata-regular text-base text-[#1E1B2E]">Facility License</h3>
           <ExpiryBadge date={clinic.facility_license_expiry_date} />
         </div>
         <dl className="grid gap-x-5 gap-y-3 sm:grid-cols-2 text-sm">
           <div>
-            <dt className="text-[11px] font-medium uppercase tracking-wide text-slate-400">License Number</dt>
-            <dd className="mt-1 font-medium text-slate-800">{clinic.facility_license_number || 'Not provided'}</dd>
+            <dt className="text-[11px] font-medium uppercase tracking-wide text-[#64748B]">License Number</dt>
+            <dd className="mt-1 font-medium text-[#1E1B2E]">{clinic.facility_license_number || 'Not provided'}</dd>
           </div>
           <div>
-            <dt className="text-[11px] font-medium uppercase tracking-wide text-slate-400">Issuing Authority</dt>
-            <dd className="mt-1 font-medium text-slate-800">{clinic.facility_license_authority || 'Not provided'}</dd>
+            <dt className="text-[11px] font-medium uppercase tracking-wide text-[#64748B]">Issuing Authority</dt>
+            <dd className="mt-1 font-medium text-[#1E1B2E]">{clinic.facility_license_authority || 'Not provided'}</dd>
           </div>
           <div>
-            <dt className="text-[11px] font-medium uppercase tracking-wide text-slate-400">Issue Date</dt>
-            <dd className="mt-1 font-medium text-slate-800">{formatDate(clinic.facility_license_issue_date)}</dd>
+            <dt className="text-[11px] font-medium uppercase tracking-wide text-[#64748B]">Issue Date</dt>
+            <dd className="mt-1 font-medium text-[#1E1B2E]">{formatDate(clinic.facility_license_issue_date)}</dd>
           </div>
           <div>
-            <dt className="text-[11px] font-medium uppercase tracking-wide text-slate-400">Expiry Date</dt>
-            <dd className="mt-1 font-medium text-slate-800">{formatDate(clinic.facility_license_expiry_date)}</dd>
+            <dt className="text-[11px] font-medium uppercase tracking-wide text-[#64748B]">Expiry Date</dt>
+            <dd className="mt-1 font-medium text-[#1E1B2E]">{formatDate(clinic.facility_license_expiry_date)}</dd>
           </div>
         </dl>
       </section>
 
       {/* Company Registration */}
-      <section className="rounded-2xl border border-slate-200 p-4">
-        <h3 className="font-semibold text-slate-900 mb-3">Company Registration</h3>
+      <section className="rounded-3xl border border-[#EAE0F2] bg-white p-5">
+        <h3 className="alata-regular text-base text-[#1E1B2E] mb-3.5">Company Registration</h3>
         <dl className="grid gap-x-5 gap-y-3 sm:grid-cols-2 text-sm">
           <div>
-            <dt className="text-[11px] font-medium uppercase tracking-wide text-slate-400">Registration Number</dt>
-            <dd className="mt-1 font-medium text-slate-800">{clinic.company_registration_number || 'Not provided'}</dd>
+            <dt className="text-[11px] font-medium uppercase tracking-wide text-[#64748B]">Registration Number</dt>
+            <dd className="mt-1 font-medium text-[#1E1B2E]">{clinic.company_registration_number || 'Not provided'}</dd>
           </div>
           <div>
-            <dt className="text-[11px] font-medium uppercase tracking-wide text-slate-400">Facility Type</dt>
-            <dd className="mt-1 font-medium text-slate-800">{clinic.facility_type || 'Not provided'}</dd>
+            <dt className="text-[11px] font-medium uppercase tracking-wide text-[#64748B]">Facility Type</dt>
+            <dd className="mt-1 font-medium text-[#1E1B2E]">{clinic.facility_type || 'Not provided'}</dd>
           </div>
           <div>
-            <dt className="text-[11px] font-medium uppercase tracking-wide text-slate-400">Emirate</dt>
-            <dd className="mt-1 font-medium text-slate-800">{clinic.emirate || '—'}</dd>
+            <dt className="text-[11px] font-medium uppercase tracking-wide text-[#64748B]">Emirate</dt>
+            <dd className="mt-1 font-medium text-[#1E1B2E]">{clinic.emirate || '—'}</dd>
           </div>
           <div>
-            <dt className="text-[11px] font-medium uppercase tracking-wide text-slate-400">Verification Status</dt>
-            <dd className="mt-1 font-medium text-slate-800">{clinic.verification_status || '—'}</dd>
+            <dt className="text-[11px] font-medium uppercase tracking-wide text-[#64748B]">Verification Status</dt>
+            <dd className="mt-1 font-medium text-[#1E1B2E]">{clinic.verification_status || '—'}</dd>
           </div>
         </dl>
       </section>
 
       {/* Practitioner Licenses Watchdog */}
-      <section className="rounded-2xl border border-slate-200 p-4">
-        <div className="flex items-center justify-between gap-3 mb-3">
+      <section className="rounded-3xl border border-[#EAE0F2] bg-white p-5">
+        <div className="flex items-center justify-between gap-3 mb-3.5">
           <div>
-            <h3 className="font-semibold text-slate-900">Practitioner Licences Watchdog</h3>
-            <p className="text-xs text-slate-500">Live credential status from practitioner_licenses table</p>
+            <h3 className="alata-regular text-base text-[#1E1B2E]">Practitioner Licences Watchdog</h3>
+            <p className="text-xs text-[#64748B]">Live credential status from practitioner_licenses table</p>
           </div>
-          <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-700">
+          <span className="text-xs alata-regular px-3 py-1 rounded-full bg-[#F0E6F6] text-[#6B3B66] border border-[#DECBE9]">
             {clinic.practitioners ? clinic.practitioners.length : 0} Doctor(s)
           </span>
         </div>
 
         {(!clinic.practitioners || clinic.practitioners.length === 0) ? (
-          <div className="p-4 text-center text-xs text-slate-400 bg-slate-50 rounded-xl">
+          <div className="p-5 text-center text-xs text-[#64748B] bg-[#F8FAFC] border border-dashed border-[#EAE0F2] rounded-2xl">
             No practitioners currently registered to this facility.
           </div>
         ) : (
@@ -394,24 +402,24 @@ function ComplianceDetailPanel({ clinic, onRefresh }) {
               return (
                 <div
                   key={doc.id}
-                  className={`p-3 rounded-xl border text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 transition-colors ${
+                  className={`p-3.5 rounded-2xl border text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 transition-colors ${
                     isExpired
-                      ? 'bg-red-50/50 border-red-200'
+                      ? 'bg-rose-50/50 border-rose-200'
                       : isCritical
                       ? 'bg-amber-50/50 border-amber-200'
-                      : 'bg-white border-slate-200'
+                      : 'bg-[#F8FAFC] border-[#EAE0F2]'
                   }`}
                 >
                   <div>
-                    <div className="flex items-center gap-2">
-                      <strong className={isExpired ? 'text-red-950 font-bold' : 'text-slate-900 font-semibold'}>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <strong className={isExpired ? 'text-rose-900 alata-regular text-sm' : 'text-[#1E1B2E] alata-regular text-sm'}>
                         {doc.full_name}
                       </strong>
-                      <span className="text-[10px] text-slate-400 font-mono">
+                      <span className="text-[10px] text-[#64748B] font-mono">
                         ({doc.authority || 'DHA'} · {doc.license_number})
                       </span>
                     </div>
-                    <span className="text-slate-500 text-[11px] block mt-0.5">
+                    <span className="text-[#64748B] text-[11px] block mt-0.5">
                       {doc.specialty} · {doc.professional_title || 'Specialist'}
                     </span>
                   </div>
@@ -419,7 +427,7 @@ function ComplianceDetailPanel({ clinic, onRefresh }) {
                   <div className="flex items-center gap-2 self-start sm:self-auto">
                     <ExpiryBadge date={doc.expiry_date} />
                     {isExpired && (
-                      <span className="text-[10px] font-bold text-red-700 bg-red-100 px-2 py-0.5 rounded-full">
+                      <span className="text-[10px] alata-regular text-rose-700 bg-rose-100 px-2.5 py-0.5 rounded-full border border-rose-200">
                         Delisted
                       </span>
                     )}
@@ -488,54 +496,54 @@ export default function ComplianceAudit() {
   ];
 
   return (
-    <main className="flex h-screen min-w-0 flex-1 flex-col overflow-hidden">
-      <header className="flex flex-wrap items-center justify-between gap-4 border-b border-[#E5DFD5] bg-white px-6 py-5 shadow-sm sm:px-8">
+    <main className="flex h-screen min-w-0 flex-1 flex-col overflow-hidden bg-[#F6F0FA]">
+      <header className="flex flex-wrap items-center justify-between gap-4 border-b border-[#EAE0F2] bg-white px-6 py-5 shadow-sm sm:px-8">
         <div>
-          <h1 className="font-serif text-xl font-bold text-[#0d281e]">Compliance & Permits</h1>
-          <p className="mt-1 text-xs text-slate-500">Monitor trade, facility, and practitioner license expiry across all registered clinics.</p>
+          <h1 className="alata-regular text-xl text-[#1E1B2E]">Compliance & Permits</h1>
+          <p className="mt-1 text-xs text-[#64748B]">Monitor trade, facility, and practitioner license expiry across all registered clinics.</p>
         </div>
         <button
           type="button"
           onClick={() => setRefreshKey((k) => k + 1)}
           disabled={loading}
-          className="inline-flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs font-semibold text-emerald-900 hover:bg-emerald-100 disabled:opacity-60"
+          className="inline-flex items-center gap-2 rounded-full border border-[#DECBE9] bg-[#F6F0FA] px-4 py-2 text-xs alata-regular text-[#6B3B66] hover:bg-[#F0E6F6] disabled:opacity-60 transition"
         >
-          <RefreshCw size={14} className={loading ? 'animate-spin' : ''} /> Refresh
+          <FaIcon icon="fa-solid fa-arrows-rotate" className={loading ? 'fa-spin' : ''} /> Refresh
         </button>
       </header>
 
       {error && (
-        <div role="alert" className="border-b border-red-200 bg-red-50 px-6 py-3 text-sm text-red-800">{error}</div>
+        <div role="alert" className="border-b border-rose-200 bg-rose-50 px-6 py-3 text-sm text-rose-800">{error}</div>
       )}
 
       <div className="grid min-h-0 flex-1 grid-cols-1 overflow-hidden xl:grid-cols-[minmax(0,1.05fr)_minmax(430px,0.95fr)]">
         {/* Left: Clinic List */}
-        <section className="flex min-h-0 flex-col border-r border-[#E5DFD5] bg-[#FDFCF9]">
+        <section className="flex min-h-0 flex-col border-r border-[#EAE0F2] bg-[#F8FAFC]">
           {/* Filters */}
-          <div className="space-y-3 border-b border-[#E5DFD5] p-4">
+          <div className="space-y-3 border-b border-[#EAE0F2] bg-white/70 p-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-sm font-semibold text-slate-800">
-                <Building2 size={16} className="text-emerald-800" /> Registered clinics
+              <div className="flex items-center gap-2 text-sm alata-regular text-[#1E1B2E]">
+                <FaIcon icon="fa-solid fa-hospital" className="text-[#6B3B66]" /> Registered clinics
               </div>
-              <span className="text-xs text-slate-500">{total} total</span>
+              <span className="text-xs alata-regular text-[#64748B]">{total} total</span>
             </div>
 
             {/* Search + Emirate */}
             <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_160px]">
               <label className="relative">
-                <Search size={15} className="absolute left-3 top-2.5 text-slate-400" />
+                <FaIcon icon="fa-solid fa-magnifying-glass" className="absolute left-3.5 top-3 text-xs text-[#64748B]" />
                 <input
                   value={search}
                   onChange={(e) => { setSearch(e.target.value); setOffset(0); }}
                   placeholder="Search clinic or tenant code"
-                  className="w-full rounded-lg border border-slate-200 bg-white py-2 pl-9 pr-3 text-sm outline-none focus:border-emerald-700"
+                  className="w-full rounded-xl border border-[#EAE0F2] bg-white py-2 pl-9 pr-3 text-sm text-[#1E1B2E] outline-none focus:border-[#6B3B66]"
                 />
               </label>
               <select
                 value={emirate}
                 onChange={updateFilter(setEmirate)}
                 aria-label="Filter by emirate"
-                className="rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-700 outline-none focus:border-emerald-700"
+                className="rounded-xl border border-[#EAE0F2] bg-white px-3 py-2 text-sm text-[#1E1B2E] outline-none focus:border-[#6B3B66]"
               >
                 <option value="">All emirates</option>
                 {EMIRATES.map((name) => <option key={name} value={name}>{name}</option>)}
@@ -543,14 +551,16 @@ export default function ComplianceAudit() {
             </div>
 
             {/* Compliance status pills */}
-            <div className="flex gap-1">
+            <div className="flex gap-1.5">
               {FILTERS.map(({ value, label }) => (
                 <button
                   key={value}
                   type="button"
                   onClick={() => { setComplianceFilter(value); setOffset(0); }}
-                  className={`flex-1 rounded py-1 text-[10px] font-semibold transition ${
-                    complianceFilter === value ? 'bg-[#0d281e] text-white' : 'text-slate-600 hover:bg-slate-100'
+                  className={`flex-1 rounded-full py-1.5 text-[11px] alata-regular transition ${
+                    complianceFilter === value
+                      ? 'bg-[#6B3B66] text-white shadow-sm'
+                      : 'bg-white border border-[#EAE0F2] text-[#64748B] hover:bg-[#F6F0FA] hover:text-[#6B3B66]'
                   }`}
                 >
                   {label}
@@ -560,11 +570,11 @@ export default function ComplianceAudit() {
           </div>
 
           {/* List */}
-          <div className="min-h-0 flex-1 overflow-auto divide-y divide-slate-100">
+          <div className="min-h-0 flex-1 overflow-auto divide-y divide-[#EAE0F2]">
             {loading && clinics.length === 0 ? (
-              <p className="p-8 text-center text-sm text-slate-500">Loading compliance data…</p>
+              <p className="p-8 text-center text-sm text-[#64748B]">Loading compliance data…</p>
             ) : clinics.length === 0 ? (
-              <p className="p-8 text-center text-sm text-slate-500">
+              <p className="p-8 text-center text-sm text-[#64748B]">
                 {error ? 'Clinic list is unavailable.' : 'No clinics match your search and filters.'}
               </p>
             ) : (
@@ -576,34 +586,39 @@ export default function ComplianceAudit() {
                     key={clinic.clinic_id}
                     type="button"
                     onClick={() => setSelectedClinic(clinic)}
-                    className={`w-full px-4 py-4 text-left transition hover:bg-emerald-50/60 ${isSelected ? 'border-l-4 border-emerald-700 bg-emerald-50/70' : ''}`}
+                    className={`w-full px-4 py-4 text-left transition hover:bg-[#F6F0FA]/60 ${
+                      isSelected ? 'border-l-4 border-[#6B3B66] bg-[#F6F0FA]/90' : 'bg-white/60'
+                    }`}
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <h2 className="truncate text-sm font-semibold text-slate-900">{clinic.trading_name}</h2>
-                        <p className="mt-1 truncate text-xs text-slate-500">{clinic.legal_name}</p>
+                        <h2 className="truncate text-sm alata-regular text-[#1E1B2E]">{clinic.trading_name}</h2>
+                        <p className="mt-1 truncate text-xs text-[#64748B]">{clinic.legal_name}</p>
                       </div>
-                      <div className={`inline-flex shrink-0 items-center gap-1 rounded-lg border px-2 py-1 text-[10px] font-bold ${tone}`}>
+                      <div className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[10px] alata-regular ${tone}`}>
                         {icon} {label}
                       </div>
                     </div>
-                    <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-slate-500">
-                      <span className="inline-flex items-center gap-1"><MapPin size={11} />{clinic.emirate || '—'}</span>
+                    <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-[#64748B]">
+                      <span className="inline-flex items-center gap-1">
+                        <FaIcon icon="fa-solid fa-location-dot" className="text-[#6B3B66]/70" />
+                        {clinic.emirate || '—'}
+                      </span>
                       <span>{clinic.facility_type}</span>
-                      <span>{clinic.tenant_code}</span>
+                      <span className="alata-regular text-[#6B3B66]">{clinic.tenant_code}</span>
                     </div>
-                    <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[10px] text-slate-400">
+                    <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[10px] text-[#64748B]">
                       <span>Trade: {formatDate(clinic.trade_license_expiry_date)}</span>
                       <span>Facility: {formatDate(clinic.facility_license_expiry_date)}</span>
                       {clinic.pending_renewals_count > 0 ? (
-                        <span className="text-blue-700 font-bold bg-blue-50 px-1.5 py-0.5 rounded border border-blue-200">
+                        <span className="text-[#6B3B66] alata-regular bg-[#F0E6F6] px-2 py-0.5 rounded-full border border-[#DECBE9]">
                           Renewals: {clinic.pending_renewals_count} Pending
                         </span>
                       ) : null}
                       {clinic.expired_doctors_count > 0 ? (
-                        <span className="text-red-600 font-bold">Docs: {clinic.expired_doctors_count} Expired</span>
+                        <span className="text-rose-700 font-bold">Docs: {clinic.expired_doctors_count} Expired</span>
                       ) : clinic.expiring_doctors_count > 0 ? (
-                        <span className="text-amber-600 font-bold">Docs: {clinic.expiring_doctors_count} Expiring</span>
+                        <span className="text-amber-700 font-bold">Docs: {clinic.expiring_doctors_count} Expiring</span>
                       ) : (
                         <span>Docs: {clinic.practitioners ? clinic.practitioners.length : 0}</span>
                       )}
@@ -615,37 +630,39 @@ export default function ComplianceAudit() {
           </div>
 
           {/* Pagination */}
-          <footer className="flex items-center justify-between border-t border-[#E5DFD5] bg-white px-4 py-3 text-xs text-slate-500">
-            <span>Page {page} of {pageCount}</span>
+          <footer className="flex items-center justify-between border-t border-[#EAE0F2] bg-white px-4 py-3 text-xs text-[#64748B]">
+            <span className="alata-regular">Page {page} of {pageCount}</span>
             <div className="flex gap-2">
               <button
                 type="button"
                 disabled={offset === 0 || loading}
                 onClick={() => setOffset(Math.max(0, offset - PAGE_SIZE))}
-                className="rounded-lg border border-slate-200 p-1.5 disabled:opacity-40"
+                className="rounded-full border border-[#EAE0F2] w-8 h-8 flex items-center justify-center hover:bg-[#F6F0FA] hover:text-[#6B3B66] disabled:opacity-40 transition"
                 aria-label="Previous page"
               >
-                <ChevronLeft size={16} />
+                <FaIcon icon="fa-solid fa-chevron-left" className="text-xs" />
               </button>
               <button
                 type="button"
                 disabled={offset + PAGE_SIZE >= total || loading}
                 onClick={() => setOffset(offset + PAGE_SIZE)}
-                className="rounded-lg border border-slate-200 p-1.5 disabled:opacity-40"
+                className="rounded-full border border-[#EAE0F2] w-8 h-8 flex items-center justify-center hover:bg-[#F6F0FA] hover:text-[#6B3B66] disabled:opacity-40 transition"
                 aria-label="Next page"
               >
-                <ChevronRight size={16} />
+                <FaIcon icon="fa-solid fa-chevron-right" className="text-xs" />
               </button>
             </div>
           </footer>
         </section>
 
         {/* Right: Detail Panel */}
-        <section className="min-h-0 overflow-y-auto bg-white p-4 sm:p-6">
-          <ComplianceDetailPanel
-            clinic={selectedClinic}
-            onRefresh={() => setRefreshKey((k) => k + 1)}
-          />
+        <section className="min-h-0 overflow-y-auto bg-[#F8FAFC] p-5 sm:p-6">
+          <div className="bg-white rounded-3xl border border-[#EAE0F2] p-5 sm:p-6 shadow-sm">
+            <ComplianceDetailPanel
+              clinic={selectedClinic}
+              onRefresh={() => setRefreshKey((k) => k + 1)}
+            />
+          </div>
         </section>
       </div>
     </main>
