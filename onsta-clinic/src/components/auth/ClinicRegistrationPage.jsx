@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowLeft, Building2, Check, FileUp, Loader2, ScanText, ShieldCheck, AlertCircle, Sparkles } from 'lucide-react';
-import { analyzeClinicDocuments, registerClinic, uploadClinicDocument, submitClinicApplication, getApplicationDetails, updateClinicApplication } from '../../api/accountApi';
+import FaIcon from '../common/FaIcon';
+import {
+  analyzeClinicDocuments,
+  registerClinic,
+  uploadClinicDocument,
+  submitClinicApplication,
+  getApplicationDetails,
+  updateClinicApplication,
+} from '../../api/accountApi';
 import { clinicRegistrationSchema, clinicEditSchema } from '../../utils/validationSchemas';
 
 const DOCUMENTS = [
@@ -244,7 +251,7 @@ export default function ClinicRegistrationPage() {
         }
 
         // Resubmit application
-        const result = await submitClinicApplication(editApplicationId, token);
+        await submitClinicApplication(editApplicationId, token);
         setSuccess('Application updated and resubmitted for Super Admin review. You will be redirected shortly.');
         setTimeout(() => navigate('/application', { replace: true }), 2000);
       } else {
@@ -282,13 +289,13 @@ export default function ClinicRegistrationPage() {
   const field = (label, key, type = 'text', required = true) => {
     const hasError = Boolean(fieldErrors[key]);
     return (
-      <label key={key} className="block text-sm font-medium text-slate-700">
-        <div className="flex items-center justify-between">
+      <label key={key} className="block text-xs font-semibold uppercase tracking-wider text-[#64748B]">
+        <div className="flex items-center justify-between gap-2">
           <span>
             {label}
-            {!required && <span className="font-normal text-slate-400"> (optional)</span>}
+            {!required && <span className="font-normal lowercase text-[#64748B]/80"> (optional)</span>}
           </span>
-          {hasError && <span className="text-xs text-red-600 font-semibold">{fieldErrors[key]}</span>}
+          {hasError && <span className="text-[11px] normal-case text-rose-600 font-semibold">{fieldErrors[key]}</span>}
         </div>
         <input
           type={type}
@@ -298,10 +305,10 @@ export default function ClinicRegistrationPage() {
           value={form[key] || ''}
           onChange={update(key)}
           placeholder={key === 'main_phone' ? '+971 50 123 4567 (optional)' : ''}
-          className={`mt-1.5 w-full rounded-xl border px-3 py-2.5 text-sm outline-none transition ${
+          className={`mt-1.5 w-full rounded-xl border px-3.5 py-2.5 text-sm font-normal text-[#1E1B2E] outline-none transition ${
             hasError
-              ? 'border-red-400 bg-red-50/50 focus:border-red-600 focus:ring-2 focus:ring-red-100'
-              : 'border-slate-300 focus:border-emerald-700 focus:ring-2 focus:ring-emerald-100'
+              ? 'border-rose-400 bg-rose-50/50 focus:border-rose-600 focus:ring-2 focus:ring-rose-100'
+              : 'border-[#EAE0F2] bg-[#F8FAFC] focus:border-[#6B3B66] focus:bg-white focus:ring-2 focus:ring-[#6B3B66]/15'
           }`}
         />
       </label>
@@ -309,21 +316,26 @@ export default function ClinicRegistrationPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#f7f4ee] px-4 py-10 text-slate-900">
+    <main className="min-h-screen bg-[#F6F0FA] px-4 py-10 text-[#1E1B2E]">
       <div className="mx-auto max-w-4xl">
-        <Link to={isEditMode ? '/application' : '/login'} className="mb-6 inline-flex items-center gap-2 text-sm text-emerald-900">
-          <ArrowLeft size={16} /> {isEditMode ? 'Back to application status' : 'Back to clinic sign in'}
+        <Link
+          to={isEditMode ? '/application' : '/login'}
+          className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#DECBE9] bg-white px-4 py-2 text-xs alata-regular text-[#6B3B66] shadow-sm transition hover:bg-[#F0E6F6]"
+        >
+          <FaIcon icon="fa-solid fa-arrow-left" />
+          {isEditMode ? 'Back to application status' : 'Back to clinic sign in'}
         </Link>
-        <div className="rounded-3xl border border-[#e7e1d7] bg-white p-6 shadow-xl sm:p-10">
+
+        <div className="rounded-3xl border border-[#EAE0F2] bg-white p-6 shadow-xl sm:p-10">
           <div className="mb-8 flex items-start gap-4">
-            <div className="rounded-2xl bg-emerald-50 p-3 text-emerald-900">
-              <Building2 size={24} />
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#F0E6F6] text-[#6B3B66] border border-[#DECBE9]">
+              <FaIcon icon="fa-solid fa-hospital" className="text-xl" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold">
+              <h1 className="alata-regular text-2xl sm:text-3xl text-[#1E1B2E]">
                 {isEditMode ? 'Modify & Update Clinic Registration' : 'Register your clinic'}
               </h1>
-              <p className="mt-1 text-sm text-slate-500">
+              <p className="mt-1 text-sm text-[#64748B]">
                 {isEditMode
                   ? 'Update your clinic details and re-upload any requested licenses to resubmit for review.'
                   : 'Upload the three required documents one at a time. We’ll read the clinic details for you to review.'}
@@ -334,131 +346,149 @@ export default function ClinicRegistrationPage() {
           {/* Super Admin Suggestion / Rejection Reason Banner in Edit Mode */}
           {reviewNotes && (
             <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
-              <div className="flex items-center gap-2 font-semibold">
-                <AlertCircle size={18} className="text-amber-800" />
-                Super Admin Modification Notes:
+              <div className="flex items-center gap-2 alata-regular">
+                <FaIcon icon="fa-solid fa-circle-exclamation" className="text-amber-700" />
+                <span>Super Admin Modification Notes:</span>
               </div>
               <p className="mt-1.5 text-xs text-amber-900 leading-relaxed font-medium">{reviewNotes}</p>
             </div>
           )}
 
           {error && (
-            <div role="alert" className="mb-5 rounded-xl border border-red-200 bg-red-50 p-3.5 text-sm text-red-900 flex items-start gap-2">
-              <AlertCircle size={18} className="text-red-700 shrink-0 mt-0.5" />
+            <div role="alert" className="mb-5 rounded-2xl border border-rose-200 bg-rose-50 p-3.5 text-sm text-rose-900 flex items-start gap-2.5">
+              <FaIcon icon="fa-solid fa-circle-exclamation" className="text-rose-600 shrink-0 mt-0.5" />
               <span>{error}</span>
             </div>
           )}
 
           {success && (
-            <div role="status" className="mb-5 rounded-xl border border-emerald-200 bg-emerald-50 p-3.5 text-sm text-emerald-900 flex items-start gap-2">
-              <Check size={18} className="text-emerald-700 shrink-0 mt-0.5" />
+            <div role="status" className="mb-5 rounded-2xl border border-emerald-200 bg-emerald-50 p-3.5 text-sm text-emerald-900 flex items-start gap-2.5">
+              <FaIcon icon="fa-solid fa-circle-check" className="text-emerald-700 shrink-0 mt-0.5" />
               <span>{success}</span>
             </div>
           )}
 
           {/* Stepper Tabs */}
-          <div className="mb-7 grid grid-cols-4 gap-2">
+          <div className="mb-7 grid grid-cols-2 sm:grid-cols-4 gap-2">
             {DOCUMENTS.map((doc, index) => (
               <button
                 type="button"
                 key={doc.code}
                 onClick={() => setStep(index)}
-                className={`rounded-xl px-3 py-2 text-left text-xs sm:text-sm transition ${
+                className={`rounded-2xl px-3.5 py-2.5 text-left text-xs sm:text-sm alata-regular transition border ${
                   index === step
-                    ? 'bg-emerald-900 text-white'
+                    ? 'bg-[#6B3B66] text-white border-[#6B3B66] shadow-sm'
                     : index < step || isEditMode
-                    ? 'bg-emerald-50 text-emerald-900'
-                    : 'bg-slate-100 text-slate-500'
+                    ? 'bg-[#F0E6F6] text-[#6B3B66] border-[#DECBE9]'
+                    : 'bg-[#F8FAFC] text-[#64748B] border-[#EAE0F2] hover:bg-[#F6F0FA]'
                 }`}
               >
-                <span className="font-semibold">{index < step ? '✓ ' : `${index + 1}. `}{doc.title}</span>
+                <span className="inline-flex items-center gap-1.5">
+                  {index < step ? <FaIcon icon="fa-solid fa-check" className="text-[11px]" /> : <span>{index + 1}.</span>}
+                  <span>{doc.title}</span>
+                </span>
               </button>
             ))}
             <button
               type="button"
               onClick={() => setStep(3)}
-              className={`rounded-xl px-3 py-2 text-left text-xs sm:text-sm transition ${
-                step === 3 ? 'bg-emerald-900 text-white' : 'bg-slate-100 text-slate-500'
+              className={`rounded-2xl px-3.5 py-2.5 text-left text-xs sm:text-sm alata-regular transition border ${
+                step === 3
+                  ? 'bg-[#6B3B66] text-white border-[#6B3B66] shadow-sm'
+                  : 'bg-[#F8FAFC] text-[#64748B] border-[#EAE0F2] hover:bg-[#F6F0FA]'
               }`}
             >
-              <span className="font-semibold">4. Clinic Details</span>
+              <span>4. Clinic Details</span>
             </button>
           </div>
 
           {step < DOCUMENTS.length ? (
             <section className="space-y-5">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-wide text-emerald-800">
+                <p className="text-xs alata-regular uppercase tracking-wider text-[#6B3B66]">
                   Document {step + 1} of {DOCUMENTS.length}
                 </p>
-                <h2 className="mt-1 text-xl font-semibold">Upload your {currentDocument.title}</h2>
-                <p className="mt-2 text-sm text-slate-600">{currentDocument.source}</p>
+                <h2 className="mt-1 alata-regular text-xl text-[#1E1B2E]">Upload your {currentDocument.title}</h2>
+                <p className="mt-2 text-sm text-[#64748B]">{currentDocument.source}</p>
               </div>
-              <div className="rounded-2xl bg-slate-50 p-4">
-                <h3 className="text-sm font-semibold">Details we’ll try to read</h3>
-                <p className="mt-1 text-sm text-slate-600">{currentDocument.details}</p>
+
+              <div className="rounded-2xl border border-[#EAE0F2] bg-[#F8FAFC] p-4">
+                <h3 className="alata-regular text-sm text-[#1E1B2E]">Details we’ll try to read</h3>
+                <p className="mt-1 text-sm text-[#64748B]">{currentDocument.details}</p>
               </div>
-              <label className="flex cursor-pointer items-center gap-3 rounded-2xl border border-dashed border-slate-300 p-5 text-sm hover:border-emerald-600 transition">
-                <FileUp size={20} className="text-emerald-800" />
+
+              <label className="flex cursor-pointer items-center gap-3.5 rounded-2xl border border-dashed border-[#DECBE9] bg-[#F8FAFC]/60 p-5 text-sm text-[#1E1B2E] hover:border-[#6B3B66] hover:bg-[#F6F0FA]/50 transition">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#F0E6F6] text-[#6B3B66]">
+                  <FaIcon icon="fa-solid fa-cloud-arrow-up" className="text-base" />
+                </div>
                 <span>{files[currentDocument.code]?.name || `Choose ${currentDocument.title} (PDF, JPEG, or PNG; up to 15 MB)`}</span>
                 <input type="file" accept="application/pdf,image/jpeg,image/png" onChange={chooseFile} className="sr-only" />
               </label>
+
               <button
                 type="button"
                 disabled={busy || !files[currentDocument.code]}
                 onClick={analyzeCurrentDocument}
-                className="flex items-center justify-center gap-2 rounded-xl border border-emerald-800 px-5 py-2.5 text-sm font-semibold text-emerald-900 hover:bg-emerald-50 transition disabled:opacity-50"
+                className="flex items-center justify-center gap-2 rounded-full border border-[#DECBE9] bg-[#F6F0FA] px-5 py-2.5 text-sm alata-regular text-[#6B3B66] hover:bg-[#F0E6F6] transition disabled:opacity-50"
               >
-                {busy ? <Loader2 className="animate-spin" size={17} /> : <ScanText size={17} />}
-                Analyze this document & Check Duplicates
+                <FaIcon icon={busy ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-wand-magic-sparkles'} />
+                <span>Analyze this document &amp; Check Duplicates</span>
               </button>
 
               {currentAnalysis && (
-                <div role="status" className="space-y-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
-                  <div className="flex items-center gap-2 text-sm font-semibold text-emerald-950">
-                    <Check size={17} />
-                    {currentAnalysis.document_type === currentDocument.code
-                      ? `Identified as ${currentDocument.title}`
-                      : currentAnalysis.document_type
-                      ? `OCR identified this as ${DOCUMENTS.find((doc) => doc.code === currentAnalysis.document_type)?.title || currentAnalysis.document_type}`
-                      : 'OCR could not identify the document type'}
+                <div role="status" className="space-y-3 rounded-2xl border border-[#DECBE9] bg-[#F6F0FA]/70 p-5">
+                  <div className="flex items-center gap-2 text-sm alata-regular text-[#6B3B66]">
+                    <FaIcon icon="fa-solid fa-circle-check" />
+                    <span>
+                      {currentAnalysis.document_type === currentDocument.code
+                        ? `Identified as ${currentDocument.title}`
+                        : currentAnalysis.document_type
+                        ? `OCR identified this as ${DOCUMENTS.find((doc) => doc.code === currentAnalysis.document_type)?.title || currentAnalysis.document_type}`
+                        : 'OCR could not identify the document type'}
+                    </span>
                   </div>
-                  <p className="text-xs text-slate-700">
+                  <p className="text-xs text-[#64748B]">
                     {currentAnalysis.ocr_status === 'TEXT_FOUND'
                       ? 'Text was detected. Any extracted clinic details will be reviewed in the next step.'
                       : 'No readable text was detected; check the scan is clear and readable.'}
                   </p>
                   {Object.keys(currentAnalysis.extracted_fields || {}).length > 0 && (
-                    <div className="rounded-xl bg-white p-3">
-                      <p className="mb-2 text-xs font-semibold text-slate-700">Details read from this document</p>
-                      <dl className="grid gap-2 text-xs sm:grid-cols-2">
+                    <div className="rounded-xl border border-[#EAE0F2] bg-white p-4">
+                      <p className="mb-2.5 text-xs alata-regular text-[#1E1B2E]">Details read from this document</p>
+                      <dl className="grid gap-2.5 text-xs sm:grid-cols-2">
                         {Object.entries(currentAnalysis.extracted_fields).map(([key, value]) => (
                           <div key={key}>
-                            <dt className="text-slate-500">{FIELD_LABELS[key] || key.replaceAll('_', ' ')}</dt>
-                            <dd className="font-medium text-slate-900">{value}</dd>
+                            <dt className="text-[#64748B]">{FIELD_LABELS[key] || key.replaceAll('_', ' ')}</dt>
+                            <dd className="font-medium text-[#1E1B2E]">{value}</dd>
                           </div>
                         ))}
                       </dl>
                     </div>
                   )}
                   {currentAnalysis.document_type !== currentDocument.code && (
-                    <label className="flex items-start gap-2 text-xs text-slate-700">
+                    <label className="flex items-start gap-2 text-xs text-[#1E1B2E]">
                       <input
                         type="checkbox"
                         checked={Boolean(confirmedTypes[currentDocument.code])}
                         onChange={(event) => setConfirmedTypes((current) => ({ ...current, [currentDocument.code]: event.target.checked }))}
-                        className="mt-0.5"
+                        className="mt-0.5 rounded text-[#6B3B66] focus:ring-[#6B3B66]"
                       />
-                      I confirm this file is the {currentDocument.title} listed for this step.
+                      <span>I confirm this file is the {currentDocument.title} listed for this step.</span>
                     </label>
                   )}
                   {canContinue && (
-                    <button type="button" onClick={goNext} className="rounded-xl bg-[#0d281e] px-5 py-2.5 text-sm font-semibold text-white">
-                      {step < DOCUMENTS.length - 1 ? 'Continue to next document' : 'Continue to clinic details'}
+                    <button
+                      type="button"
+                      onClick={goNext}
+                      className="inline-flex items-center gap-2 rounded-full bg-[#6B3B66] px-6 py-2.5 text-sm alata-regular text-white shadow-sm hover:bg-[#552B51] transition"
+                    >
+                      <span>{step < DOCUMENTS.length - 1 ? 'Continue to next document' : 'Continue to clinic details'}</span>
+                      <FaIcon icon="fa-solid fa-arrow-right" className="text-xs" />
                     </button>
                   )}
                 </div>
               )}
+
               {step > 0 && (
                 <button
                   type="button"
@@ -466,8 +496,9 @@ export default function ClinicRegistrationPage() {
                     setError('');
                     setStep((value) => value - 1);
                   }}
-                  className="text-sm text-emerald-900"
+                  className="inline-flex items-center gap-1.5 text-sm alata-regular text-[#6B3B66] hover:text-[#552B51]"
                 >
+                  <FaIcon icon="fa-solid fa-arrow-left" className="text-xs" />
                   Back to previous document
                 </button>
               )}
@@ -476,13 +507,13 @@ export default function ClinicRegistrationPage() {
             <form onSubmit={handleSubmit} className="space-y-7">
               {!isEditMode && (
                 <section>
-                  <h2 className="mb-3 font-semibold">Document uploads complete</h2>
+                  <h2 className="mb-3 alata-regular text-base text-[#1E1B2E]">Document uploads complete</h2>
                   <ul className="space-y-2">
                     {DOCUMENTS.map((doc) => (
-                      <li key={doc.code} className="flex items-center gap-2 rounded-xl bg-emerald-50 px-3 py-2 text-sm text-emerald-950">
-                        <Check size={16} />
+                      <li key={doc.code} className="flex items-center gap-2.5 rounded-2xl border border-[#DECBE9] bg-[#F6F0FA]/70 px-4 py-2.5 text-sm text-[#1E1B2E]">
+                        <FaIcon icon="fa-solid fa-circle-check" className="text-[#6B3B66]" />
                         <span>
-                          <strong>{doc.title}:</strong> {files[doc.code]?.name || 'Pre-attached'}
+                          <strong className="alata-regular">{doc.title}:</strong> {files[doc.code]?.name || 'Pre-attached'}
                         </span>
                       </li>
                     ))}
@@ -492,10 +523,12 @@ export default function ClinicRegistrationPage() {
 
               <section>
                 <div className="flex items-center justify-between mb-1">
-                  <h2 className="font-semibold text-base">Review extracted clinic details</h2>
-                  <span className="text-xs text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md font-medium">Validated with Zod</span>
+                  <h2 className="alata-regular text-lg text-[#1E1B2E]">Review extracted clinic details</h2>
+                  <span className="text-xs alata-regular text-[#6B3B66] bg-[#F0E6F6] border border-[#DECBE9] px-3 py-0.5 rounded-full">
+                    Validated with Zod
+                  </span>
                 </div>
-                <p className="mb-4 text-xs text-slate-500">Correct any values before submitting. Area is optional.</p>
+                <p className="mb-4 text-xs text-[#64748B]">Correct any values before submitting. Area is optional.</p>
                 <div className="grid gap-4 sm:grid-cols-2">
                   {CLINIC_FIELDS.map(([label, key, type, required]) => field(label, key, type || 'text', required))}
                 </div>
@@ -503,8 +536,8 @@ export default function ClinicRegistrationPage() {
 
               {!isEditMode && (
                 <section>
-                  <h2 className="mb-1 font-semibold text-base">Account Credentials</h2>
-                  <p className="mb-4 text-xs text-slate-500">
+                  <h2 className="mb-1 alata-regular text-lg text-[#1E1B2E]">Account Credentials</h2>
+                  <p className="mb-4 text-xs text-[#64748B]">
                     Account holder name defaults to the license owner/signatory if detected.
                   </p>
                   <div className="grid gap-4 sm:grid-cols-2">
@@ -515,8 +548,8 @@ export default function ClinicRegistrationPage() {
                 </section>
               )}
 
-              <div className="flex items-start gap-2 rounded-xl bg-slate-50 p-3 text-xs text-slate-600">
-                <ShieldCheck size={16} className="mt-0.5 shrink-0 text-emerald-800" />
+              <div className="flex items-start gap-2.5 rounded-2xl border border-[#EAE0F2] bg-[#F8FAFC] p-4 text-xs text-[#64748B]">
+                <FaIcon icon="fa-solid fa-shield-halved" className="mt-0.5 shrink-0 text-[#6B3B66] text-sm" />
                 <span>
                   {isEditMode
                     ? 'Submitting these changes will update your pending application and notify the Super Admin for review.'
@@ -524,25 +557,26 @@ export default function ClinicRegistrationPage() {
                 </span>
               </div>
 
-              <div className="flex items-center justify-between gap-3">
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-[#EAE0F2]">
                 <button
                   type="button"
                   onClick={() => {
                     setError('');
                     setStep(DOCUMENTS.length - 1);
                   }}
-                  className="text-sm text-emerald-900"
+                  className="inline-flex items-center gap-1.5 text-sm alata-regular text-[#6B3B66] hover:text-[#552B51]"
                 >
+                  <FaIcon icon="fa-solid fa-arrow-left" className="text-xs" />
                   Back to documents
                 </button>
                 <button
                   disabled={busy || Boolean(success)}
-                  className="flex items-center justify-center gap-2 rounded-xl bg-[#0d281e] px-6 py-3 font-semibold text-white hover:bg-[#13392a] transition disabled:opacity-60"
+                  className="flex items-center justify-center gap-2 rounded-full bg-[#6B3B66] px-6 py-3 text-sm alata-regular text-white shadow-sm hover:bg-[#552B51] transition disabled:opacity-60"
                 >
                   {busy ? (
                     <>
-                      <Loader2 className="animate-spin" size={17} />
-                      {isEditMode ? 'Saving and resubmitting…' : 'Creating account and submitting…'}
+                      <FaIcon icon="fa-solid fa-spinner fa-spin" />
+                      <span>{isEditMode ? 'Saving and resubmitting…' : 'Creating account and submitting…'}</span>
                     </>
                   ) : isEditMode ? (
                     'Save changes & Resubmit Application'
