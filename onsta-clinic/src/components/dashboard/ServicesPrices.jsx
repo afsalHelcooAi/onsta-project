@@ -1,12 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useClinic } from '../../context/ClinicContext';
-import {
-  Stethoscope, Plus, Search, Filter, Edit2, Trash2, CheckCircle2,
-  AlertCircle, ShieldAlert, Sparkles, X, Check, ArrowRight, FileText,
-  Upload, Cpu, CheckSquare, Loader2, AlertTriangle, FileSpreadsheet,
-  Layers
-} from 'lucide-react';
 import VerificationBadge from '../common/VerificationBadge';
+import FaIcon from '../common/FaIcon';
 import { parseTariffSheet, fetchMasterTreatments } from '../../api/serviceApi';
 
 export default function ServicesPrices() {
@@ -58,7 +53,13 @@ export default function ServicesPrices() {
     isActive: true
   });
 
-  const categories = ['All', 'Laser Clinic', 'Dermatology', 'Aesthetic Clinic', 'Wellness', 'Medical Clinic'];
+  const dynamicCategories = Array.from(
+    new Set([
+      'All',
+      ...services.map((s) => s.category).filter(Boolean),
+      ...masterCategories.map((c) => c.name).filter(Boolean),
+    ])
+  );
 
   const categoryScopes = {
     'Laser Clinic': 'Class 4 Medical Laser Facility Scope',
@@ -230,17 +231,22 @@ export default function ServicesPrices() {
   return (
     <div className="space-y-6 animate-fadeIn pb-12">
       {/* Title & Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-serif font-bold text-gray-900 tracking-tight">
-            Services & Pricing Catalogue
-          </h1>
-          <p className="text-xs text-gray-500 mt-1">
-            Maintain your clinical treatment offerings. Add single services or import full price lists from a PDF tariff sheet.
-          </p>
+      <div className="bg-white rounded-3xl border border-[#EAE0F2] p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5">
+          <div className="w-11 h-11 rounded-2xl bg-[#F0E6F6] text-[#6B3B66] flex items-center justify-center flex-shrink-0">
+            <FaIcon icon="fa-solid fa-stethoscope" className="text-lg" />
+          </div>
+          <div>
+            <h1 className="text-2xl sm:text-3xl alata-regular text-[#1E1B2E] tracking-tight">
+              Services & Pricing Catalogue
+            </h1>
+            <p className="text-xs text-[#64748B] mt-0.5">
+              Maintain your clinical treatment offerings. Add single services or import full tariffs from PDF sheets.
+            </p>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2 self-start sm:self-center">
+        <div className="flex flex-wrap items-center gap-2.5 self-start sm:self-center">
           <button
             onClick={() => {
               setSelectedFile(null);
@@ -248,54 +254,76 @@ export default function ServicesPrices() {
               setPdfParsingStep('upload');
               setIsPdfImportOpen(true);
             }}
-            className="px-4 py-2.5 rounded-xl bg-emerald-50 text-emerald-900 border border-emerald-300 hover:bg-emerald-100 text-xs font-semibold flex items-center gap-2 transition-colors shadow-sm"
+            className="px-4 py-2.5 rounded-full bg-[#F6F0FA] text-[#6B3B66] border border-[#DECBE9] hover:bg-[#F0E6F6] text-xs alata-regular flex items-center gap-2 transition-colors shadow-xs"
           >
-            <FileText className="w-4 h-4 text-emerald-700" />
-            <span>Import from PDF Tariff</span>
+            <FaIcon icon="fa-solid fa-file-pdf" />
+            <span>Import PDF Tariff</span>
           </button>
 
           <button
             onClick={openAddModal}
-            className="px-4 py-2.5 rounded-xl bg-[#0d281e] text-white hover:bg-[#153f2f] text-xs font-semibold flex items-center gap-2 transition-colors shadow-sm"
+            className="px-5 py-2.5 rounded-full bg-[#6B3B66] text-white hover:bg-[#552B51] text-xs alata-regular flex items-center gap-2 transition-all shadow-sm hover:shadow-md"
           >
-            <Plus className="w-4 h-4" />
+            <FaIcon icon="fa-solid fa-plus" className="text-xs" />
             <span>Add Single Service</span>
           </button>
         </div>
       </div>
 
-      {/* Filter and Search Bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-[#e7e1d7] shadow-sm">
-        <div className="relative flex-1">
-          <Search className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-          <input
-            type="text"
-            placeholder="Search treatments by name, category, or clinical description..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-9 pr-4 py-2 rounded-xl border border-gray-200 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0d281e]"
-          />
+      {/* Department Pills & Search Bar (Polyclinic.ae Inspiration) */}
+      <div className="bg-white p-4 rounded-2xl border border-[#EAE0F2] shadow-sm space-y-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+          <div className="relative flex-1">
+            <FaIcon icon="fa-solid fa-magnifying-glass" className="text-xs text-[#94A3B8] absolute left-4 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Search treatments by name, category, or clinical description..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-xs text-[#1E1B2E] focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#6B3B66]/30 focus:border-[#6B3B66]"
+            />
+          </div>
+
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-[#64748B] font-medium">Department:</span>
+            <select
+              value={selectedCategory}
+              onChange={(e) => setSelectedCategory(e.target.value)}
+              className="px-3 py-2 rounded-xl border border-[#E2E8F0] text-xs text-[#1E1B2E] bg-[#F8FAFC] focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/30"
+            >
+              {dynamicCategories.map(c => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </select>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2">
-          <span className="text-xs text-gray-500 font-medium">Category:</span>
-          <select
-            value={selectedCategory}
-            onChange={(e) => setSelectedCategory(e.target.value)}
-            className="px-3 py-2 rounded-xl border border-gray-200 text-xs text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#0d281e]"
-          >
-            {categories.map(c => (
-              <option key={c} value={c}>{c}</option>
+        {/* Category Filter Pills */}
+        {dynamicCategories.length > 1 && (
+          <div className="flex flex-wrap items-center gap-1.5 pt-1">
+            {dynamicCategories.map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setSelectedCategory(cat)}
+                className={`px-3 py-1 rounded-full text-[11px] alata-regular transition-all ${
+                  selectedCategory === cat
+                    ? 'bg-[#6B3B66] text-white shadow-xs'
+                    : 'bg-[#F8FAFC] text-[#64748B] border border-[#E2E8F0] hover:border-[#DECBE9] hover:text-[#6B3B66]'
+                }`}
+              >
+                {cat}
+              </button>
             ))}
-          </select>
-        </div>
+          </div>
+        )}
       </div>
 
       {/* Services Table */}
-      <div className="bg-white rounded-2xl border border-[#e7e1d7] overflow-hidden shadow-sm">
+      <div className="bg-white rounded-3xl border border-[#EAE0F2] overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-[#F7F4EE] border-b border-[#e7e1d7] text-gray-700 font-bold uppercase tracking-wider text-[11px]">
+            <thead className="bg-[#F6F0FA] border-b border-[#EAE0F2] text-[#552B51] alata-regular uppercase tracking-wider text-[11px]">
               <tr>
                 <th className="py-3.5 px-5">Treatment / Service Name</th>
                 <th className="py-3.5 px-4">Category</th>
@@ -306,75 +334,78 @@ export default function ServicesPrices() {
                 <th className="py-3.5 px-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y divide-[#F1EDF6]">
               {filteredServices.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-14 text-center text-gray-500">
-                    <Stethoscope className="w-10 h-10 text-gray-300 mx-auto mb-2.5" />
-                    <p className="font-semibold text-sm text-gray-700">
+                  <td colSpan={7} className="py-14 text-center text-[#64748B]">
+                    <div className="w-12 h-12 rounded-2xl bg-[#F6F0FA] text-[#6B3B66] flex items-center justify-center mx-auto mb-3">
+                      <FaIcon icon="fa-solid fa-stethoscope" className="text-xl" />
+                    </div>
+                    <p className="alata-regular text-sm text-[#1E1B2E]">
                       {services.length === 0 ? 'No services in catalogue yet' : 'No services match your criteria'}
                     </p>
-                    <p className="text-xs text-gray-400 mt-1 max-w-sm mx-auto">
+                    <p className="text-xs text-[#64748B] mt-1 max-w-sm mx-auto">
                       {services.length === 0
                         ? 'Import your treatment price list from a PDF Tariff sheet or click "Add Single Service" above.'
-                        : 'Try another search keyword or select a different category filter.'}
+                        : 'Try another search keyword or select a different department filter.'}
                     </p>
                   </td>
                 </tr>
               ) : (
                 filteredServices.map((srv) => (
-                  <tr key={srv.id} className="hover:bg-gray-50/80 transition-colors">
+                  <tr key={srv.id} className="hover:bg-[#F8FAFC] transition-colors">
                     <td className="py-3.5 px-5">
-                      <div className="font-bold text-gray-900 text-sm">{srv.name}</div>
+                      <div className="alata-regular text-[#1E1B2E] text-sm">{srv.name}</div>
                       {srv.description && (
-                        <div className="text-[11px] text-gray-500 truncate max-w-sm mt-0.5">{srv.description}</div>
+                        <div className="text-[11px] text-[#64748B] truncate max-w-sm mt-0.5">{srv.description}</div>
                       )}
                     </td>
                     <td className="py-3.5 px-4">
-                      <span className="px-2.5 py-1 rounded-full text-[10px] font-bold bg-[#F7F4EE] text-gray-800 border border-[#e7e1d7]">
+                      <span className="px-2.5 py-1 rounded-full text-[10px] alata-regular bg-[#F0E6F6] text-[#6B3B66] border border-[#DECBE9]">
                         {srv.category}
                       </span>
                     </td>
-                    <td className="py-3.5 px-4 text-gray-600 font-medium">
+                    <td className="py-3.5 px-4 text-[#475569] font-medium">
+                      <FaIcon icon="fa-regular fa-clock" className="mr-1.5 text-[#94A3B8]" />
                       {srv.duration}
                     </td>
                     <td className="py-3.5 px-4">
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-bold text-[#0d281e] text-sm font-mono">
-                          AED {srv.offerPrice ? srv.offerPrice : srv.normalPrice}
+                      <div className="flex items-baseline gap-1.5">
+                        <span className="alata-regular text-[#6B3B66] text-sm">
+                          {srv.offerPrice ? srv.offerPrice : srv.normalPrice} AED
                         </span>
                         {srv.offerPrice && (
-                          <span className="text-[10px] text-gray-400 line-through font-mono">
-                            AED {srv.normalPrice}
+                          <span className="text-[10px] text-[#94A3B8] line-through">
+                            {srv.normalPrice} AED
                           </span>
                         )}
                       </div>
                     </td>
                     <td className="py-3.5 px-4">
-                      <span className="text-[11px] text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                        {srv.scopeRequired || "Outpatient Scope"}
+                      <span className="text-[11px] text-[#166534] bg-[#DCFCE7] px-2.5 py-0.5 rounded-full border border-[#BBF7D0]">
+                        {srv.scopeRequired || 'Outpatient Scope'}
                       </span>
                     </td>
                     <td className="py-3.5 px-4">
                       <button
                         onClick={() => toggleServiceActive(srv.id)}
-                        className={`px-2.5 py-1 rounded-lg text-[10px] font-bold transition-colors ${
+                        className={`px-3 py-1 rounded-full text-[10px] alata-regular transition-colors ${
                           srv.isActive
-                            ? 'bg-emerald-100 text-emerald-800 hover:bg-emerald-200'
-                            : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                            ? 'bg-[#DCFCE7] text-[#166534] hover:bg-[#BBF7D0]'
+                            : 'bg-[#F1F5F9] text-[#475569] hover:bg-[#E2E8F0]'
                         }`}
                       >
                         {srv.isActive ? 'Active' : 'Inactive'}
                       </button>
                     </td>
                     <td className="py-3.5 px-4 text-right">
-                      <div className="flex items-center justify-end gap-1">
+                      <div className="flex items-center justify-end gap-1.5">
                         <button
                           onClick={() => openEditModal(srv)}
-                          className="p-1.5 text-gray-400 hover:text-gray-700 rounded-lg hover:bg-gray-100"
+                          className="w-8 h-8 rounded-xl text-[#64748B] hover:text-[#6B3B66] hover:bg-[#F6F0FA] flex items-center justify-center transition-colors"
                           title="Edit service"
                         >
-                          <Edit2 className="w-3.5 h-3.5" />
+                          <FaIcon icon="fa-solid fa-pen-to-square" className="text-xs" />
                         </button>
                         <button
                           onClick={() => {
@@ -382,10 +413,10 @@ export default function ServicesPrices() {
                               deleteService(srv.id);
                             }
                           }}
-                          className="p-1.5 text-gray-400 hover:text-red-600 rounded-lg hover:bg-red-50"
+                          className="w-8 h-8 rounded-xl text-[#94A3B8] hover:text-[#991B1B] hover:bg-[#FEE2E2] flex items-center justify-center transition-colors"
                           title="Delete service"
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
+                          <FaIcon icon="fa-solid fa-trash-can" className="text-xs" />
                         </button>
                       </div>
                     </td>
@@ -399,37 +430,35 @@ export default function ServicesPrices() {
 
       {/* PDF BATCH IMPORT MODAL & STEP 2 REVIEW WINDOW */}
       {isPdfImportOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full overflow-hidden border border-[#e7e1d7] animate-scaleUp max-h-[90vh] flex flex-col">
-            {/* Header */}
-            <div className="p-5 bg-[#0d281e] text-white flex items-center justify-between flex-shrink-0">
-              <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-xl bg-white/10 text-emerald-300">
-                  <FileText className="w-5 h-5" />
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A1320]/60 backdrop-blur-sm animate-fadeIn">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full overflow-hidden border border-[#EAE0F2] max-h-[90vh] flex flex-col">
+            <div className="p-5 bg-[#1A1320] text-white flex items-center justify-between flex-shrink-0">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-[#6B3B66] text-white flex items-center justify-center">
+                  <FaIcon icon="fa-solid fa-file-pdf" className="text-sm" />
                 </div>
                 <div>
-                  <h3 className="font-serif font-bold text-base">
+                  <h3 className="alata-regular text-base">
                     Import Services & Prices from PDF / Image Tariff
                   </h3>
-                  <p className="text-emerald-200 text-xs">
+                  <p className="text-[#C7B0D8] text-xs">
                     Multimodal Vision AI extracts treatments, AED rates, and maps them to DHA regulatory scope.
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setIsPdfImportOpen(false)}
-                className="text-white/60 hover:text-white p-1 rounded-lg"
+                className="text-white/70 hover:text-white w-8 h-8 rounded-xl flex items-center justify-center hover:bg-white/10"
               >
-                <X className="w-5 h-5" />
+                <FaIcon icon="fa-solid fa-xmark" className="text-base" />
               </button>
             </div>
 
-            {/* Step 1: Upload */}
             {pdfParsingStep === 'upload' && (
               <div className="p-8 text-center space-y-6 overflow-y-auto">
                 <div
                   onClick={() => fileInputRef.current?.click()}
-                  className="border-2 border-dashed border-[#e7e1d7] rounded-2xl p-8 hover:border-[#137333] transition-colors bg-[#FAF8F5] cursor-pointer"
+                  className="border-2 border-dashed border-[#DECBE9] rounded-3xl p-8 hover:border-[#6B3B66] transition-colors bg-[#F8FAFC] cursor-pointer"
                 >
                   <input
                     ref={fileInputRef}
@@ -438,13 +467,13 @@ export default function ServicesPrices() {
                     className="hidden"
                     onChange={handleFileSelect}
                   />
-                  <div className="w-16 h-16 bg-emerald-50 text-[#0d281e] rounded-2xl flex items-center justify-center mx-auto mb-4 border border-emerald-200">
-                    <Upload className="w-8 h-8" />
+                  <div className="w-16 h-16 bg-[#F0E6F6] text-[#6B3B66] rounded-2xl flex items-center justify-center mx-auto mb-4 border border-[#DECBE9]">
+                    <FaIcon icon="fa-solid fa-cloud-arrow-up" className="text-2xl" />
                   </div>
-                  <h4 className="font-serif font-bold text-gray-900 text-base">
+                  <h4 className="alata-regular text-[#1E1B2E] text-base">
                     {selectedFile ? selectedFile.name : 'Drop your Clinic Price List or Treatment Menu'}
                   </h4>
-                  <p className="text-xs text-gray-500 mt-1 max-w-md mx-auto">
+                  <p className="text-xs text-[#64748B] mt-1 max-w-md mx-auto">
                     {selectedFile
                       ? `Selected ${(selectedFile.size / 1024).toFixed(1)} KB. Ready for AI extraction.`
                       : 'Supports multi-page PDFs, scanned price menus, or tariff sheets (PDF, PNG, JPG).'}
@@ -457,13 +486,13 @@ export default function ServicesPrices() {
                           e.stopPropagation();
                           executeTariffParse(false);
                         }}
-                        className="px-6 py-2.5 bg-[#0d281e] hover:bg-[#153f2f] text-white rounded-xl text-xs font-semibold shadow-sm inline-flex items-center gap-2"
+                        className="px-6 py-2.5 bg-[#6B3B66] hover:bg-[#552B51] text-white rounded-full text-xs alata-regular shadow-sm inline-flex items-center gap-2"
                       >
-                        <Sparkles className="w-4 h-4 text-emerald-300" />
+                        <FaIcon icon="fa-solid fa-wand-magic-sparkles" />
                         <span>Run AI Extraction on Uploaded File</span>
                       </button>
                     ) : (
-                      <span className="px-4 py-2 bg-white border border-gray-300 rounded-xl text-xs font-semibold text-gray-700 hover:bg-gray-50">
+                      <span className="px-4 py-2 bg-white border border-[#DECBE9] rounded-full text-xs alata-regular text-[#6B3B66] hover:bg-[#F6F0FA]">
                         Choose File from Computer
                       </span>
                     )}
@@ -471,80 +500,78 @@ export default function ServicesPrices() {
                 </div>
 
                 {parseError && (
-                  <div className="p-3 bg-red-50 border border-red-200 rounded-xl text-xs text-red-700 flex items-center gap-2 text-left">
-                    <AlertCircle className="w-4 h-4 flex-shrink-0 text-red-600" />
+                  <div className="p-3.5 bg-[#FEE2E2] border border-[#FECACA] rounded-2xl text-xs text-[#991B1B] flex items-center gap-2 text-left">
+                    <FaIcon icon="fa-solid fa-circle-exclamation" className="flex-shrink-0 text-[#DC2626]" />
                     <span>{parseError}</span>
                   </div>
                 )}
 
                 <div className="relative flex py-2 items-center">
-                  <div className="flex-grow border-t border-gray-200"></div>
-                  <span className="flex-shrink mx-4 text-gray-400 text-xs font-medium uppercase tracking-wider">
+                  <div className="flex-grow border-t border-[#EAE0F2]"></div>
+                  <span className="flex-shrink mx-4 text-[#94A3B8] text-xs font-medium uppercase tracking-wider">
                     Or Test Instantly
                   </span>
-                  <div className="flex-grow border-t border-gray-200"></div>
+                  <div className="flex-grow border-t border-[#EAE0F2]"></div>
                 </div>
 
-                <div className="p-4 bg-emerald-50/60 border border-emerald-200/80 rounded-2xl flex items-center justify-between">
+                <div className="p-4 bg-[#F6F0FA] border border-[#EAE0F2] rounded-2xl flex items-center justify-between gap-4">
                   <div className="text-left">
-                    <p className="text-xs font-bold text-emerald-950">
+                    <p className="text-xs alata-regular text-[#1E1B2E]">
                       Sample UAE Aesthetic & Laser Clinic Tariff Sheet
                     </p>
-                    <p className="text-[11px] text-emerald-800 mt-0.5">
+                    <p className="text-[11px] text-[#64748B] mt-0.5">
                       Extracts 6 real treatments (Hydrafacial, Candela GentleMax Laser, PRP, SkinPen, ZO Health, Carbon Peel).
                     </p>
                   </div>
                   <button
                     onClick={() => executeTariffParse(true)}
-                    className="px-4 py-2 bg-emerald-800 hover:bg-emerald-900 text-white rounded-xl text-xs font-semibold shadow-sm inline-flex items-center gap-1.5 flex-shrink-0"
+                    className="px-4 py-2 bg-[#6B3B66] hover:bg-[#552B51] text-white rounded-full text-xs alata-regular shadow-sm inline-flex items-center gap-1.5 flex-shrink-0"
                   >
-                    <Sparkles className="w-3.5 h-3.5 text-emerald-200" />
+                    <FaIcon icon="fa-solid fa-wand-magic-sparkles" />
                     <span>Parse Sample Menu</span>
                   </button>
                 </div>
               </div>
             )}
 
-            {/* Step 2: Parsing Animation */}
             {pdfParsingStep === 'parsing' && (
               <div className="p-16 text-center space-y-4">
-                <div className="w-16 h-16 bg-emerald-50 text-[#0d281e] rounded-2xl flex items-center justify-center mx-auto border border-emerald-200">
-                  <Loader2 className="w-8 h-8 animate-spin text-emerald-700" />
+                <div className="w-16 h-16 bg-[#F0E6F6] text-[#6B3B66] rounded-2xl flex items-center justify-center mx-auto border border-[#DECBE9]">
+                  <FaIcon icon="fa-solid fa-spinner fa-spin" className="text-2xl" />
                 </div>
-                <h4 className="font-serif font-bold text-gray-900 text-lg">
+                <h4 className="alata-regular text-[#1E1B2E] text-lg">
                   AI Reading & Structuring Services from Tariff...
                 </h4>
-                <p className="text-xs text-gray-500 max-w-sm mx-auto">
+                <p className="text-xs text-[#64748B] max-w-sm mx-auto">
                   Detecting treatments, duration times, categories, and matching against permitted DHA facility scopes.
                 </p>
-                <div className="flex items-center justify-center gap-2 text-[11px] text-emerald-700 font-medium">
-                  <Cpu className="w-3.5 h-3.5" />
+                <div className="flex items-center justify-center gap-2 text-[11px] text-[#6B3B66] font-medium">
+                  <FaIcon icon="fa-solid fa-microchip" />
                   <span>Multimodal Vision AI + UAE Regulatory Scope Engine</span>
                 </div>
               </div>
             )}
 
-            {/* Step 3: PRE-SAVE BATCH REVIEW WINDOW (Human-in-the-Loop) */}
             {pdfParsingStep === 'review' && (
               <div className="flex flex-col flex-1 overflow-hidden">
-                <div className="p-4 bg-emerald-50 border-b border-emerald-200 flex flex-wrap items-center justify-between gap-2 flex-shrink-0">
+                <div className="p-4 bg-[#DCFCE7] border-b border-[#BBF7D0] flex flex-wrap items-center justify-between gap-2 flex-shrink-0">
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-700 flex-shrink-0" />
-                    <span className="text-xs font-bold text-emerald-950">
+                    <FaIcon icon="fa-solid fa-circle-check" className="text-[#166534]" />
+                    <span className="text-xs alata-regular text-[#166534]">
                       AI Extracted {parsedServices.length} Treatments from {parsedFileName} (Confidence: {Math.round(parseConfidence * 100)}%)
                     </span>
                   </div>
                   {duplicatesCount > 0 && (
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-300 flex items-center gap-1">
-                      <AlertTriangle className="w-3 h-3" />
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] alata-regular bg-[#FFEDD5] text-[#9A3412] border border-[#FED7AA] flex items-center gap-1">
+                      <FaIcon icon="fa-solid fa-triangle-exclamation" />
                       {duplicatesCount} already in catalogue
                     </span>
                   )}
                 </div>
 
                 <div className="p-4 overflow-y-auto flex-1">
-                  <table className="w-full text-left text-xs border border-gray-200 rounded-xl overflow-hidden">
-                    <thead className="bg-[#F7F4EE] border-b border-gray-200 text-gray-700 font-bold uppercase text-[10px]">
+                  <table className="w-full text-left text-xs border border-[#EAE0F2] rounded-xl overflow-hidden">
+                    <thead className="bg-[#F6F0FA] border-b border-[#EAE0F2] text-[#552B51] alata-regular uppercase text-[10px]">
                       <tr>
                         <th className="py-2.5 px-3">Service Name</th>
                         <th className="py-2.5 px-3">Category</th>
@@ -555,20 +582,20 @@ export default function ServicesPrices() {
                         <th className="py-2.5 px-3 text-center">Action</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-gray-100">
+                    <tbody className="divide-y divide-[#F1EDF6]">
                       {parsedServices.map((item, idx) => (
-                        <tr key={idx} className={`hover:bg-gray-50 ${item.isDuplicate ? 'bg-amber-50/50' : ''}`}>
+                        <tr key={idx} className={`hover:bg-[#F8FAFC] ${item.isDuplicate ? 'bg-[#FFF9F2]' : ''}`}>
                           <td className="py-2 px-3">
                             <input
                               type="text"
                               value={item.name}
                               onChange={(e) => handleUpdateParsedItem(idx, 'name', e.target.value)}
-                              className="w-full px-2 py-1 border border-gray-200 rounded text-xs text-gray-900 focus:outline-none focus:border-[#0d281e]"
+                              className="w-full px-2 py-1 border border-[#E2E8F0] rounded-lg text-xs text-[#1E1B2E] focus:outline-none focus:border-[#6B3B66]"
                             />
                             {item.isDuplicate && (
-                              <div className="text-[10px] text-amber-700 font-semibold mt-0.5 flex items-center gap-1">
-                                <AlertTriangle className="w-2.5 h-2.5" />
-                                <span>Already in catalogue (will skip if duplicate)</span>
+                              <div className="text-[10px] text-[#9A3412] font-semibold mt-0.5 flex items-center gap-1">
+                                <FaIcon icon="fa-solid fa-triangle-exclamation" />
+                                <span>Already in catalogue</span>
                               </div>
                             )}
                           </td>
@@ -576,7 +603,7 @@ export default function ServicesPrices() {
                             <select
                               value={item.category}
                               onChange={(e) => handleUpdateParsedItem(idx, 'category', e.target.value)}
-                              className="w-full px-2 py-1 border border-gray-200 rounded text-xs text-gray-900 focus:outline-none focus:border-[#0d281e]"
+                              className="w-full px-2 py-1 border border-[#E2E8F0] rounded-lg text-xs text-[#1E1B2E] focus:outline-none focus:border-[#6B3B66]"
                             >
                               <option value="Dermatology">Dermatology</option>
                               <option value="Laser Clinic">Laser Clinic</option>
@@ -590,7 +617,7 @@ export default function ServicesPrices() {
                               type="text"
                               value={item.duration}
                               onChange={(e) => handleUpdateParsedItem(idx, 'duration', e.target.value)}
-                              className="w-20 px-2 py-1 border border-gray-200 rounded text-xs text-gray-900 focus:outline-none focus:border-[#0d281e]"
+                              className="w-20 px-2 py-1 border border-[#E2E8F0] rounded-lg text-xs text-[#1E1B2E] focus:outline-none focus:border-[#6B3B66]"
                             />
                           </td>
                           <td className="py-2 px-3">
@@ -598,7 +625,7 @@ export default function ServicesPrices() {
                               type="number"
                               value={item.normalPrice}
                               onChange={(e) => handleUpdateParsedItem(idx, 'normalPrice', e.target.value)}
-                              className="w-20 px-2 py-1 border border-gray-200 rounded text-xs font-mono font-bold text-[#0d281e] focus:outline-none focus:border-[#0d281e]"
+                              className="w-20 px-2 py-1 border border-[#E2E8F0] rounded-lg text-xs alata-regular text-[#6B3B66] focus:outline-none focus:border-[#6B3B66]"
                             />
                           </td>
                           <td className="py-2 px-3">
@@ -607,21 +634,21 @@ export default function ServicesPrices() {
                               placeholder="Optional"
                               value={item.offerPrice ?? ''}
                               onChange={(e) => handleUpdateParsedItem(idx, 'offerPrice', e.target.value ? parseFloat(e.target.value) : null)}
-                              className="w-20 px-2 py-1 border border-gray-200 rounded text-xs font-mono text-gray-700 focus:outline-none focus:border-[#0d281e]"
+                              className="w-20 px-2 py-1 border border-[#E2E8F0] rounded-lg text-xs alata-regular text-[#475569] focus:outline-none focus:border-[#6B3B66]"
                             />
                           </td>
                           <td className="py-2 px-3">
-                            <span className="text-[10px] text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 truncate block max-w-[140px]" title={item.scopeRequired}>
+                            <span className="text-[10px] text-[#166534] bg-[#DCFCE7] px-2 py-0.5 rounded-full border border-[#BBF7D0] truncate block max-w-[140px]" title={item.scopeRequired}>
                               {item.scopeRequired}
                             </span>
                           </td>
                           <td className="py-2 px-3 text-center">
                             <button
                               onClick={() => handleDeleteParsedItem(idx)}
-                              className="text-gray-400 hover:text-red-600 p-1 rounded"
+                              className="text-[#94A3B8] hover:text-[#991B1B] p-1 rounded"
                               title="Remove item"
                             >
-                              <Trash2 className="w-3.5 h-3.5" />
+                              <FaIcon icon="fa-solid fa-trash-can" />
                             </button>
                           </td>
                         </tr>
@@ -632,19 +659,18 @@ export default function ServicesPrices() {
                   <div className="mt-3">
                     <button
                       onClick={handleAddCustomParsedItem}
-                      className="text-xs text-emerald-700 hover:text-emerald-900 font-semibold inline-flex items-center gap-1"
+                      className="text-xs text-[#6B3B66] hover:text-[#552B51] alata-regular inline-flex items-center gap-1.5"
                     >
-                      <Plus className="w-3.5 h-3.5" />
+                      <FaIcon icon="fa-solid fa-plus" className="text-[10px]" />
                       <span>Add another treatment row</span>
                     </button>
                   </div>
                 </div>
 
-                {/* Footer Controls */}
-                <div className="p-4 bg-gray-50 border-t border-gray-200 flex items-center justify-between flex-shrink-0">
+                <div className="p-4 bg-[#F8FAFC] border-t border-[#EAE0F2] flex items-center justify-between flex-shrink-0">
                   <button
                     onClick={() => setPdfParsingStep('upload')}
-                    className="text-xs text-gray-600 hover:underline"
+                    className="text-xs text-[#64748B] hover:underline"
                   >
                     ← Re-upload Tariff
                   </button>
@@ -652,15 +678,15 @@ export default function ServicesPrices() {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => setIsPdfImportOpen(false)}
-                      className="px-4 py-2 border border-gray-300 rounded-xl text-xs text-gray-700 hover:bg-gray-100"
+                      className="px-4 py-2 border border-[#E2E8F0] rounded-full text-xs text-[#475569] hover:bg-white"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={handleSaveAllParsedServices}
-                      className="px-6 py-2 bg-[#0d281e] hover:bg-[#153f2f] text-white rounded-xl text-xs font-semibold shadow-sm flex items-center gap-1.5"
+                      className="px-6 py-2 bg-[#6B3B66] hover:bg-[#552B51] text-white rounded-full text-xs alata-regular shadow-sm flex items-center gap-2"
                     >
-                      <CheckCircle2 className="w-4 h-4 text-emerald-300" />
+                      <FaIcon icon="fa-solid fa-circle-check" />
                       <span>Confirm & Save All ({parsedServices.length} Services)</span>
                     </button>
                   </div>
@@ -673,37 +699,38 @@ export default function ServicesPrices() {
 
       {/* Add / Edit Single Service Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-[#e7e1d7] animate-scaleUp">
-            <div className="p-5 bg-[#0d281e] text-white flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Stethoscope className="w-5 h-5 text-emerald-300" />
-                <h3 className="font-serif font-bold text-base">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A1320]/60 backdrop-blur-sm animate-fadeIn">
+          <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border border-[#EAE0F2]">
+            <div className="p-5 bg-[#1A1320] text-white flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-[#6B3B66] flex items-center justify-center">
+                  <FaIcon icon="fa-solid fa-stethoscope" className="text-sm" />
+                </div>
+                <h3 className="alata-regular text-base">
                   {editingService ? 'Edit Treatment Offering' : 'Add Treatment Service'}
                 </h3>
               </div>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="text-white/60 hover:text-white p-1"
+                className="text-white/70 hover:text-white w-8 h-8 rounded-xl flex items-center justify-center hover:bg-white/10"
               >
-                <X className="w-5 h-5" />
+                <FaIcon icon="fa-solid fa-xmark" />
               </button>
             </div>
 
             <form onSubmit={handleFormSubmit} className="p-6 space-y-4">
-              {/* Master Treatment Selection */}
-              <div className="bg-emerald-50/70 p-3.5 rounded-xl border border-emerald-200/70">
-                <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-900 mb-1">
-                  <Sparkles className="w-3.5 h-3.5 text-emerald-700" />
+              <div className="bg-[#F6F0FA] p-4 rounded-2xl border border-[#EAE0F2]">
+                <div className="flex items-center gap-1.5 text-xs alata-regular text-[#6B3B66] mb-1">
+                  <FaIcon icon="fa-solid fa-wand-magic-sparkles" />
                   <span>Map to Onsta Master Treatment (AI Face Detection)</span>
                 </div>
-                <p className="text-[11px] text-emerald-800/80 mb-2">
+                <p className="text-[11px] text-[#64748B] mb-2">
                   Selecting a standard treatment links your clinic's service to patient face scan recommendations automatically.
                 </p>
                 <select
                   value={formData.masterTreatmentId}
                   onChange={(e) => handleMasterTreatmentSelect(e.target.value)}
-                  className="w-full px-3 py-2 bg-white rounded-lg border border-emerald-300 text-xs text-gray-900 font-medium focus:outline-none focus:ring-2 focus:ring-emerald-600"
+                  className="w-full px-3 py-2 bg-white rounded-xl border border-[#DECBE9] text-xs text-[#1E1B2E] font-medium focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/30"
                 >
                   <option value="">-- Custom / Other Clinic Service --</option>
                   {masterTreatments.map((mt) => (
@@ -715,7 +742,7 @@ export default function ServicesPrices() {
                 {formData.masterTreatmentId && (
                   <div className="mt-2 flex flex-wrap gap-1">
                     {masterTreatments.find(t => t.id === formData.masterTreatmentId)?.target_concerns?.map((c) => (
-                      <span key={c.id} className="text-[10px] bg-white border border-amber-300 text-amber-900 px-2 py-0.5 rounded-full font-medium">
+                      <span key={c.id} className="text-[10px] bg-white border border-[#DECBE9] text-[#6B3B66] px-2.5 py-0.5 rounded-full alata-regular">
                         ✓ Treats: {c.name}
                       </span>
                     ))}
@@ -724,7 +751,7 @@ export default function ServicesPrices() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">
+                <label className="block text-xs font-semibold text-[#1E1B2E] mb-1">
                   Service / Treatment Name *
                 </label>
                 <input
@@ -732,20 +759,20 @@ export default function ServicesPrices() {
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0d281e]"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] text-xs text-[#1E1B2E] focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/30"
                   placeholder="e.g. Hydrafacial MD Deep Extraction"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1">
+                  <label className="block text-xs font-semibold text-[#1E1B2E] mb-1">
                     Category *
                   </label>
                   <select
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0d281e]"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] text-xs text-[#1E1B2E] focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/30"
                   >
                     {masterCategories.length > 0 ? (
                       masterCategories.map(cat => (
@@ -765,7 +792,7 @@ export default function ServicesPrices() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1">
+                  <label className="block text-xs font-semibold text-[#1E1B2E] mb-1">
                     Duration *
                   </label>
                   <input
@@ -773,7 +800,7 @@ export default function ServicesPrices() {
                     required
                     value={formData.duration}
                     onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                    className="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0d281e]"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] text-xs text-[#1E1B2E] focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/30"
                     placeholder="e.g. 45 mins"
                   />
                 </div>
@@ -781,7 +808,7 @@ export default function ServicesPrices() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1">
+                  <label className="block text-xs font-semibold text-[#1E1B2E] mb-1">
                     Standard Tariff (AED) *
                   </label>
                   <input
@@ -790,63 +817,63 @@ export default function ServicesPrices() {
                     min="1"
                     value={formData.normalPrice}
                     onChange={(e) => setFormData({ ...formData, normalPrice: e.target.value })}
-                    className="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-xs font-mono font-bold text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0d281e]"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] text-xs alata-regular text-[#1E1B2E] focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/30"
                     placeholder="e.g. 450"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-gray-700 mb-1">
-                    Offer Price (AED) <span className="text-gray-400 font-normal">(Optional)</span>
+                  <label className="block text-xs font-semibold text-[#1E1B2E] mb-1">
+                    Offer Price (AED) <span className="text-[#94A3B8] font-normal">(Optional)</span>
                   </label>
                   <input
                     type="number"
                     value={formData.offerPrice}
                     onChange={(e) => setFormData({ ...formData, offerPrice: e.target.value })}
-                    className="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-xs font-mono text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0d281e]"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] text-xs alata-regular text-[#6B3B66] focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/30"
                     placeholder="e.g. 299"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">
+                <label className="block text-xs font-semibold text-[#1E1B2E] mb-1">
                   Regulatory Scope (MOHAP / DHA Facility Compliance)
                 </label>
                 <input
                   type="text"
                   value={formData.scopeRequired}
                   onChange={(e) => setFormData({ ...formData, scopeRequired: e.target.value })}
-                  className="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0d281e] bg-gray-50"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] text-xs text-[#1E1B2E] bg-[#F8FAFC] focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">
+                <label className="block text-xs font-semibold text-[#1E1B2E] mb-1">
                   Clinical Description
                 </label>
                 <textarea
                   rows={3}
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full px-3.5 py-2 rounded-xl border border-gray-300 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0d281e]"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] text-xs text-[#1E1B2E] focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/30"
                   placeholder="Describe treatment procedure, clinical benefits, and technology used."
                 />
               </div>
 
-              <div className="pt-4 border-t border-gray-100 flex items-center justify-end gap-2">
+              <div className="pt-4 border-t border-[#F1EDF6] flex items-center justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 border border-gray-300 rounded-xl text-xs text-gray-700 hover:bg-gray-100"
+                  className="px-4 py-2 border border-[#E2E8F0] rounded-full text-xs text-[#475569] hover:bg-[#F8FAFC]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2 bg-[#0d281e] hover:bg-[#153f2f] text-white rounded-xl text-xs font-semibold shadow-sm flex items-center gap-1.5"
+                  className="px-6 py-2.5 bg-[#6B3B66] hover:bg-[#552B51] text-white rounded-full text-xs alata-regular shadow-sm flex items-center gap-2"
                 >
-                  <CheckCircle2 className="w-4 h-4 text-emerald-300" />
+                  <FaIcon icon="fa-solid fa-circle-check" />
                   <span>{editingService ? 'Update Service' : 'Save Service'}</span>
                 </button>
               </div>

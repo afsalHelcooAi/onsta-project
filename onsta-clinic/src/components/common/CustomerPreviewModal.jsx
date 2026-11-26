@@ -51,29 +51,29 @@ export default function CustomerPreviewModal({ isOpen, onClose }) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-[#FAF7F2] rounded-3xl shadow-2xl max-w-6xl w-full h-[94vh] flex flex-col overflow-hidden border border-[#e7e1d7] animate-scaleUp">
+      <div className="bg-[#F6F0FA] rounded-3xl shadow-2xl max-w-6xl w-full h-[94vh] flex flex-col overflow-hidden border border-[#EAE0F2] animate-scaleUp">
         
         {/* Top Control Bar */}
-        <div className="px-6 py-3 bg-[#0d281e] text-white flex items-center justify-between border-b border-[#1a4a37] flex-shrink-0">
+        <div className="px-6 py-3 bg-[#1A1320] text-white flex items-center justify-between border-b border-[#2E2238] flex-shrink-0">
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 bg-white/10 px-2.5 py-1 rounded-lg">
-              <span className="font-serif font-bold text-sm tracking-wide text-white">ONSTA</span>
-              <span className="text-[11px] text-emerald-300">Live Customer Portal Preview</span>
+            <div className="flex items-center gap-2 bg-[#6B3B66] px-3 py-1 rounded-full">
+              <span className="alata-regular text-xs tracking-wider text-white">ONSTA</span>
+              <span className="text-[11px] text-[#F0E6F6]">Live Customer Portal Preview</span>
             </div>
-            <span className="hidden md:inline-flex items-center gap-1.5 text-xs text-emerald-200">
+            <span className="hidden md:inline-flex items-center gap-1.5 text-xs text-[#DECBE9]">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-              Verified Public Layout (onsta.ai/salons)
+              Verified Public Layout (onsta.ae)
             </span>
           </div>
 
           <div className="flex items-center gap-3">
             {/* Device Switcher */}
-            <div className="hidden sm:flex items-center bg-black/30 p-0.5 rounded-lg border border-white/10">
+            <div className="hidden sm:flex items-center bg-[#2A1F35] p-0.5 rounded-full border border-[#3E2F4D]">
               <button
                 type="button"
                 onClick={() => setDeviceMode('desktop')}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium transition-colors ${
-                  deviceMode === 'desktop' ? 'bg-white text-[#0d281e] shadow-sm font-semibold' : 'text-gray-300 hover:text-white'
+                className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs alata-regular transition-colors ${
+                  deviceMode === 'desktop' ? 'bg-white text-[#6B3B66] shadow-sm' : 'text-[#BDB1C9] hover:text-white'
                 }`}
               >
                 <Monitor className="w-3.5 h-3.5" />
@@ -82,8 +82,8 @@ export default function CustomerPreviewModal({ isOpen, onClose }) {
               <button
                 type="button"
                 onClick={() => setDeviceMode('mobile')}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded-md text-xs font-medium transition-colors ${
-                  deviceMode === 'mobile' ? 'bg-white text-[#0d281e] shadow-sm font-semibold' : 'text-gray-300 hover:text-white'
+                className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs alata-regular transition-colors ${
+                  deviceMode === 'mobile' ? 'bg-white text-[#6B3B66] shadow-sm' : 'text-[#BDB1C9] hover:text-white'
                 }`}
               >
                 <Smartphone className="w-3.5 h-3.5" />
@@ -94,7 +94,7 @@ export default function CustomerPreviewModal({ isOpen, onClose }) {
             <button
               type="button"
               onClick={onClose}
-              className="text-white/70 hover:text-white p-1 rounded-lg transition-colors hover:bg-white/10"
+              className="text-white/70 hover:text-white p-1.5 rounded-full transition-colors hover:bg-white/10"
               aria-label="Close Preview"
             >
               <X className="w-5 h-5" />
@@ -103,7 +103,7 @@ export default function CustomerPreviewModal({ isOpen, onClose }) {
         </div>
 
         {/* Viewport Canvas */}
-        <div className="flex-1 overflow-y-auto bg-[#FBF8F5] p-3 sm:p-6 lg:p-8 flex justify-center">
+        <div className="flex-1 overflow-y-auto bg-[#F8FAFC] p-3 sm:p-6 lg:p-8 flex justify-center">
           <div
             className={`w-full transition-all duration-300 ${
               deviceMode === 'mobile'

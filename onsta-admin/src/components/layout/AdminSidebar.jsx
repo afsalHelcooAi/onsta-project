@@ -1,67 +1,65 @@
 import React from 'react';
-import {
-  ShieldCheck,
-  Building2,
-  FileCheck,
-  UserRound,
-  ScrollText,
-  LayoutDashboard,
-  LogOut,
-  Sparkles,
-  Layers
-} from 'lucide-react';
+import FaIcon from '../common/FaIcon';
 
 export default function AdminSidebar({ activeTab, setActiveTab, pendingCount = 0, onSignOut }) {
   const menuItems = [
-    { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-    { id: 'master-catalog', label: 'Master Treatments & AI', icon: Sparkles },
-    { id: 'review-queue', label: 'Clinic Verifications', icon: ShieldCheck, badge: pendingCount },
-    { id: 'all-clinics', label: 'Registered Clinics', icon: Building2 },
-    { id: 'compliance-audit', label: 'Compliance & Permits', icon: FileCheck },
-    { id: 'all-users', label: 'All Users', icon: UserRound },
-    { id: 'audit-logs', label: 'Audit Logs', icon: ScrollText },
+    { id: 'overview', label: 'Overview', icon: 'fa-solid fa-table-columns' },
+    { id: 'master-catalog', label: 'Master Treatments & AI', icon: 'fa-solid fa-wand-magic-sparkles' },
+    { id: 'review-queue', label: 'Clinic Verifications', icon: 'fa-solid fa-shield-halved', badge: pendingCount },
+    { id: 'all-clinics', label: 'Registered Clinics', icon: 'fa-solid fa-hospital' },
+    { id: 'compliance-audit', label: 'Compliance & Permits', icon: 'fa-solid fa-file-contract' },
+    { id: 'all-users', label: 'All Users', icon: 'fa-solid fa-users' },
+    { id: 'audit-logs', label: 'Audit Logs', icon: 'fa-solid fa-scroll' },
   ];
 
   return (
-    <aside className="w-64 bg-[#0d281e] text-white flex flex-col justify-between border-r border-[#1a4a37] shadow-xl shrink-0">
+    <aside className="w-64 bg-[#1A1320] text-white flex flex-col justify-between h-screen border-r border-[#2E2238] shrink-0 select-none">
       <div>
         {/* Brand Header */}
-        <div className="p-6 border-b border-[#1a4a37]/60">
+        <div className="p-6 border-b border-[#2E2238]">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-300 font-bold text-xl shadow-inner">
-              Ω
-            </div>
+            <span className="bg-[#6B3B66] text-white alata-regular px-2.5 py-1 rounded-lg text-xs tracking-widest border border-white/15 uppercase shadow-sm">
+              ONSTA
+            </span>
             <div>
-              <h1 className="font-serif font-bold text-lg tracking-tight text-cream-100">ONSTA</h1>
-              <p className="text-[11px] font-medium uppercase tracking-wider text-emerald-400/80">Admin Operations</p>
+              <h1 className="alata-regular text-sm tracking-wide text-[#EFE8F6]">Platform Admin</h1>
+              <p className="text-[10px] font-medium uppercase tracking-wider text-[#C7B0D8]">Central Operations</p>
             </div>
           </div>
         </div>
 
         {/* Navigation Menu */}
-        <nav className="p-4 space-y-1.5">
-          <div className="px-3 py-2 text-[10px] font-semibold tracking-wider text-emerald-300/50 uppercase">
+        <nav className="p-3.5 space-y-1.5 mt-1">
+          <div className="px-3 py-1.5 text-[10px] font-semibold tracking-wider text-[#9F8FB0] uppercase">
             Operations & Review
           </div>
           {menuItems.map((item) => {
-            const Icon = item.icon;
             const isActive = activeTab === item.id;
             return (
               <button
                 key={item.id}
                 onClick={() => setActiveTab(item.id)}
-                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-lg text-sm font-medium transition-all ${
+                className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm transition-all duration-150 ${
                   isActive
-                    ? 'bg-emerald-600 text-white shadow-md'
-                    : 'text-cream-200/80 hover:text-white hover:bg-white/5'
+                    ? 'bg-white text-[#1E1B2E] alata-regular shadow-md'
+                    : 'text-[#BDB1C9] hover:text-white hover:bg-[#2A1F35] font-medium'
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-emerald-400/70'}`} />
-                  <span>{item.label}</span>
+                  <FaIcon
+                    icon={item.icon}
+                    className={`w-4 text-center text-sm ${
+                      isActive ? 'text-[#6B3B66]' : 'text-[#9F8FB0]'
+                    }`}
+                  />
+                  <span className={isActive ? 'alata-regular' : ''}>{item.label}</span>
                 </div>
                 {item.badge > 0 && (
-                  <span className="px-2 py-0.5 text-xs font-semibold rounded-full bg-amber-400 text-gray-900 shadow-sm animate-pulse">
+                  <span className={`px-2 py-0.5 text-[11px] alata-regular rounded-full ${
+                    isActive
+                      ? 'bg-[#6B3B66] text-white'
+                      : 'bg-[#F0E6F6] text-[#6B3B66]'
+                  }`}>
                     {item.badge}
                   </span>
                 )}
@@ -71,17 +69,17 @@ export default function AdminSidebar({ activeTab, setActiveTab, pendingCount = 0
         </nav>
       </div>
 
-      {/* Footer Info */}
-      <div className="p-4 border-t border-[#1a4a37]/60 text-xs text-cream-300/60 flex flex-col gap-2">
-        <div className="flex items-center gap-2 text-emerald-300/80">
-          <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-          <span>Human review required</span>
-        </div>
-        <div className="text-[11px] text-emerald-200/50">
-          Environment: <span className="text-emerald-300 font-semibold">Local Dev (Port 3001)</span>
-        </div>
-        <button onClick={onSignOut} className="mt-2 flex items-center gap-2 rounded-lg px-2 py-2 text-left text-xs text-emerald-100 hover:bg-white/10">
-          <LogOut className="h-3.5 w-3.5" /> Sign out
+      {/* Footer Prominent Log Out Button */}
+      <div className="p-4 border-t border-[#2E2238]">
+        <button
+          onClick={onSignOut}
+          className="flex items-center justify-center gap-2.5 w-full px-4 py-2.5 rounded-xl text-xs alata-regular tracking-wide text-[#F4D9E6] bg-[#2D1F34] hover:bg-[#6B3B66] hover:text-white border border-[#422E4B] transition-all shadow-sm group"
+        >
+          <FaIcon
+            icon="fa-solid fa-arrow-right-from-bracket"
+            className="text-sm text-[#E09CB8] group-hover:text-white transition-colors"
+          />
+          <span>Log Out</span>
         </button>
       </div>
     </aside>

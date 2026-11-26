@@ -1,15 +1,11 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useClinic } from '../../context/ClinicContext';
+import FaIcon from '../common/FaIcon';
 import {
   fetchClinicProfile,
   saveClinicProfile,
   uploadBrandAsset,
 } from '../../api/clinicProfileApi';
-import {
-  Building2, Save, ShieldCheck, AlertCircle, MapPin,
-  Phone, Mail, Globe, Clock, CheckCircle2, Eye,
-  Upload, X, Loader2, Star
-} from 'lucide-react';
 
 const PROHIBITED_REGEX = /(?:\bbest\b|#\s*1\b|\bno\.?\s*1\b|\bnumber\s*(?:one|1)\b|\bcheapest\b|\b100%\b|\bguarantee[ds]?\b|\bonly\b|\bunbeatable\b|\blowest\s+price\b|\bmost\s+advanced\b)/i;
 
@@ -171,37 +167,42 @@ export default function ClinicProfile({ onOpenPreview }) {
   return (
     <div className="space-y-6 animate-fadeIn pb-12">
       {/* Title & Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-serif font-bold text-gray-900 tracking-tight">
-            Clinic Profile
-          </h1>
-          <p className="text-xs text-gray-500 mt-1">
-            Manage your verified business credentials, public details, and brand assets for patient discovery.
-          </p>
+      <div className="bg-white rounded-3xl border border-[#EAE0F2] p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3.5">
+          <div className="w-11 h-11 rounded-2xl bg-[#F0E6F6] text-[#6B3B66] flex items-center justify-center flex-shrink-0">
+            <FaIcon icon="fa-solid fa-hospital" className="text-lg" />
+          </div>
+          <div>
+            <h1 className="text-2xl sm:text-3xl alata-regular text-[#1E1B2E] tracking-tight">
+              Clinic Profile
+            </h1>
+            <p className="text-xs text-[#64748B] mt-0.5">
+              Manage your verified business credentials, public details, and brand assets for patient discovery.
+            </p>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <button
             type="button"
             onClick={handleTriggerProhibited}
-            className="px-3 py-1.5 rounded-xl bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200 text-xs font-semibold transition"
+            className="px-3.5 py-2 rounded-full bg-[#FEE2E2] text-[#991B1B] hover:bg-[#FECACA] border border-[#FECACA] text-xs alata-regular transition"
           >
-            Test "Best" Claim Rejection
+            Test "Best" Rejection
           </button>
           <button
             type="button"
             onClick={handleResetValid}
-            className="px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 hover:bg-emerald-100 border border-emerald-200 text-xs font-semibold transition"
+            className="px-3.5 py-2 rounded-full bg-[#F6F0FA] text-[#6B3B66] hover:bg-[#F0E6F6] border border-[#DECBE9] text-xs alata-regular transition"
           >
             Reset Factual Name
           </button>
           <button
             type="button"
             onClick={onOpenPreview || (() => setShowCustomerPreview && setShowCustomerPreview(true))}
-            className="px-3.5 py-1.5 bg-[#0d281e] text-white font-semibold rounded-xl hover:bg-[#153f2f] transition-colors text-xs flex items-center gap-1.5 shadow-sm"
+            className="px-5 py-2 rounded-full bg-[#6B3B66] text-white hover:bg-[#552B51] transition-colors text-xs alata-regular flex items-center gap-2 shadow-sm"
           >
-            <Eye className="w-3.5 h-3.5 text-emerald-300" />
+            <FaIcon icon="fa-regular fa-eye" />
             <span>Customer Preview</span>
           </button>
         </div>
@@ -209,46 +210,45 @@ export default function ClinicProfile({ onOpenPreview }) {
 
       {/* Error & Success Banners */}
       {errorMessage && (
-        <div role="alert" className="rounded-2xl border border-red-200 bg-red-50 p-4 text-xs text-red-900 flex items-start gap-2.5">
-          <AlertCircle size={18} className="text-red-700 shrink-0 mt-0.5" />
+        <div role="alert" className="rounded-2xl border border-[#FECACA] bg-[#FEE2E2] p-4 text-xs text-[#991B1B] flex items-start gap-2.5">
+          <FaIcon icon="fa-solid fa-circle-exclamation" className="text-sm text-[#DC2626] shrink-0 mt-0.5" />
           <div className="flex-1">
-            <span className="font-semibold block mb-0.5">Validation / Compliance Alert:</span>
+            <span className="alata-regular block mb-0.5">Validation / Compliance Alert:</span>
             <span>{errorMessage}</span>
           </div>
         </div>
       )}
 
       {successMessage && (
-        <div role="status" className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-xs text-emerald-900 flex items-start gap-2.5">
-          <CheckCircle2 size={18} className="text-emerald-700 shrink-0 mt-0.5" />
-          <span>{successMessage}</span>
+        <div role="status" className="rounded-2xl border border-[#BBF7D0] bg-[#DCFCE7] p-4 text-xs text-[#166534] flex items-start gap-2.5">
+          <FaIcon icon="fa-solid fa-circle-check" className="text-sm text-[#16A34A] shrink-0 mt-0.5" />
+          <span className="alata-regular">{successMessage}</span>
         </div>
       )}
 
       {/* Clinic Details Form */}
-      <form onSubmit={handleSave} className="bg-white rounded-2xl border border-[#e7e1d7] p-6 sm:p-8 shadow-sm space-y-6">
+      <form onSubmit={handleSave} className="bg-white rounded-3xl border border-[#EAE0F2] p-6 sm:p-8 shadow-sm space-y-6">
         {/* Cover & Logo Section */}
         <div className="space-y-3">
-          <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider">
+          <label className="block text-xs alata-regular text-[#6B3B66] uppercase tracking-wider">
             Brand Assets (Cover Banner & Clinic Logo)
           </label>
-          
-          {/* Cover Banner Container */}
-          <div className="relative h-48 sm:h-64 rounded-2xl overflow-hidden bg-gray-100 border border-gray-200 group">
+
+          <div className="relative h-48 sm:h-64 rounded-2xl overflow-hidden bg-[#F8FAFC] border border-[#E2E8F0] group">
             <img
               src={form.coverImage}
               alt="Clinic Cover"
               className="w-full h-full object-cover"
             />
-            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+            <div className="absolute inset-0 bg-[#1A1320]/45 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
               <button
                 type="button"
                 onClick={() => coverInputRef.current?.click()}
                 disabled={uploadingAsset === 'cover'}
-                className="px-4 py-2 bg-white/95 text-gray-900 rounded-xl text-xs font-semibold hover:bg-white shadow-lg flex items-center gap-2 transition"
+                className="px-4 py-2 bg-white/95 text-[#1E1B2E] rounded-full text-xs alata-regular hover:bg-white shadow-lg flex items-center gap-2 transition"
               >
-                {uploadingAsset === 'cover' ? <Loader2 className="animate-spin w-4 h-4" /> : <Upload className="w-4 h-4" />}
-                <span>{uploadingAsset === 'cover' ? "Uploading..." : "Change Cover Banner"}</span>
+                <FaIcon icon={uploadingAsset === 'cover' ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-cloud-arrow-up'} />
+                <span>{uploadingAsset === 'cover' ? 'Uploading...' : 'Change Cover Banner'}</span>
               </button>
             </div>
             <input
@@ -261,7 +261,7 @@ export default function ClinicProfile({ onOpenPreview }) {
 
             {/* Logo Overlay */}
             <div className="absolute bottom-4 left-4 flex items-end gap-3">
-              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-white p-1.5 shadow-xl border border-gray-200 relative group/logo overflow-hidden">
+              <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-white p-1.5 shadow-xl border border-[#EAE0F2] relative group/logo overflow-hidden">
                 <img
                   src={form.logo}
                   alt="Clinic Logo"
@@ -271,9 +271,9 @@ export default function ClinicProfile({ onOpenPreview }) {
                   type="button"
                   onClick={() => logoInputRef.current?.click()}
                   disabled={uploadingAsset === 'logo'}
-                  className="absolute inset-1.5 bg-black/50 rounded-xl opacity-0 group-hover/logo:opacity-100 transition-opacity flex items-center justify-center text-white text-[10px] font-semibold"
+                  className="absolute inset-1.5 bg-[#1A1320]/60 rounded-xl opacity-0 group-hover/logo:opacity-100 transition-opacity flex items-center justify-center text-white text-[10px] alata-regular"
                 >
-                  {uploadingAsset === 'logo' ? <Loader2 className="animate-spin w-3 h-3" /> : "Update"}
+                  {uploadingAsset === 'logo' ? <FaIcon icon="fa-solid fa-spinner fa-spin" /> : 'Update'}
                 </button>
                 <input
                   type="file"
@@ -284,26 +284,26 @@ export default function ClinicProfile({ onOpenPreview }) {
                 />
               </div>
               <div className="text-white drop-shadow-md pb-1 hidden sm:block">
-                <p className="text-sm font-bold">{form.displayName || "Clinic Name"}</p>
-                <p className="text-xs text-gray-200">{form.category || "Medical Facility"}</p>
+                <p className="text-sm alata-regular">{form.displayName || 'Clinic Name'}</p>
+                <p className="text-xs text-[#F0E6F6]">{form.category || 'Medical Facility'}</p>
               </div>
             </div>
           </div>
-          <p className="text-[11px] text-gray-500">
+          <p className="text-[11px] text-[#64748B]">
             Recommended size: 1200×400px for cover banner, 400×400px square for logo. Supported: JPG, PNG, WebP (Max 15MB).
           </p>
         </div>
 
         {/* Legal & Display Name */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-gray-100">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 border-t border-[#F1EDF6]">
           <div>
             <div className="flex items-center justify-between mb-1.5">
-              <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">
+              <label className="text-xs alata-regular text-[#1E1B2E] uppercase tracking-wider">
                 Public Display / Trading Name *
               </label>
               {displayNameViolation && (
-                <span className="text-[11px] font-semibold text-rose-600 flex items-center gap-1">
-                  <AlertCircle size={12} /> Prohibited Superlative Detected
+                <span className="text-[11px] font-semibold text-[#DC2626] flex items-center gap-1">
+                  <FaIcon icon="fa-solid fa-circle-exclamation" /> Prohibited Superlative Detected
                 </span>
               )}
             </div>
@@ -313,19 +313,19 @@ export default function ClinicProfile({ onOpenPreview }) {
               onChange={(e) => setForm({ ...form, displayName: e.target.value })}
               className={`w-full px-3.5 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 transition ${
                 displayNameViolation
-                  ? 'border-rose-400 bg-rose-50/40 focus:ring-rose-200 text-rose-950 font-medium'
-                  : 'border-gray-200 bg-white focus:ring-emerald-700/20 focus:border-emerald-700'
+                  ? 'border-[#DC2626] bg-[#FEF2F2] focus:ring-rose-200 text-[#991B1B] font-medium'
+                  : 'border-[#E2E8F0] bg-[#F8FAFC] focus:bg-white focus:ring-[#6B3B66]/20 focus:border-[#6B3B66]'
               }`}
               placeholder="e.g. Al Noor Aesthetic & Laser Clinic"
               required
             />
-            <p className="text-[11px] text-gray-500 mt-1">
+            <p className="text-[11px] text-[#64748B] mt-1">
               Must be factual and match licensed medical naming. Avoid words like <em>best, #1, cheapest, only</em>.
             </p>
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs alata-regular text-[#1E1B2E] uppercase tracking-wider mb-1.5">
               Legal Registered Entity Name (Read-Only)
             </label>
             <div className="relative">
@@ -334,15 +334,15 @@ export default function ClinicProfile({ onOpenPreview }) {
                 value={form.legalName}
                 readOnly
                 disabled
-                className="w-full px-3.5 py-2.5 rounded-xl border border-gray-200 bg-gray-100 text-gray-600 text-sm cursor-not-allowed"
+                className="w-full px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] bg-[#F1F5F9] text-[#64748B] text-sm cursor-not-allowed"
               />
-              <span className="absolute right-3 top-2.5 text-[11px] font-semibold text-gray-400 flex items-center gap-1">
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+              <span className="absolute right-3 top-2.5 text-[11px] alata-regular text-[#166534] flex items-center gap-1">
+                <FaIcon icon="fa-solid fa-shield-halved" className="text-[#16A34A]" />
                 DHA Verified
               </span>
             </div>
-            <p className="text-[11px] text-gray-500 mt-1">
-              Tied to government commercial trade license & facility accreditation.
+            <p className="text-[11px] text-[#64748B] mt-1">
+              Tied to government commercial trade licence & facility accreditation.
             </p>
           </div>
         </div>
@@ -350,16 +350,16 @@ export default function ClinicProfile({ onOpenPreview }) {
         {/* Public Description with MOHAP Rule V08 check */}
         <div className="pt-2">
           <div className="flex items-center justify-between mb-1.5">
-            <label className="text-xs font-bold text-gray-700 uppercase tracking-wider">
+            <label className="text-xs alata-regular text-[#1E1B2E] uppercase tracking-wider">
               About Clinic / Public Description *
             </label>
             {descriptionViolation ? (
-              <span className="text-[11px] font-semibold text-rose-600 flex items-center gap-1">
-                <AlertCircle size={12} /> MOHAP Rule V08: Superlatives Prohibited
+              <span className="text-[11px] font-semibold text-[#DC2626] flex items-center gap-1">
+                <FaIcon icon="fa-solid fa-circle-exclamation" /> MOHAP Rule V08: Superlatives Prohibited
               </span>
             ) : (
-              <span className="text-[11px] font-semibold text-emerald-700 flex items-center gap-1">
-                <ShieldCheck size={12} /> Factual Medical Content
+              <span className="text-[11px] font-semibold text-[#166534] flex items-center gap-1">
+                <FaIcon icon="fa-solid fa-shield-halved" /> Factual Medical Content
               </span>
             )}
           </div>
@@ -369,33 +369,33 @@ export default function ClinicProfile({ onOpenPreview }) {
             onChange={(e) => setForm({ ...form, description: e.target.value })}
             className={`w-full px-3.5 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 transition ${
               descriptionViolation
-                ? 'border-rose-400 bg-rose-50/40 focus:ring-rose-200 text-rose-950 font-medium'
-                : 'border-gray-200 bg-white focus:ring-emerald-700/20 focus:border-emerald-700'
+                ? 'border-[#DC2626] bg-[#FEF2F2] focus:ring-rose-200 text-[#991B1B] font-medium'
+                : 'border-[#E2E8F0] bg-[#F8FAFC] focus:bg-white focus:ring-[#6B3B66]/20 focus:border-[#6B3B66]'
             }`}
             placeholder="Describe clinical scope, diagnostic capabilities, equipment, and medical specializations factually."
             required
           />
           <div className="flex items-center justify-between mt-1 text-[11px]">
-            <span className="text-gray-500">
+            <span className="text-[#64748B]">
               UAE Health Advertising Law strictly bans promotional claims, superlative cures, or price guarantee claims.
             </span>
-            <span className="text-gray-400">{form.description.length} chars</span>
+            <span className="text-[#94A3B8]">{form.description.length} chars</span>
           </div>
         </div>
 
         {/* Contact and Location Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-gray-100">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-[#F1EDF6]">
           <div>
-            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs alata-regular text-[#1E1B2E] uppercase tracking-wider mb-1.5">
               Contact Phone (UAE) *
             </label>
             <div className="relative">
-              <Phone className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
+              <FaIcon icon="fa-solid fa-phone" className="text-xs text-[#94A3B8] absolute left-3.5 top-3.5" />
               <input
                 type="text"
                 value={form.contactPhone}
                 onChange={(e) => setForm({ ...form, contactPhone: e.target.value })}
-                className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-700/20 focus:border-emerald-700"
+                className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] focus:bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/20 focus:border-[#6B3B66]"
                 placeholder="+971 4 123 4567"
                 required
               />
@@ -403,16 +403,16 @@ export default function ClinicProfile({ onOpenPreview }) {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs alata-regular text-[#1E1B2E] uppercase tracking-wider mb-1.5">
               Primary Clinic Email *
             </label>
             <div className="relative">
-              <Mail className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
+              <FaIcon icon="fa-solid fa-envelope" className="text-xs text-[#94A3B8] absolute left-3.5 top-3.5" />
               <input
                 type="email"
                 value={form.companyEmail}
                 onChange={(e) => setForm({ ...form, companyEmail: e.target.value })}
-                className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-700/20 focus:border-emerald-700"
+                className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] focus:bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/20 focus:border-[#6B3B66]"
                 placeholder="contact@clinic.ae"
                 required
               />
@@ -420,16 +420,16 @@ export default function ClinicProfile({ onOpenPreview }) {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs alata-regular text-[#1E1B2E] uppercase tracking-wider mb-1.5">
               Official Website
             </label>
             <div className="relative">
-              <Globe className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
+              <FaIcon icon="fa-solid fa-globe" className="text-xs text-[#94A3B8] absolute left-3.5 top-3.5" />
               <input
                 type="url"
                 value={form.website}
                 onChange={(e) => setForm({ ...form, website: e.target.value })}
-                className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-700/20 focus:border-emerald-700"
+                className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] focus:bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/20 focus:border-[#6B3B66]"
                 placeholder="https://alnoorclinic.ae"
               />
             </div>
@@ -439,16 +439,16 @@ export default function ClinicProfile({ onOpenPreview }) {
         {/* Address and Hours Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
           <div>
-            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs alata-regular text-[#1E1B2E] uppercase tracking-wider mb-1.5">
               Physical Street Address *
             </label>
             <div className="relative">
-              <MapPin className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
+              <FaIcon icon="fa-solid fa-location-dot" className="text-xs text-[#94A3B8] absolute left-3.5 top-3.5" />
               <input
                 type="text"
                 value={form.address}
                 onChange={(e) => setForm({ ...form, address: e.target.value })}
-                className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-700/20 focus:border-emerald-700"
+                className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] focus:bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/20 focus:border-[#6B3B66]"
                 placeholder="Villa 14, Al Wasl Road, Jumeirah 1, Dubai"
                 required
               />
@@ -456,16 +456,16 @@ export default function ClinicProfile({ onOpenPreview }) {
           </div>
 
           <div>
-            <label className="block text-xs font-bold text-gray-700 uppercase tracking-wider mb-1.5">
+            <label className="block text-xs alata-regular text-[#1E1B2E] uppercase tracking-wider mb-1.5">
               Operating Hours *
             </label>
             <div className="relative">
-              <Clock className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
+              <FaIcon icon="fa-regular fa-clock" className="text-xs text-[#94A3B8] absolute left-3.5 top-3.5" />
               <input
                 type="text"
                 value={form.openingHours}
                 onChange={(e) => setForm({ ...form, openingHours: e.target.value })}
-                className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-700/20 focus:border-emerald-700"
+                className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] focus:bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/20 focus:border-[#6B3B66]"
                 placeholder="Mon - Sat: 9:00 AM - 8:00 PM | Sun: Closed"
                 required
               />
@@ -474,19 +474,19 @@ export default function ClinicProfile({ onOpenPreview }) {
         </div>
 
         {/* Submit Actions */}
-        <div className="pt-4 border-t border-gray-100 flex items-center justify-between">
-          <div className="text-xs text-gray-500 flex items-center gap-1.5">
-            <ShieldCheck className="w-4 h-4 text-emerald-600" />
+        <div className="pt-4 border-t border-[#F1EDF6] flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="text-xs text-[#64748B] flex items-center gap-2">
+            <FaIcon icon="fa-solid fa-shield-halved" className="text-[#16A34A]" />
             <span>Updates are validated against MOHAP healthcare advertising guidelines.</span>
           </div>
 
           <button
             type="submit"
             disabled={isSubmitting || hasComplianceViolation}
-            className="px-6 py-2.5 rounded-xl bg-[#0d281e] text-white hover:bg-[#153f2f] text-xs font-semibold flex items-center gap-2 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+            className="px-6 py-2.5 rounded-full bg-[#6B3B66] text-white hover:bg-[#552B51] text-xs alata-regular flex items-center justify-center gap-2 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSubmitting ? <Loader2 className="animate-spin w-4 h-4" /> : <Save className="w-4 h-4" />}
-            <span>{isSubmitting ? "Verifying..." : "Save Profile Details"}</span>
+            <FaIcon icon={isSubmitting ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-floppy-disk'} />
+            <span>{isSubmitting ? 'Verifying...' : 'Save Profile Details'}</span>
           </button>
         </div>
       </form>
