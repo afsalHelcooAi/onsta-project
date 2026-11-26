@@ -7,6 +7,10 @@ export default function AdminLogin({ onSignedIn }) {
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
+  const clinicPortalUrl =
+    import.meta.env.VITE_CLINIC_URL ||
+    `${window.location.protocol}//${window.location.hostname}:3000/login`;
+
   const submit = async (event) => {
     event.preventDefault();
     setBusy(true);
@@ -91,7 +95,7 @@ export default function AdminLogin({ onSignedIn }) {
 
         <p className="mt-6 text-center text-xs text-[#64748B]">
           Clinic account?{' '}
-          <a href="http://localhost:3000/login" className="alata-regular text-[#6B3B66] hover:underline">
+          <a href={clinicPortalUrl} className="alata-regular text-[#6B3B66] hover:underline">
             Clinic sign in
           </a>
         </p>

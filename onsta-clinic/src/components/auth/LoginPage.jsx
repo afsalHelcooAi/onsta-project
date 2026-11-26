@@ -12,6 +12,10 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
+  const adminPortalUrl =
+    import.meta.env.VITE_ADMIN_URL ||
+    `${window.location.protocol}//${window.location.hostname}:3001`;
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setBusy(true);
@@ -120,7 +124,7 @@ export default function LoginPage() {
 
         <p className="mt-3 text-center text-xs text-[#64748B]">
           Super Admins use the{' '}
-          <a href="http://localhost:3001" className="alata-regular text-[#6B3B66] underline hover:text-[#552B51]">
+          <a href={adminPortalUrl} className="alata-regular text-[#6B3B66] underline hover:text-[#552B51]">
             admin portal
           </a>
           .
