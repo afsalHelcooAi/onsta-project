@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import AppIcon from '../common/AppIcon';
 import { fetchAuditLogs } from '../../api/adminApi';
 
@@ -106,6 +107,7 @@ function DetailSummary({ details }) {
 }
 
 export default function AuditLogs() {
+  const { t } = useTranslation();
   const [logs, setLogs] = useState([]);
   const [total, setTotal] = useState(0);
   const [search, setSearch] = useState('');
@@ -156,9 +158,9 @@ export default function AuditLogs() {
       {/* Header */}
       <header className="flex flex-wrap items-center justify-between gap-4 border-b border-theme-border bg-theme-card px-6 py-5 shadow-sm sm:px-8">
         <div>
-          <h1 className="alata-regular text-xl text-theme-ink">Audit &amp; Activity Logs</h1>
+          <h1 className="alata-regular text-xl text-theme-ink">{t('auditLogs.title')}</h1>
           <p className="mt-1 text-xs text-theme-muted">
-            Immutable administrative record of user status changes, verification decisions, and platform events.
+            {t('auditLogs.subtitle')}
           </p>
         </div>
         <button
@@ -167,13 +169,13 @@ export default function AuditLogs() {
           disabled={loading}
           className="inline-flex items-center gap-2 rounded-full border border-theme-border-strong bg-theme-canvas px-4 py-2 text-xs alata-regular text-theme-primary hover:bg-theme-primary-soft disabled:opacity-60 transition"
         >
-          <AppIcon name="refresh" spin={loading} /> Refresh
+          <AppIcon name="refresh" spin={loading} /> {t('common.refresh')}
         </button>
       </header>
 
       {error && (
         <div role="alert" className="border-b border-rose-200 bg-rose-50 px-6 py-3 text-sm text-rose-800">
-          {error}
+          <span dir="auto">{error}</span>
         </div>
       )}
 
@@ -182,33 +184,41 @@ export default function AuditLogs() {
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3">
           <div className="flex flex-1 flex-wrap items-center gap-2 sm:max-w-xl">
             <label className="relative min-w-[200px] flex-1">
-              <AppIcon name="search" className="absolute left-3.5 top-3 text-xs text-theme-muted" />
+              <AppIcon name="search" className="absolute start-3.5 top-3 text-xs text-theme-muted" />
               <input
+                dir="auto"
                 value={search}
                 onChange={(e) => { setSearch(e.target.value); setOffset(0); }}
-                placeholder="Search actor, action, or details..."
-                className="w-full rounded-xl border border-theme-border bg-theme-card py-2 pl-9 pr-3 text-sm text-theme-ink outline-none focus:border-theme-primary"
+                placeholder={t('auditLogs.searchPlaceholder')}
+                className="w-full rounded-xl border border-theme-border bg-theme-card py-2 ps-9 pe-3 text-sm text-theme-ink outline-none focus:border-theme-primary"
               />
             </label>
             <select
               value={actionFilter}
               onChange={(e) => { setActionFilter(e.target.value); setOffset(0); }}
-              aria-label="Filter by action"
+              aria-label={t('auditLogs.allActions')}
               className="rounded-xl border border-theme-border bg-theme-card px-3 py-2 text-sm text-theme-ink outline-none focus:border-theme-primary"
             >
-              {ACTIONS.map((a) => <option key={a.value} value={a.value}>{a.label}</option>)}
+              <option value="ALL">{t('auditLogs.allActions')}</option>
+              <option value="CLINIC_APPROVED">{t('auditLogs.clinicApproved')}</option>
+              <option value="CLINIC_REJECTED">{t('auditLogs.clinicRejected')}</option>
+              <option value="INFO_REQUESTED">{t('auditLogs.infoRequested')}</option>
+              <option value="USER_STATUS_CHANGED">{t('auditLogs.userStatusChanged')}</option>
             </select>
             <select
               value={entityFilter}
               onChange={(e) => { setEntityFilter(e.target.value); setOffset(0); }}
-              aria-label="Filter by entity type"
+              aria-label={t('auditLogs.allEntities')}
               className="rounded-xl border border-theme-border bg-theme-card px-3 py-2 text-sm text-theme-ink outline-none focus:border-theme-primary"
             >
-              {ENTITY_TYPES.map((e) => <option key={e.value} value={e.value}>{e.label}</option>)}
+              <option value="ALL">{t('auditLogs.allEntities')}</option>
+              <option value="CLINIC_APPLICATION">{t('auditLogs.clinicApplication')}</option>
+              <option value="USER">{t('auditLogs.userAccount')}</option>
+              <option value="CLINIC">{t('auditLogs.clinicTenant')}</option>
             </select>
           </div>
           <div className="text-xs alata-regular text-theme-muted">
-            {total} {total === 1 ? 'event' : 'events'} logged
+            {t('auditLogs.eventsLogged', { count: total })}
           </div>
         </div>
       </div>
@@ -217,17 +227,17 @@ export default function AuditLogs() {
       <div className="min-h-0 flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
         <div className="mx-auto max-w-7xl">
           {loading && logs.length === 0 ? (
-            <p className="p-12 text-center text-sm text-theme-muted">Loading audit trail…</p>
+            <p className="p-12 text-center text-sm text-theme-muted">{t('auditLogs.loadingTrail')}</p>
           ) : logs.length === 0 ? (
             <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-theme-border-strong bg-theme-card p-12 text-center">
               <div className="w-14 h-14 rounded-2xl bg-theme-primary-soft text-theme-primary flex items-center justify-center mb-3 border border-theme-border-strong">
                 <AppIcon name="scroll" className="text-xl" />
               </div>
-              <h3 className="text-base alata-regular text-theme-ink">No audit events found</h3>
+              <h3 className="text-base alata-regular text-theme-ink">{t('auditLogs.noEventsFound')}</h3>
               <p className="mt-1 text-xs text-theme-muted">
                 {search || actionFilter !== 'ALL' || entityFilter !== 'ALL'
-                  ? 'No events match your active filters.'
-                  : 'Administrative actions will appear here as they are performed.'}
+                  ? t('auditLogs.noEventsMatch')
+                  : t('auditLogs.noEventsYet')}
               </p>
             </div>
           ) : (
@@ -246,11 +256,11 @@ export default function AuditLogs() {
                         </div>
                         <div>
                           <div className="flex flex-wrap items-center gap-2">
-                            <span className="alata-regular text-theme-ink text-sm">
-                              {log.actor_name || log.actor_email || 'System'}
+                            <span dir="auto" className="alata-regular text-theme-ink text-sm">
+                              {log.actor_name || log.actor_email || t('auditLogs.systemActor')}
                             </span>
                             {log.actor_email && log.actor_name && (
-                              <span className="text-xs text-theme-muted">({log.actor_email})</span>
+                              <span dir="ltr" className="text-xs text-theme-muted">({log.actor_email})</span>
                             )}
                             <ActionBadge action={log.action} />
                           </div>
@@ -261,7 +271,7 @@ export default function AuditLogs() {
                       </div>
 
                       <div className="flex items-center gap-3">
-                        <div className="text-right">
+                        <div className="text-end">
                           <p className="text-xs font-medium text-theme-muted">{formatTimestamp(log.created_at)}</p>
                           <p className="text-[10px] text-theme-muted font-mono">
                             {log.entity_type} {log.entity_id ? `· ${log.entity_id.slice(0, 8)}…` : ''}
@@ -270,7 +280,7 @@ export default function AuditLogs() {
                         <button
                           type="button"
                           onClick={() => setExpandedId(isExpanded ? null : log.id)}
-                          aria-label={isExpanded ? 'Collapse JSON payload' : 'Expand JSON payload'}
+                          aria-label={isExpanded ? 'Collapse' : 'Expand'}
                           className="rounded-full border border-theme-border min-w-[44px] min-h-[44px] flex items-center justify-center text-theme-muted hover:bg-theme-canvas hover:text-theme-primary transition"
                         >
                           <AppIcon name={isExpanded ? 'caret-up' : 'caret-down'} className="text-sm" />
@@ -280,12 +290,12 @@ export default function AuditLogs() {
 
                     {isExpanded && (
                       <div className="mt-3 rounded-xl border border-theme-border bg-theme-surface p-3 text-xs">
-                        <p className="alata-regular text-theme-ink mb-1">Raw Payload Details:</p>
-                        <pre className="overflow-x-auto font-mono text-[11px] text-theme-muted">
+                        <p className="alata-regular text-theme-ink mb-1">{t('auditLogs.rawPayload')}</p>
+                        <pre dir="ltr" className="overflow-x-auto font-mono text-[11px] text-theme-muted">
                           {JSON.stringify(log.details, null, 2)}
                         </pre>
                         {log.ip_address && (
-                          <p className="mt-2 text-[10px] text-theme-muted">IP address: {log.ip_address}</p>
+                          <p className="mt-2 text-[10px] text-theme-muted">{t('auditLogs.ipAddress', { ip: log.ip_address })}</p>
                         )}
                       </div>
                     )}
@@ -300,25 +310,25 @@ export default function AuditLogs() {
       {/* Pagination Footer */}
       <footer className="border-t border-theme-border bg-theme-card px-6 py-3 text-xs text-theme-muted sm:px-8">
         <div className="mx-auto flex max-w-7xl items-center justify-between">
-          <span className="alata-regular">Page {page} of {pageCount} ({total} total records)</span>
+          <span className="alata-regular">{t('auditLogs.pageOf', { page, pageCount, total })}</span>
           <div className="flex gap-2">
             <button
               type="button"
               disabled={offset === 0 || loading}
               onClick={() => setOffset(Math.max(0, offset - PAGE_SIZE))}
               className="rounded-full border border-theme-border min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-theme-canvas hover:text-theme-primary disabled:opacity-40 transition"
-              aria-label="Previous page"
+              aria-label={t('users.prevPage')}
             >
-              <AppIcon name="caret-left" className="text-sm" />
+              <AppIcon name="caret-left" className="text-sm rtl:rotate-180" />
             </button>
             <button
               type="button"
               disabled={offset + PAGE_SIZE >= total || loading}
               onClick={() => setOffset(offset + PAGE_SIZE)}
               className="rounded-full border border-theme-border min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-theme-canvas hover:text-theme-primary disabled:opacity-40 transition"
-              aria-label="Next page"
+              aria-label={t('users.nextPage')}
             >
-              <AppIcon name="caret-right" className="text-sm" />
+              <AppIcon name="caret-right" className="text-sm rtl:rotate-180" />
             </button>
           </div>
         </div>

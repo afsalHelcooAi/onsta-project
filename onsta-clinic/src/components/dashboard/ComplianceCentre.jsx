@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useClinic } from '../../context/ClinicContext';
 import AIDocumentScanModal from '../common/AIDocumentScanModal';
 import AppIcon from '../common/AppIcon';
@@ -13,6 +14,7 @@ function calculateDoctorDays(dateVal) {
 }
 
 export default function ComplianceCentre() {
+  const { t } = useTranslation();
   const { documents, reuploadDocument, doctors, showToast, renewDoctorLicense } = useClinic();
 
   const [activeTab, setActiveTab] = useState('credentials'); // 'credentials' | 'matrix' | 'listing_gate'
@@ -302,8 +304,8 @@ export default function ComplianceCentre() {
   const handleScanComplete = async (renewedData) => {
     showToast(
       "info",
-      "Renewal Request Submitted",
-      "Your renewed document has been sent to ONSTA Compliance Administration for verification. Live status on onsta.ae will update upon admin approval."
+      t('compliance.renewalSubmittedTitle'),
+      t('compliance.renewalSubmittedMsg')
     );
     loadComplianceState();
   };
@@ -320,10 +322,10 @@ export default function ComplianceCentre() {
           </div>
           <div>
             <h1 className="text-2xl sm:text-3xl alata-regular text-theme-ink tracking-tight">
-              Compliance & Regulatory Centre
+              {t('compliance.title')}
             </h1>
             <p className="text-xs text-theme-muted mt-0.5">
-              UAE Healthcare Regulatory Intelligence • Expiry Watchdog & Real-Time Rule Set Matrix (DHA, MOHAP, DOH)
+              {t('compliance.subtitle')}
             </p>
           </div>
         </div>
@@ -332,16 +334,16 @@ export default function ComplianceCentre() {
           <button
             onClick={loadComplianceState}
             disabled={isLoading}
-            aria-label="Refresh Compliance State"
+            aria-label={t('compliance.refreshTitle')}
             className="min-w-[44px] min-h-[44px] rounded-full border border-theme-border bg-theme-surface hover:bg-theme-canvas text-theme-primary flex items-center justify-center transition-colors"
-            title="Refresh Compliance State"
+            title={t('compliance.refreshTitle')}
           >
             <AppIcon name="refresh" spin={isLoading} />
           </button>
 
           <span className="px-4 py-2 rounded-full text-xs alata-regular bg-[#DCFCE7] text-[#166534] border border-[#BBF7D0] flex items-center gap-2 shadow-xs">
             <AppIcon name="shield-check" className="text-[#16A34A]" />
-            <span>Health Score: {overallScore}% Compliant</span>
+            <span>{t('compliance.healthScore', { score: overallScore })}</span>
           </span>
         </div>
       </div>
@@ -357,7 +359,7 @@ export default function ComplianceCentre() {
           }`}
         >
           <AppIcon name="clock" />
-          <span>Credentials & Expiry Watchdog</span>
+          <span>{t('compliance.tabCredentials')}</span>
           {warningCount > 0 && (
             <span className="w-2 h-2 rounded-full bg-theme-accent animate-pulse" />
           )}
@@ -372,7 +374,7 @@ export default function ComplianceCentre() {
           }`}
         >
           <AppIcon name="cpu" />
-          <span>UAE Rule Set Matrix (12 Rules)</span>
+          <span>{t('compliance.tabMatrix')}</span>
           <span className="px-2 py-0.5 rounded-full text-[10px] bg-theme-primary-soft text-theme-primary alata-regular">
             {passedCount}/{totalRules}
           </span>
@@ -387,17 +389,14 @@ export default function ComplianceCentre() {
           }`}
         >
           <AppIcon name="eye" />
-          <span>Public Listing Gate (onsta.ae)</span>
+          <span>{t('compliance.tabListingGate')}</span>
           <span className={`w-2 h-2 rounded-full ${isPublicListingActive ? 'bg-[#16A34A]' : 'bg-[#DC2626]'}`} />
         </button>
       </div>
 
-      {/* ========================================================= */}
       {/* TAB 1: CREDENTIALS & EXPIRY WATCHDOG */}
-      {/* ========================================================= */}
       {activeTab === 'credentials' && (
         <div className="space-y-6 animate-fadeIn">
-          {/* Dynamic Renewal Alert Banner */}
           {expiringDoc && (
             <div className={`p-5 rounded-3xl border text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-sm ${
               expiringDoc.daysRemaining <= 0
@@ -412,12 +411,12 @@ export default function ComplianceCentre() {
                 </div>
                 <div>
                   <h4 className="alata-regular text-sm text-theme-ink">
-                    {expiringDoc.title} Renewal Notice
+                    {t('compliance.renewalNoticeTitle', { title: expiringDoc.title })}
                   </h4>
                   <p className="text-theme-muted text-xs mt-0.5">
                     {expiringDoc.daysRemaining <= 0
-                      ? `Expired ${Math.abs(expiringDoc.daysRemaining)} days ago (${expiringDoc.expiryDate}). Upload your renewal document to restore public listing.`
-                      : `Expires in ${expiringDoc.daysRemaining} days (${expiringDoc.expiryDate}). Re-upload is unlocked to prevent public profile disruption.`}
+                      ? t('compliance.expiredNotice', { days: Math.abs(expiringDoc.daysRemaining), date: expiringDoc.expiryDate })
+                      : t('compliance.expiringNotice', { days: expiringDoc.daysRemaining, date: expiringDoc.expiryDate })}
                   </p>
                 </div>
               </div>
@@ -427,16 +426,15 @@ export default function ComplianceCentre() {
                 className="px-5 py-2.5 rounded-full bg-theme-primary text-white text-xs alata-regular hover:bg-theme-primary-hover transition-colors flex items-center gap-2 flex-shrink-0 shadow-sm"
               >
                 <AppIcon name="upload" />
-                <span>Upload Renewed Licence</span>
+                <span>{t('compliance.uploadRenewedLicence')}</span>
               </button>
             </div>
           )}
 
-          {/* Core Licences Grid */}
           <div>
             <h2 className="text-xs alata-regular uppercase tracking-wider text-theme-primary mb-3.5 flex items-center gap-2">
               <AppIcon name="building" />
-              <span>Core Institutional Accreditation</span>
+              <span>{t('compliance.coreAccreditation')}</span>
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -450,7 +448,6 @@ export default function ComplianceCentre() {
                     className="bg-theme-card rounded-3xl border border-theme-border p-5 shadow-sm flex flex-col justify-between space-y-4 hover:shadow-md transition-shadow"
                   >
                     <div>
-                      {/* Top Bar */}
                       <div className="flex items-start justify-between gap-3 pb-3.5 border-b border-theme-border">
                         <div className="flex items-center gap-3">
                           <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${
@@ -463,8 +460,8 @@ export default function ComplianceCentre() {
                             <AppIcon name="file-contract" className="text-base" />
                           </div>
                           <div>
-                            <h3 className="text-sm alata-regular text-theme-ink">{doc.title}</h3>
-                            <p className="text-[11px] text-theme-muted">{doc.authority}</p>
+                            <h3 dir="auto" className="text-sm alata-regular text-theme-ink">{doc.title}</h3>
+                            <p dir="auto" className="text-[11px] text-theme-muted">{doc.authority}</p>
                           </div>
                         </div>
 
@@ -480,72 +477,74 @@ export default function ComplianceCentre() {
                             : 'bg-[#DCFCE7] text-[#166534] border border-[#BBF7D0]'
                         }`}>
                           {doc.renewalStatus === 'PENDING_REVIEW' || doc.status === 'PENDING_REVIEW'
-                            ? 'UNDER REVIEW'
+                            ? t('compliance.underReview')
                             : doc.renewalStatus === 'REJECTED' || doc.status === 'REJECTED'
-                            ? 'MODIFICATION REQUIRED'
-                            : doc.statusLabel}
+                            ? t('compliance.modificationRequired')
+                            : isExpired
+                            ? t('status.expired')
+                            : isExpiring
+                            ? t('overview.daysLeft', { days: doc.daysRemaining })
+                            : t('overview.activeAndValid')}
                         </span>
                       </div>
 
                       {doc.adminNotes && (
                         <div className="p-3 bg-[#FEE2E2] border border-[#FECACA] rounded-xl text-[11px] text-[#991B1B] mt-3">
-                          <strong className="block alata-regular">Admin Feedback:</strong>
-                          <span>{doc.adminNotes}</span>
+                          <strong className="block alata-regular">{t('compliance.adminFeedback')}</strong>
+                          <span dir="auto">{doc.adminNotes}</span>
                         </div>
                       )}
 
-                      {/* Details Table */}
                       <div className="space-y-2 text-xs mt-3.5">
                         <div className="flex items-center justify-between text-theme-muted">
-                          <span>Licence Number:</span>
-                          <strong className="alata-regular text-theme-ink">{doc.licenseNumber}</strong>
+                          <span>{t('compliance.licenceNumber')}</span>
+                          <strong dir="ltr" className="alata-regular text-theme-ink">{doc.licenseNumber}</strong>
                         </div>
 
                         <div className="flex items-center justify-between text-theme-muted">
-                          <span>Expiry Date:</span>
-                          <strong className={`alata-regular ${isExpired ? 'text-[#991B1B]' : isExpiring ? 'text-[#9A3412]' : 'text-theme-ink'}`}>
+                          <span>{t('compliance.expiryDate')}</span>
+                          <strong dir="ltr" className={`alata-regular ${isExpired ? 'text-[#991B1B]' : isExpiring ? 'text-[#9A3412]' : 'text-theme-ink'}`}>
                             {doc.expiryDate}
                           </strong>
                         </div>
 
                         <div className="flex items-center justify-between text-theme-muted">
-                          <span>Scope:</span>
-                          <span className="text-theme-muted truncate max-w-[220px]">{doc.regulatoryScope}</span>
+                          <span>{t('compliance.scope')}</span>
+                          <span dir="auto" className="text-theme-muted truncate max-w-[220px]">{doc.regulatoryScope}</span>
                         </div>
 
                         <div className="flex items-center justify-between text-theme-muted">
-                          <span>Status:</span>
+                          <span>{t('common.status')}:</span>
                           <span className="text-[#166534] alata-regular flex items-center gap-1.5">
-                            <AppIcon name="check-circle" /> Verified by ONSTA AI
+                            <AppIcon name="check-circle" /> {t('compliance.verifiedByAi')}
                           </span>
                         </div>
                       </div>
                     </div>
 
-                    {/* Bottom Action */}
                     <div className="pt-3.5 border-t border-theme-border flex items-center justify-between">
                       {doc.canRenew ? (
                         <div className="flex items-center justify-between w-full">
                           <span className="text-[11px] text-[#9A3412] alata-regular flex items-center gap-1.5">
                             <AppIcon name="warning-circle" />
-                            <span>Renewal Unlocked</span>
+                            <span>{t('compliance.renewalUnlocked')}</span>
                           </span>
                           <button
                             onClick={() => handleStartRenewalScan(doc)}
                             className="px-4 py-1.5 rounded-full bg-theme-primary text-white text-xs alata-regular hover:bg-theme-primary-hover flex items-center gap-1.5 transition-colors shadow-sm"
                           >
                             <AppIcon name="upload" className="text-[11px]" />
-                            <span>Re-upload Renewed Doc</span>
+                            <span>{t('compliance.reuploadDoc')}</span>
                           </button>
                         </div>
                       ) : (
                         <div className="flex items-center justify-between w-full">
                           <span className="text-[11px] text-theme-subtle flex items-center gap-1.5">
                             <AppIcon name="lock" />
-                            <span>Locked (Opens ≤ 60 days before expiry)</span>
+                            <span>{t('compliance.lockedNotice')}</span>
                           </span>
                           <span className="text-[10px] alata-regular text-[#166534] uppercase tracking-wider bg-[#DCFCE7] px-2.5 py-0.5 rounded-full border border-[#BBF7D0]">
-                            Compliant
+                            {t('compliance.compliantBadge')}
                           </span>
                         </div>
                       )}
@@ -561,10 +560,10 @@ export default function ComplianceCentre() {
             <div className="flex items-center justify-between mb-3.5">
               <h2 className="text-xs alata-regular uppercase tracking-wider text-theme-primary flex items-center gap-2">
                 <AppIcon name="stethoscope" />
-                <span>Practitioner Credentials & Doctor Licences Watchdog</span>
+                <span>{t('compliance.practitionerWatchdog')}</span>
               </h2>
               <span className="text-xs text-theme-muted alata-regular">
-                {practitionersWatchdog.length} Registered Doctor(s)
+                {t('compliance.registeredDoctorsCount', { count: practitionersWatchdog.length })}
               </span>
             </div>
 
@@ -573,21 +572,21 @@ export default function ComplianceCentre() {
                 <div className="w-12 h-12 rounded-2xl bg-theme-canvas text-theme-primary flex items-center justify-center mx-auto">
                   <AppIcon name="doctor" className="text-xl" />
                 </div>
-                <p className="alata-regular text-sm text-theme-ink">No individual doctors registered yet.</p>
-                <p>Register doctors under the Doctors section to enable automatic licence expiry monitoring.</p>
+                <p className="alata-regular text-sm text-theme-ink">{t('compliance.noDoctorsTitle')}</p>
+                <p>{t('compliance.noDoctorsDesc')}</p>
               </div>
             ) : (
               <div className="bg-theme-card rounded-3xl border border-theme-border overflow-hidden shadow-sm">
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left text-xs">
+                  <table className="w-full text-start text-xs">
                     <thead className="bg-theme-canvas text-theme-primary-hover alata-regular uppercase text-[10px] tracking-wider border-b border-theme-border">
                       <tr>
-                        <th className="py-3.5 px-4">Practitioner Name</th>
-                        <th className="py-3.5 px-4">Specialty & Title</th>
-                        <th className="py-3.5 px-4">Authority & Licence</th>
-                        <th className="py-3.5 px-4">Expiry Horizon</th>
-                        <th className="py-3.5 px-4 text-center">Status</th>
-                        <th className="py-3.5 px-4 text-right">Action</th>
+                        <th className="py-3.5 px-4">{t('compliance.colPractitioner')}</th>
+                        <th className="py-3.5 px-4">{t('compliance.colSpecialtyTitle')}</th>
+                        <th className="py-3.5 px-4">{t('compliance.colAuthorityLicence')}</th>
+                        <th className="py-3.5 px-4">{t('compliance.colExpiryHorizon')}</th>
+                        <th className="py-3.5 px-4 text-center">{t('common.status')}</th>
+                        <th className="py-3.5 px-4 text-end">{t('common.actions')}</th>
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-theme-border">
@@ -605,34 +604,34 @@ export default function ComplianceCentre() {
                               ) : (
                                 <AppIcon name="check-circle" className="text-[#16A34A] flex-shrink-0" />
                               )}
-                              <span className={`alata-regular text-sm ${p.isExpired ? 'text-[#991B1B]' : 'text-theme-ink'}`}>
+                              <span dir="auto" className={`alata-regular text-sm ${p.isExpired ? 'text-[#991B1B]' : 'text-theme-ink'}`}>
                                 {p.fullName}
                               </span>
                             </div>
                           </td>
                           <td className="py-3.5 px-4 text-theme-muted">
-                            <span className="font-medium text-theme-ink">{p.specialty}</span>
-                            <span className="block text-[10px] text-theme-subtle">{p.professionalTitle}</span>
+                            <span dir="auto" className="font-medium text-theme-ink">{p.specialty}</span>
+                            <span dir="auto" className="block text-[10px] text-theme-subtle">{p.professionalTitle}</span>
                           </td>
                           <td className="py-3.5 px-4">
-                            <span className="alata-regular text-theme-ink">{p.licenseNumber}</span>
+                            <span dir="ltr" className="alata-regular text-theme-ink">{p.licenseNumber}</span>
                             <span className="block text-[10px] text-theme-primary font-semibold">{p.authority}</span>
                           </td>
                           <td className="py-3.5 px-4">
-                            <span className={`alata-regular ${p.isExpired ? 'text-[#991B1B]' : p.daysRemaining <= 30 ? 'text-[#9A3412]' : 'text-theme-ink'}`}>
+                            <span dir="ltr" className={`alata-regular ${p.isExpired ? 'text-[#991B1B]' : p.daysRemaining <= 30 ? 'text-[#9A3412]' : 'text-theme-ink'}`}>
                               {p.expiryDate}
                             </span>
                             {p.isExpired ? (
                               <span className="block text-[10px] text-[#DC2626] font-semibold mt-0.5">
-                                Expired {Math.abs(p.daysRemaining)} days ago
+                                {t('overview.expiredDaysAgo', { days: Math.abs(p.daysRemaining) })}
                               </span>
                             ) : p.daysRemaining <= 30 ? (
                               <span className="block text-[10px] text-[#9A3412] font-semibold mt-0.5">
-                                Critical • {p.daysRemaining} days left
+                                {t('overview.daysLeft', { days: p.daysRemaining })}
                               </span>
                             ) : (
                               <span className="block text-[10px] text-[#166534] font-medium mt-0.5">
-                                {p.daysRemaining} days left
+                                {t('overview.daysLeft', { days: p.daysRemaining })}
                               </span>
                             )}
                           </td>
@@ -640,54 +639,54 @@ export default function ComplianceCentre() {
                             {p.status === 'PENDING_REVIEW' || p.renewalStatus === 'PENDING_REVIEW' ? (
                               <div>
                                 <span className="px-2.5 py-0.5 rounded-full text-[10px] alata-regular bg-theme-primary-soft text-theme-primary border border-theme-border-strong uppercase tracking-wide inline-flex items-center gap-1">
-                                  <AppIcon name="spinner" spin /> UNDER REVIEW
+                                  <AppIcon name="spinner" spin /> {t('compliance.underReview')}
                                 </span>
                                 <span className="block text-[10px] font-medium text-theme-primary mt-0.5">
-                                  Pending ONSTA Admin Approval
+                                  {t('compliance.pendingAdminApproval')}
                                 </span>
                               </div>
                             ) : p.status === 'REJECTED' || p.renewalStatus === 'REJECTED' ? (
                               <div>
                                 <span className="px-2.5 py-0.5 rounded-full text-[10px] alata-regular bg-[#FEE2E2] text-[#991B1B] border border-[#FECACA] uppercase tracking-wide inline-flex items-center gap-1">
-                                  <AppIcon name="x-circle" /> MODIFICATION REQUIRED
+                                  <AppIcon name="x-circle" /> {t('compliance.modificationRequired')}
                                 </span>
-                                <span className="block text-[10px] font-medium text-[#991B1B] mt-0.5 max-w-[180px] truncate mx-auto" title={p.adminNotes}>
-                                  Note: {p.adminNotes || 'Please re-upload scan'}
+                                <span dir="auto" className="block text-[10px] font-medium text-[#991B1B] mt-0.5 max-w-[180px] truncate mx-auto" title={p.adminNotes}>
+                                  {p.adminNotes || ''}
                                 </span>
                               </div>
                             ) : p.isExpired ? (
                               <div>
                                 <span className="px-2.5 py-0.5 rounded-full text-[10px] alata-regular bg-[#FEE2E2] text-[#991B1B] border border-[#FECACA] uppercase tracking-wide inline-flex items-center gap-1">
-                                  <AppIcon name="x-circle" /> EXPIRED
+                                  <AppIcon name="x-circle" /> {t('status.expired')}
                                 </span>
                                 <span className="block text-[10px] font-medium text-[#DC2626] mt-0.5">
-                                  Delisted on onsta.ae
+                                  {t('compliance.delistedOnOnsta')}
                                 </span>
                               </div>
                             ) : p.daysRemaining <= 30 ? (
                               <div>
                                 <span className="px-2.5 py-0.5 rounded-full text-[10px] alata-regular bg-[#FFEDD5] text-[#9A3412] border border-[#FED7AA] uppercase tracking-wide inline-flex items-center gap-1">
-                                  <AppIcon name="warning" /> EXPIRING SOON
+                                  <AppIcon name="warning" /> {t('status.expiring_soon')}
                                 </span>
                                 <span className="block text-[10px] font-medium text-[#9A3412] mt-0.5">
-                                  Renewal Due
+                                  {t('compliance.renewalDue')}
                                 </span>
                               </div>
                             ) : (
                               <div>
                                 <span className="px-2.5 py-0.5 rounded-full text-[10px] alata-regular bg-[#DCFCE7] text-[#166534] border border-[#BBF7D0] uppercase tracking-wide inline-flex items-center gap-1">
-                                  <AppIcon name="check-circle" /> Active & Valid
+                                  <AppIcon name="check-circle" /> {t('overview.activeAndValid')}
                                 </span>
                                 <span className="block text-[10px] font-medium text-[#166534] mt-0.5">
-                                  Live on onsta.ae
+                                  {t('overview.liveOnOnsta')}
                                 </span>
                               </div>
                             )}
                           </td>
-                          <td className="py-3.5 px-4 text-right">
+                          <td className="py-3.5 px-4 text-end">
                             <button
                               onClick={() => handleStartDoctorRenewalScan(p)}
-                              className={`px-3.5 py-1.5 rounded-full text-xs alata-regular flex items-center gap-1.5 ml-auto transition-colors shadow-sm ${
+                              className={`px-3.5 py-1.5 rounded-full text-xs alata-regular flex items-center gap-1.5 ms-auto transition-colors shadow-sm ${
                                 p.status === 'REJECTED' || p.renewalStatus === 'REJECTED' || p.isExpired
                                   ? 'bg-[#DC2626] text-white hover:bg-[#B91C1C]'
                                   : p.daysRemaining <= 60
@@ -698,12 +697,12 @@ export default function ComplianceCentre() {
                               <AppIcon name="upload" className="text-[11px]" />
                               <span>
                                 {p.status === 'REJECTED' || p.renewalStatus === 'REJECTED'
-                                  ? 'Re-upload Fix'
+                                  ? t('compliance.reuploadFix')
                                   : p.status === 'PENDING_REVIEW' || p.renewalStatus === 'PENDING_REVIEW'
-                                  ? 'Re-upload / Update'
+                                  ? t('compliance.reuploadUpdate')
                                   : p.isExpired
-                                  ? 'Re-upload Licence'
-                                  : 'Renew'}
+                                  ? t('overview.reuploadLicence')
+                                  : t('compliance.renew')}
                               </span>
                             </button>
                           </td>
@@ -718,19 +717,17 @@ export default function ComplianceCentre() {
         </div>
       )}
 
-      {/* ========================================================= */}
       {/* TAB 2: UAE REGULATORY RULES AUDIT MATRIX (12 RULES) */}
-      {/* ========================================================= */}
       {activeTab === 'matrix' && (
         <div className="space-y-6 animate-fadeIn">
           <div className="bg-theme-card rounded-3xl border border-theme-border p-5 shadow-sm space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
                 <h3 className="text-base alata-regular text-theme-ink">
-                  UAE Clinical & Advertising Compliance Matrix
+                  {t('compliance.matrixTitle')}
                 </h3>
                 <p className="text-xs text-theme-muted">
-                  Automated audit evaluating your clinic profile, catalogue, and accreditation against UAE regulatory statutes.
+                  {t('compliance.matrixSubtitle')}
                 </p>
               </div>
 
@@ -741,7 +738,7 @@ export default function ComplianceCentre() {
                     ruleFilter === 'ALL' ? 'bg-theme-card text-theme-primary shadow-xs' : 'text-theme-muted hover:text-theme-ink'
                   }`}
                 >
-                  All ({totalRules})
+                  {t('compliance.filterAll', { count: totalRules })}
                 </button>
                 <button
                   onClick={() => setRuleFilter('PASS')}
@@ -749,7 +746,7 @@ export default function ComplianceCentre() {
                     ruleFilter === 'PASS' ? 'bg-[#16A34A] text-white shadow-xs' : 'text-theme-muted hover:text-theme-ink'
                   }`}
                 >
-                  Pass ({passedCount})
+                  {t('compliance.filterPass', { count: passedCount })}
                 </button>
                 <button
                   onClick={() => setRuleFilter('WARNING')}
@@ -757,7 +754,7 @@ export default function ComplianceCentre() {
                     ruleFilter === 'WARNING' ? 'bg-[#EA580C] text-white shadow-xs' : 'text-theme-muted hover:text-theme-ink'
                   }`}
                 >
-                  Warnings ({warningCount})
+                  {t('compliance.filterWarnings', { count: warningCount })}
                 </button>
                 {failedCount > 0 && (
                   <button
@@ -766,7 +763,7 @@ export default function ComplianceCentre() {
                       ruleFilter === 'FAIL' ? 'bg-[#DC2626] text-white shadow-xs' : 'text-theme-muted hover:text-theme-ink'
                     }`}
                   >
-                    Action ({failedCount})
+                    {t('compliance.filterAction', { count: failedCount })}
                   </button>
                 )}
               </div>
@@ -774,7 +771,7 @@ export default function ComplianceCentre() {
 
             <div className="flex items-center gap-2 overflow-x-auto pt-3 border-t border-theme-border">
               <span className="text-[11px] alata-regular text-theme-muted flex items-center gap-1.5">
-                <AppIcon name="filter" /> Category:
+                <AppIcon name="filter" /> {t('compliance.categoryFilter')}
               </span>
               {categories.map((cat) => (
                 <button
@@ -786,7 +783,7 @@ export default function ComplianceCentre() {
                       : 'bg-theme-surface text-theme-muted border border-theme-border-slate hover:border-theme-border-strong'
                   }`}
                 >
-                  {cat}
+                  {cat === 'ALL' ? t('common.all') : cat}
                 </button>
               ))}
             </div>
@@ -814,7 +811,7 @@ export default function ComplianceCentre() {
                         <span className="px-2.5 py-0.5 rounded-lg alata-regular text-xs bg-theme-primary text-white">
                           {rule.id}
                         </span>
-                        <h4 className="text-xs alata-regular text-theme-ink">
+                        <h4 dir="auto" className="text-xs alata-regular text-theme-ink">
                           {rule.name}
                         </h4>
                       </div>
@@ -826,12 +823,12 @@ export default function ComplianceCentre() {
                           ? 'bg-[#FFEDD5] text-[#9A3412] border border-[#FED7AA]'
                           : 'bg-[#FEE2E2] text-[#991B1B] border border-[#FECACA]'
                       }`}>
-                        {isPass ? 'PASS' : isWarning ? 'WARNING' : 'ACTION REQUIRED'}
+                        {isPass ? t('compliance.passBadge') : isWarning ? t('compliance.warningBadge') : t('compliance.actionRequiredBadge')}
                       </span>
                     </div>
 
                     <div className="text-[11px] text-theme-muted">
-                      Authority Standard: <span className="text-theme-ink font-medium">{rule.authorityStandard}</span>
+                      {t('compliance.authorityStandard')} <span dir="auto" className="text-theme-ink font-medium">{rule.authorityStandard}</span>
                     </div>
 
                     <div className={`p-3 rounded-2xl text-xs ${
@@ -849,14 +846,14 @@ export default function ComplianceCentre() {
                         ) : (
                           <AppIcon name="x-circle" className="text-[#DC2626] flex-shrink-0 mt-0.5" />
                         )}
-                        <span>{rule.diagnostic}</span>
+                        <span dir="auto">{rule.diagnostic}</span>
                       </div>
                     </div>
                   </div>
 
                   <div className="mt-3 pt-3 border-t border-theme-border text-[11px] text-theme-muted flex items-center justify-between">
-                    <span className="text-theme-subtle">Category: {rule.category}</span>
-                    <span className="alata-regular text-theme-primary">{rule.severity} Priority</span>
+                    <span className="text-theme-subtle">{t('compliance.categoryFilter')} {rule.category}</span>
+                    <span className="alata-regular text-theme-primary">{t('compliance.prioritySuffix', { severity: rule.severity })}</span>
                   </div>
                 </div>
               );
@@ -865,9 +862,7 @@ export default function ComplianceCentre() {
         </div>
       )}
 
-      {/* ========================================================= */}
       {/* TAB 3: PUBLIC LISTING GATE (onsta.ae) */}
-      {/* ========================================================= */}
       {activeTab === 'listing_gate' && (
         <div className="space-y-6 animate-fadeIn">
           <div className="p-6 rounded-3xl bg-theme-sidebar-bg text-white border border-theme-sidebar-border shadow-md flex flex-col md:flex-row md:items-center justify-between gap-6">
@@ -879,18 +874,14 @@ export default function ComplianceCentre() {
                 <div className="flex items-center gap-2">
                   <span className={`w-2.5 h-2.5 rounded-full ${isPublicListingActive ? 'bg-emerald-400 animate-pulse' : 'bg-rose-500'}`} />
                   <span className="text-xs uppercase tracking-wider alata-regular text-theme-border-strong">
-                    Live Public Listing Status on onsta.ae
+                    {t('compliance.listingStatusKicker')}
                   </span>
                 </div>
                 <h3 className="text-2xl alata-regular text-white">
-                  {isPublicListingActive
-                    ? 'Active & Discoverable across UAE'
-                    : 'Listing Suspended • Compliance Action Required'}
+                  {isPublicListingActive ? t('compliance.listingActiveTitle') : t('compliance.listingSuspendedTitle')}
                 </h3>
                 <p className="text-xs text-theme-sidebar-kicker max-w-xl leading-relaxed">
-                  {isPublicListingActive
-                    ? 'Your clinic is fully certified and visible to patients searching on ONSTA UAE Marketplace. Tariffs, doctors, and treatments are live.'
-                    : 'Public search discovery has been temporarily suspended because your facility licence or commercial trade licence has lapsed.'}
+                  {isPublicListingActive ? t('compliance.listingActiveDesc') : t('compliance.listingSuspendedDesc')}
                 </p>
               </div>
             </div>
@@ -902,7 +893,7 @@ export default function ComplianceCentre() {
                 rel="noreferrer"
                 className="px-5 py-2.5 rounded-full bg-theme-card text-theme-primary text-xs alata-regular hover:bg-theme-canvas transition-colors flex items-center justify-center gap-2 shadow-sm"
               >
-                <span>View on onsta.ae</span>
+                <span>{t('compliance.viewOnOnsta')}</span>
                 <AppIcon name="external-link" className="text-[11px]" />
               </a>
             </div>
@@ -910,10 +901,10 @@ export default function ComplianceCentre() {
 
           <div className="bg-theme-card rounded-3xl border border-theme-border p-6 shadow-sm space-y-4">
             <h3 className="text-base alata-regular text-theme-ink">
-              Listing Gate Enforced Audit Criteria
+              {t('compliance.listingCriteriaTitle')}
             </h3>
             <p className="text-xs text-theme-muted">
-              The ONSTA platform enforces deterministic UAE statutory compliance checks. When your credentials satisfy these rules, your listing stays active automatically.
+              {t('compliance.listingCriteriaDesc')}
             </p>
 
             <div className="divide-y divide-theme-border text-xs">
@@ -943,12 +934,12 @@ export default function ComplianceCentre() {
                   <div className="flex items-center gap-3">
                     <AppIcon name="check-circle" className="text-[#16A34A] text-sm" />
                     <div>
-                      <strong className="alata-regular text-sm text-theme-ink block">{item.title}</strong>
-                      <span className="text-theme-muted text-[11px]">{item.desc}</span>
+                      <strong dir="auto" className="alata-regular text-sm text-theme-ink block">{item.title}</strong>
+                      <span dir="auto" className="text-theme-muted text-[11px]">{item.desc}</span>
                     </div>
                   </div>
                   <span className="px-3 py-0.5 rounded-full text-[10px] alata-regular bg-[#DCFCE7] text-[#166534]">
-                    Passed
+                    {t('compliance.passed')}
                   </span>
                 </div>
               ))}

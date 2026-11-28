@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import AppIcon from '../common/AppIcon';
 import { fetchAdminOverview } from '../../api/adminApi';
 
@@ -112,17 +113,18 @@ function StatCard({ label, icon, value, sub, loading, urgent, onClick }) {
   );
 }
 
-function EmptyApplications() {
+function EmptyApplications({ t }) {
   return (
     <div className="mt-4 flex flex-col items-center justify-center rounded-2xl border border-dashed border-theme-border-strong bg-theme-surface py-8 text-center">
       <AppIcon name="waveform" className="mb-2 text-2xl text-theme-border-strong" />
-      <p className="text-sm alata-regular text-theme-ink">No applications submitted yet</p>
-      <p className="mt-1 text-xs text-theme-muted">Clinic applications will appear here once submitted.</p>
+      <p className="text-sm alata-regular text-theme-ink">{t('overview.noApplications')}</p>
+      <p className="mt-1 text-xs text-theme-muted">{t('overview.noApplicationsSub')}</p>
     </div>
   );
 }
 
 export default function Overview({ onNavigate }) {
+  const { t } = useTranslation();
   const [overview, setOverview] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -180,14 +182,14 @@ export default function Overview({ onNavigate }) {
   const recentActivity = overview?.recent_activity || [];
 
   const recommendations = [];
-  if (pendingApplications > 0) recommendations.push(`${pendingApplications} clinic application${pendingApplications === 1 ? '' : 's'} may need review.`);
-  if (openInfoRequests > 0) recommendations.push(`Check ${openInfoRequests} open clinic information request${openInfoRequests === 1 ? '' : 's'}.`);
-  if (clinicsAwaitingActivation > 0) recommendations.push(`${clinicsAwaitingActivation} approved clinic${clinicsAwaitingActivation === 1 ? '' : 's'} are awaiting activation.`);
-  if (expiringLicenses.length > 0) recommendations.push(`${overview.expiring_licenses_total} clinic${overview.expiring_licenses_total === 1 ? '' : 's'} have licenses expiring within 30 days.`);
+  if (pendingApplications > 0) recommendations.push(t('overview.recPending', { count: pendingApplications }));
+  if (openInfoRequests > 0) recommendations.push(t('overview.recInfoRequests', { count: openInfoRequests }));
+  if (clinicsAwaitingActivation > 0) recommendations.push(t('overview.recAwaitingActivation', { count: clinicsAwaitingActivation }));
+  if (expiringLicenses.length > 0) recommendations.push(t('overview.recExpiring', { count: overview.expiring_licenses_total }));
   if (catalog.total_clinics > 0 && catalog.clinics_with_services < catalog.total_clinics) {
-    recommendations.push(`${catalog.total_clinics - catalog.clinics_with_services} approved clinic(s) have not yet added treatments to their menu.`);
+    recommendations.push(t('overview.recMissingMenus', { count: catalog.total_clinics - catalog.clinics_with_services }));
   }
-  if (overview && recommendations.length === 0) recommendations.push('No outstanding application or compliance issues were found in the current counts.');
+  if (overview && recommendations.length === 0) recommendations.push(t('overview.recAllClear'));
 
   return (
     <main className="min-w-0 flex-1 overflow-y-auto p-6 lg:p-8 bg-theme-canvas">
@@ -200,16 +202,16 @@ export default function Overview({ onNavigate }) {
               <AppIcon name="overview" className="text-lg" />
             </div>
             <div>
-              <h1 className="alata-regular text-2xl sm:text-3xl text-theme-ink">Platform Overview</h1>
+              <h1 className="alata-regular text-2xl sm:text-3xl text-theme-ink">{t('overview.title')}</h1>
               <p className="mt-0.5 text-xs text-theme-muted">
-                Live executive summary across clinic operations, regulatory verifications, AI catalog, and offers.
+                {t('overview.subtitle')}
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-3">
             <span className="text-xs text-theme-muted hidden sm:inline">
-              {lastRefreshed ? `Updated ${formatTime(lastRefreshed)} · auto in ${countdown}s` : 'Loading…'}
+              {lastRefreshed ? t('overview.updatedAuto', { time: formatTime(lastRefreshed), seconds: countdown }) : t('common.loading')}
             </span>
             <button
               type="button"
@@ -217,7 +219,7 @@ export default function Overview({ onNavigate }) {
               disabled={loading}
               className="inline-flex items-center gap-2 rounded-full border border-theme-border-strong bg-theme-canvas px-4 py-2 text-xs alata-regular text-theme-primary hover:bg-theme-primary-soft shadow-xs disabled:opacity-60 transition-all"
             >
-              <AppIcon name="refresh" spin={loading} /> Refresh
+              <AppIcon name="refresh" spin={loading} /> {t('common.refresh')}
             </button>
           </div>
         </div>
@@ -226,7 +228,7 @@ export default function Overview({ onNavigate }) {
         <div className="bg-theme-card rounded-2xl border border-theme-border p-4 shadow-sm flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-2 text-xs alata-regular text-theme-primary uppercase tracking-wider">
             <span className="w-2 h-2 rounded-full bg-[#16A34A] animate-pulse" />
-            Quick Operations
+            {t('overview.quickOperations')}
           </div>
           <div className="flex flex-wrap items-center gap-2">
             <button
@@ -235,7 +237,7 @@ export default function Overview({ onNavigate }) {
               className="px-3.5 py-1.5 rounded-full bg-theme-canvas hover:bg-theme-primary-soft border border-theme-border-strong text-theme-primary text-xs alata-regular flex items-center gap-1.5 transition-colors"
             >
               <AppIcon name="ai" />
-              <span>Master Treatments &amp; AI</span>
+              <span>{t('overview.masterTreatmentsAi')}</span>
             </button>
 
             <button
@@ -244,7 +246,7 @@ export default function Overview({ onNavigate }) {
               className="px-3.5 py-1.5 rounded-full bg-theme-surface hover:bg-theme-surface-muted border border-theme-border-slate text-theme-ink text-xs alata-regular flex items-center gap-1.5 transition-colors"
             >
               <AppIcon name="shield-check" className="text-theme-primary" />
-              <span>Verification Queue ({pendingApplications})</span>
+              <span>{t('overview.verificationQueueCount', { count: pendingApplications })}</span>
             </button>
 
             <button
@@ -253,7 +255,7 @@ export default function Overview({ onNavigate }) {
               className="px-3.5 py-1.5 rounded-full bg-theme-accent-soft hover:bg-theme-accent/20 border border-theme-accent-border text-theme-accent-text text-xs alata-regular flex items-center gap-1.5 transition-colors"
             >
               <AppIcon name="file-contract" className="text-theme-accent" />
-              <span>Compliance &amp; Permits</span>
+              <span>{t('overview.compliancePermits')}</span>
             </button>
 
             <button
@@ -262,14 +264,14 @@ export default function Overview({ onNavigate }) {
               className="px-3.5 py-1.5 rounded-full bg-theme-surface hover:bg-theme-surface-muted border border-theme-border-slate text-theme-muted text-xs alata-regular flex items-center gap-1.5 transition-colors"
             >
               <AppIcon name="scroll" />
-              <span>Audit Logs</span>
+              <span>{t('overview.auditLogs')}</span>
             </button>
           </div>
         </div>
 
         {error && (
           <div role="alert" className="flex items-center gap-2 rounded-2xl border border-[#FECACA] bg-[#FEE2E2] px-4 py-3 text-xs text-[#991B1B]">
-            <AppIcon name="warning-circle" className="shrink-0" /> {error}
+            <AppIcon name="warning-circle" className="shrink-0" /> <span dir="auto">{error}</span>
           </div>
         )}
 
@@ -283,15 +285,15 @@ export default function Overview({ onNavigate }) {
               <div>
                 <h2 id="expiring-licenses-title" className="flex items-center gap-2 alata-regular text-base text-theme-ink">
                   <AppIcon name="warning" className="text-theme-accent" />
-                  Licences expiring within 30 days
+                  {t('overview.expiringTitle')}
                 </h2>
                 <p className="mt-1 text-xs text-theme-muted">
-                  Showing {expiringLicenses.length} soonest of {overview.expiring_licenses_total} clinics.
+                  {t('overview.expiringSub', { shown: expiringLicenses.length, total: overview.expiring_licenses_total })}
                 </p>
               </div>
               {onNavigate && (
                 <button type="button" onClick={() => onNavigate('compliance-audit')} className="inline-flex items-center gap-1.5 text-xs alata-regular text-theme-primary hover:underline">
-                  Open Compliance &amp; Permits <AppIcon name="arrow-right" className="text-[11px]" />
+                  {t('overview.openCompliance')} <AppIcon name="arrow-right" className="text-[11px] rtl:rotate-180" />
                 </button>
               )}
             </div>
@@ -299,11 +301,12 @@ export default function Overview({ onNavigate }) {
               {expiringLicenses.map((clinic) => {
                 const license = soonestExpiringLicense(clinic);
                 const days = daysUntil(license.date);
+                const licenseLabel = license.type === 'Trade license' ? t('overview.tradeLicense') : t('overview.facilityLicense');
                 return (
                   <li key={clinic.clinic_id} className="rounded-2xl border border-theme-card bg-theme-card/90 px-3.5 py-2.5 shadow-xs">
-                    <p className="truncate text-xs alata-regular text-theme-ink">{clinic.trading_name}</p>
+                    <p dir="auto" className="truncate text-xs alata-regular text-theme-ink">{clinic.trading_name}</p>
                     <p className={`mt-1 text-[11px] ${days <= 7 ? 'font-semibold text-[#991B1B]' : 'text-theme-accent-text'}`}>
-                      {license.type} · {formatDate(license.date)} ({days === 0 ? 'today' : `in ${days}d`})
+                      {licenseLabel} · {formatDate(license.date)} ({days === 0 ? t('overview.today') : t('overview.inDays', { days })})
                     </p>
                   </li>
                 );
@@ -315,35 +318,35 @@ export default function Overview({ onNavigate }) {
         {/* Primary KPI Row */}
         <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <StatCard
-            label="Pending Review"
+            label={t('overview.pendingReview')}
             icon="shield-check"
             value={pendingApplications}
-            sub="Clinic verification queue"
+            sub={t('overview.clinicVerificationQueue')}
             loading={loading && !overview}
             urgent={pendingApplications > 0}
             onClick={onNavigate ? () => onNavigate('review-queue') : undefined}
           />
           <StatCard
-            label="Registered Clinics"
+            label={t('overview.registeredClinics')}
             icon="hospital"
             value={overview?.registered_clinics ?? 0}
-            sub={`${clinicsAwaitingActivation} awaiting activation`}
+            sub={t('overview.awaitingActivation', { count: clinicsAwaitingActivation })}
             loading={loading && !overview}
             onClick={onNavigate ? () => onNavigate('all-clinics') : undefined}
           />
           <StatCard
-            label="Platform Users"
+            label={t('overview.platformUsers')}
             icon="users"
             value={users.ACTIVE ?? 0}
-            sub={`${users.SUSPENDED ?? 0} suspended · ${users.DISABLED ?? 0} disabled`}
+            sub={t('overview.usersSub', { suspended: users.SUSPENDED ?? 0, disabled: users.DISABLED ?? 0 })}
             loading={loading && !overview}
             onClick={onNavigate ? () => onNavigate('all-users') : undefined}
           />
           <StatCard
-            label="Open Info Requests"
+            label={t('overview.openInfoRequests')}
             icon="warning-circle"
             value={openInfoRequests}
-            sub="Awaiting clinic modifications"
+            sub={t('overview.awaitingModifications')}
             loading={loading && !overview}
             urgent={openInfoRequests > 0}
             onClick={onNavigate ? () => onNavigate('review-queue') : undefined}
@@ -358,9 +361,9 @@ export default function Overview({ onNavigate }) {
               <div>
                 <span className="text-[11px] alata-regular text-theme-primary uppercase tracking-wider flex items-center gap-1.5">
                   <AppIcon name="ai" />
-                  AI Face Scan &amp; Clinical Catalog
+                  {t('overview.aiFaceCatalog')}
                 </span>
-                <h2 className="text-lg alata-regular text-theme-ink mt-0.5">Master Treatments Coverage</h2>
+                <h2 className="text-lg alata-regular text-theme-ink mt-0.5">{t('overview.masterTreatmentsCoverage')}</h2>
               </div>
               {onNavigate && (
                 <button
@@ -368,7 +371,7 @@ export default function Overview({ onNavigate }) {
                   onClick={() => onNavigate('master-catalog')}
                   className="text-xs alata-regular text-theme-primary hover:text-theme-primary-hover flex items-center gap-1"
                 >
-                  Manage <AppIcon name="caret-right" className="text-[10px]" />
+                  {t('overview.manage')} <AppIcon name="caret-right" className="text-[10px] rtl:rotate-180" />
                 </button>
               )}
             </div>
@@ -376,23 +379,27 @@ export default function Overview({ onNavigate }) {
             <div className="grid grid-cols-3 gap-3">
               <div className="bg-theme-surface p-4 rounded-2xl border border-theme-border-slate text-center">
                 <span className="text-2xl alata-regular text-theme-ink">{catalog.master_treatments}</span>
-                <p className="text-[11px] font-medium text-theme-muted mt-0.5">Master Treatments</p>
+                <p className="text-[11px] font-medium text-theme-muted mt-0.5">{t('overview.masterTreatments')}</p>
               </div>
               <div className="bg-theme-canvas p-4 rounded-2xl border border-theme-border text-center">
                 <span className="text-2xl alata-regular text-theme-primary">{catalog.target_concerns}</span>
-                <p className="text-[11px] font-medium text-theme-muted mt-0.5">AI Face Concerns</p>
+                <p className="text-[11px] font-medium text-theme-muted mt-0.5">{t('overview.aiFaceConcerns')}</p>
               </div>
               <div className="bg-theme-surface p-4 rounded-2xl border border-theme-border-slate text-center">
                 <span className="text-2xl alata-regular text-theme-ink">{catalog.categories}</span>
-                <p className="text-[11px] font-medium text-theme-muted mt-0.5">Categories</p>
+                <p className="text-[11px] font-medium text-theme-muted mt-0.5">{t('overview.categories')}</p>
               </div>
             </div>
 
             <div className="pt-3 border-t border-theme-border">
               <div className="flex items-center justify-between text-xs text-theme-muted mb-2">
-                <span className="font-medium">Clinic Menu Ingestion Readiness</span>
+                <span className="font-medium">{t('overview.ingestionReadiness')}</span>
                 <strong className="alata-regular text-theme-primary">
-                  {catalog.clinics_with_services} of {catalog.total_clinics} clinics ({catalog.total_clinics > 0 ? Math.round((catalog.clinics_with_services / catalog.total_clinics) * 100) : 0}%)
+                  {t('overview.clinicsProgress', {
+                    ready: catalog.clinics_with_services,
+                    total: catalog.total_clinics,
+                    percent: catalog.total_clinics > 0 ? Math.round((catalog.clinics_with_services / catalog.total_clinics) * 100) : 0,
+                  })}
                 </strong>
               </div>
               <div className="w-full h-2.5 rounded-full bg-theme-canvas overflow-hidden">
@@ -404,7 +411,7 @@ export default function Overview({ onNavigate }) {
                 />
               </div>
               <p className="text-[11px] text-theme-subtle mt-1.5">
-                Clinics with configured services mapped to Onsta face-detection treatments.
+                {t('overview.ingestionHint')}
               </p>
             </div>
           </div>
@@ -415,42 +422,42 @@ export default function Overview({ onNavigate }) {
               <div>
                 <span className="text-[11px] alata-regular text-theme-accent uppercase tracking-wider flex items-center gap-1.5">
                   <AppIcon name="tag" />
-                  Marketplace Campaigns
+                  {t('overview.marketplaceCampaigns')}
                 </span>
-                <h2 className="text-lg alata-regular text-theme-ink mt-0.5">Live Consumer Offers</h2>
+                <h2 className="text-lg alata-regular text-theme-ink mt-0.5">{t('overview.liveConsumerOffers')}</h2>
               </div>
               <span className="px-3 py-1 rounded-full text-[11px] alata-regular bg-[#DCFCE7] text-[#166534] border border-[#BBF7D0]">
-                Live on onsta.ae
+                {t('overview.liveOnOnsta')}
               </span>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div className="bg-theme-surface p-4 rounded-2xl border border-theme-border-slate">
                 <div className="flex items-center justify-between text-theme-muted text-xs">
-                  <span>Active Live Offers</span>
+                  <span>{t('overview.activeLiveOffers')}</span>
                   <AppIcon name="tag" className="text-theme-accent" />
                 </div>
                 <div className="mt-2 text-3xl alata-regular text-theme-ink">{catalog.active_offers}</div>
                 <p className="mt-1 text-[11px] text-theme-muted">
-                  Across {catalog.clinics_with_offers} participating clinics
+                  {t('overview.participatingClinics', { count: catalog.clinics_with_offers })}
                 </p>
               </div>
 
               <div className="bg-theme-accent-soft p-4 rounded-2xl border border-theme-accent-border">
                 <div className="flex items-center justify-between text-theme-accent-text text-xs">
-                  <span>Average Discount</span>
+                  <span>{t('overview.avgDiscount')}</span>
                   <AppIcon name="percent" className="text-theme-accent" />
                 </div>
                 <div className="mt-2 text-3xl alata-regular text-theme-accent">{catalog.avg_discount_percent}%</div>
                 <p className="mt-1 text-[11px] text-theme-muted">
-                  Promotional patient savings in UAE
+                  {t('overview.patientSavings')}
                 </p>
               </div>
             </div>
 
             <div className="p-3.5 bg-[#DCFCE7]/60 border border-[#BBF7D0] rounded-2xl text-xs text-[#166534] flex items-center gap-2.5">
               <AppIcon name="shield-check" className="shrink-0" />
-              <span>All active offers satisfy DHA ST-21 advertising wording rules &amp; positive price validation.</span>
+              <span>{t('overview.offersComplianceNote')}</span>
             </div>
           </div>
         </section>
@@ -458,33 +465,33 @@ export default function Overview({ onNavigate }) {
         {/* Detail Cards: System Health, User Accounts, Applications */}
         <section className="grid gap-5 lg:grid-cols-3">
           <div className="rounded-3xl border border-theme-border bg-theme-card p-5 shadow-sm">
-            <h2 className="text-base alata-regular text-theme-ink">System health</h2>
-            <p className="mt-1 text-xs text-theme-muted">Status from real-time database query checks.</p>
+            <h2 className="text-base alata-regular text-theme-ink">{t('overview.systemHealth')}</h2>
+            <p className="mt-1 text-xs text-theme-muted">{t('overview.systemHealthSub')}</p>
             {loading && !overview ? (
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
                 <Skeleton className="h-16" /><Skeleton className="h-16" />
               </div>
             ) : overview ? (
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                <HealthCard label="Admin API" value={formatLabel(overview.system_health.api)} detail="Overview responding" />
-                <HealthCard label="Database" value={formatLabel(overview.system_health.database)} detail="PostgreSQL live" />
+                <HealthCard label={t('overview.adminApi')} value={formatLabel(overview.system_health.api)} detail={t('overview.overviewResponding')} />
+                <HealthCard label={t('overview.database')} value={formatLabel(overview.system_health.database)} detail={t('overview.postgresLive')} />
               </div>
-            ) : <p className="mt-4 text-xs text-theme-subtle">Health details unavailable.</p>}
+            ) : <p className="mt-4 text-xs text-theme-subtle">{t('overview.healthUnavailable')}</p>}
           </div>
 
           <div className="rounded-3xl border border-theme-border bg-theme-card p-5 shadow-sm">
-            <h2 className="text-base alata-regular text-theme-ink mb-3">User accounts</h2>
+            <h2 className="text-base alata-regular text-theme-ink mb-3">{t('overview.userAccounts')}</h2>
             {loading && !overview ? (
               <div className="space-y-2">
                 <Skeleton className="h-4 w-full" /><Skeleton className="h-4 w-full" /><Skeleton className="h-4 w-3/4" />
               </div>
             ) : overview ? (
-              <StatusList title="Accounts by status" statuses={USER_STATUSES} counts={users} />
-            ) : <p className="text-xs text-theme-subtle">Account details unavailable.</p>}
+              <StatusList title={t('overview.accountsByStatus')} statuses={USER_STATUSES} counts={users} />
+            ) : <p className="text-xs text-theme-subtle">{t('overview.accountUnavailable')}</p>}
           </div>
 
           <div className="rounded-3xl border border-theme-border bg-theme-card p-5 shadow-sm">
-            <h2 className="text-base alata-regular text-theme-ink">Clinic applications</h2>
+            <h2 className="text-base alata-regular text-theme-ink">{t('overview.clinicApplications')}</h2>
             {loading && !overview ? (
               <div className="mt-4 grid grid-cols-2 gap-3">
                 <Skeleton className="h-14" /><Skeleton className="h-14" /><Skeleton className="h-14" /><Skeleton className="h-14" />
@@ -499,8 +506,8 @@ export default function Overview({ onNavigate }) {
                     </div>
                   ))}
                 </dl>
-              ) : <EmptyApplications />
-            ) : <p className="mt-4 text-xs text-theme-subtle">Application details unavailable.</p>}
+              ) : <EmptyApplications t={t} />
+            ) : <p className="mt-4 text-xs text-theme-subtle">{t('overview.applicationUnavailable')}</p>}
           </div>
         </section>
 
@@ -508,28 +515,28 @@ export default function Overview({ onNavigate }) {
         <section className="grid gap-6 lg:grid-cols-2">
           <div className="rounded-3xl border border-theme-border bg-theme-card p-6 shadow-sm">
             <div className="flex items-center justify-between mb-4">
-              <h2 className="text-base alata-regular text-theme-ink">Recent Platform Activity</h2>
+              <h2 className="text-base alata-regular text-theme-ink">{t('overview.recentActivity')}</h2>
               {onNavigate && (
                 <button
                   type="button"
                   onClick={() => onNavigate('audit-logs')}
                   className="text-xs alata-regular text-theme-primary hover:text-theme-primary-hover"
                 >
-                  View all logs →
+                  {t('overview.viewAllLogs')}
                 </button>
               )}
             </div>
             {recentActivity.length === 0 ? (
-              <p className="text-xs text-theme-subtle py-4">No recent activity recorded.</p>
+              <p className="text-xs text-theme-subtle py-4">{t('overview.noRecentActivity')}</p>
             ) : (
               <ul className="divide-y divide-theme-border">
                 {recentActivity.map((act) => (
                   <li key={act.id} className="py-3 flex items-start justify-between gap-3 text-xs">
                     <div>
-                      <span className="alata-regular text-theme-ink">{act.action}</span>
-                      <span className="text-theme-muted text-[11px] ml-1.5">by {act.actor_name}</span>
+                      <span dir="auto" className="alata-regular text-theme-ink">{act.action}</span>
+                      <span className="text-theme-muted text-[11px] ms-1.5">{t('overview.byActor', { name: act.actor_name })}</span>
                       {act.tenant_name && act.tenant_name !== 'Platform' && (
-                        <span className="text-theme-primary font-semibold ml-1">({act.tenant_name})</span>
+                        <span dir="auto" className="text-theme-primary font-semibold ms-1">({act.tenant_name})</span>
                       )}
                     </div>
                     <span className="text-theme-subtle text-[10px] whitespace-nowrap shrink-0">
@@ -543,8 +550,8 @@ export default function Overview({ onNavigate }) {
 
           <div className="rounded-3xl border border-theme-border bg-theme-card p-6 shadow-sm flex flex-col justify-between">
             <div>
-              <h2 className="text-base alata-regular text-theme-ink">Suggested follow-ups</h2>
-              <p className="text-xs text-theme-muted mt-0.5">Automated actionable alerts requiring administrator attention.</p>
+              <h2 className="text-base alata-regular text-theme-ink">{t('overview.suggestedFollowups')}</h2>
+              <p className="text-xs text-theme-muted mt-0.5">{t('overview.suggestedFollowupsSub')}</p>
               {loading && !overview ? (
                 <div className="mt-3 space-y-2">
                   <Skeleton className="h-4 w-3/4" /><Skeleton className="h-4 w-1/2" />
@@ -558,7 +565,7 @@ export default function Overview({ onNavigate }) {
                     </li>
                   ))}
                 </ul>
-              ) : <p className="mt-3 text-xs text-theme-subtle">Follow-ups unavailable.</p>}
+              ) : <p className="mt-3 text-xs text-theme-subtle">{t('overview.followupsUnavailable')}</p>}
             </div>
 
             {onNavigate && (
@@ -570,9 +577,9 @@ export default function Overview({ onNavigate }) {
               >
                 <div className="flex items-center gap-2.5">
                   <AppIcon name="file-contract" className="text-theme-primary" />
-                  <span className="text-xs alata-regular text-theme-ink">Open Compliance &amp; Permits Audit</span>
+                  <span className="text-xs alata-regular text-theme-ink">{t('overview.openComplianceAudit')}</span>
                 </div>
-                <AppIcon name="arrow-right" className="text-xs text-theme-primary" />
+                <AppIcon name="arrow-right" className="text-xs text-theme-primary rtl:rotate-180" />
               </div>
             )}
           </div>

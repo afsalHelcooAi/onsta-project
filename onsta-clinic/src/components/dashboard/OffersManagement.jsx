@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useClinic } from '../../context/ClinicContext';
 import VerificationBadge from '../common/VerificationBadge';
 import AppIcon from '../common/AppIcon';
 import ModalPortal from '../common/ModalPortal';
 
 export default function OffersManagement({ onOpenPreview }) {
+  const { t } = useTranslation();
   const { offers, services, clinicData, addOffer, updateOffer, deleteOffer, toggleOfferActive } = useClinic();
 
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -118,10 +120,10 @@ export default function OffersManagement({ onOpenPreview }) {
           </div>
           <div>
             <h1 className="text-2xl sm:text-3xl alata-regular text-theme-ink tracking-tight">
-              Promotional Offers
+              {t('offers.title')}
             </h1>
             <p className="text-xs text-theme-muted mt-0.5">
-              Manage multiple active promotional offers. Each campaign includes independent visibility and automated MOHAP wording checks.
+              {t('offers.subtitle')}
             </p>
           </div>
         </div>
@@ -134,7 +136,7 @@ export default function OffersManagement({ onOpenPreview }) {
             className="px-3.5 py-2 rounded-full bg-[#FEE2E2] text-[#991B1B] hover:bg-[#FECACA] border border-[#FECACA] text-xs alata-regular flex items-center gap-1.5 transition-colors disabled:opacity-50"
           >
             <AppIcon name="warning" />
-            <span>Test "Best" Wording Warning</span>
+            <span>{t('offers.testBestWording')}</span>
           </button>
 
           <button
@@ -144,7 +146,7 @@ export default function OffersManagement({ onOpenPreview }) {
             className="px-5 py-2.5 rounded-full bg-theme-primary text-white hover:bg-theme-primary-hover text-xs alata-regular flex items-center gap-2 transition-all shadow-sm disabled:opacity-50"
           >
             <AppIcon name="plus" className="text-xs" />
-            <span>Create New Offer</span>
+            <span>{t('offers.createNewOffer')}</span>
           </button>
         </div>
       </div>
@@ -154,9 +156,9 @@ export default function OffersManagement({ onOpenPreview }) {
         <div className="p-4 bg-theme-accent-soft border border-theme-accent-border rounded-2xl flex items-start gap-3">
           <AppIcon name="warning" className="text-base text-theme-accent shrink-0 mt-0.5" />
           <div className="text-xs text-theme-accent-text">
-            <p className="alata-regular">No Services Found in Your Clinic Directory</p>
+            <p className="alata-regular">{t('offers.noServicesTitle')}</p>
             <p className="mt-0.5 opacity-90">
-              Promotional offers must be attached to an existing clinical treatment service. Please go to <strong>Services & Prices</strong> to add your treatments first.
+              {t('offers.noServicesDesc')}
             </p>
           </div>
         </div>
@@ -166,7 +168,7 @@ export default function OffersManagement({ onOpenPreview }) {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-theme-card rounded-2xl border border-theme-border p-5 shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-xs text-theme-muted font-medium">Total Promotional Offers</p>
+            <p className="text-xs text-theme-muted font-medium">{t('offers.totalOffers')}</p>
             <h4 className="text-2xl alata-regular text-theme-ink mt-1">{offers.length}</h4>
           </div>
           <div className="w-10 h-10 rounded-xl bg-theme-accent-soft border border-theme-accent-border text-theme-accent flex items-center justify-center">
@@ -176,7 +178,7 @@ export default function OffersManagement({ onOpenPreview }) {
 
         <div className="bg-theme-card rounded-2xl border border-theme-border p-5 shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-xs text-theme-muted font-medium">Live & Active on ONSTA</p>
+            <p className="text-xs text-theme-muted font-medium">{t('offers.liveActive')}</p>
             <h4 className="text-2xl alata-regular text-[#166534] mt-1">
               {offers.filter(o => o.isActive).length}
             </h4>
@@ -188,7 +190,7 @@ export default function OffersManagement({ onOpenPreview }) {
 
         <div className="bg-theme-card rounded-2xl border border-theme-border p-5 shadow-sm flex items-center justify-between">
           <div>
-            <p className="text-xs text-theme-muted font-medium">Inactive (Hidden)</p>
+            <p className="text-xs text-theme-muted font-medium">{t('offers.inactiveHidden')}</p>
             <h4 className="text-2xl alata-regular text-theme-muted mt-1">
               {offers.filter(o => !o.isActive).length}
             </h4>
@@ -202,52 +204,52 @@ export default function OffersManagement({ onOpenPreview }) {
       {/* Offers Table */}
       <div className="bg-theme-card rounded-3xl border border-theme-border shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-xs">
+          <table className="w-full text-start text-xs">
             <thead className="bg-theme-canvas text-theme-primary-hover alata-regular uppercase tracking-wider text-[11px] border-b border-theme-border">
               <tr>
-                <th className="py-3.5 px-4">Offer title</th>
-                <th className="py-3.5 px-3">Linked treatment</th>
-                <th className="py-3.5 px-3 text-right">Normal</th>
-                <th className="py-3.5 px-3 text-right">Offer</th>
-                <th className="py-3.5 px-3 text-center">Discount</th>
-                <th className="py-3.5 px-3">Validity period</th>
-                <th className="py-3.5 px-3 text-center">Active toggle</th>
-                <th className="py-3.5 px-3 text-center">Verification</th>
-                <th className="py-3.5 px-4 text-right">Actions</th>
+                <th className="py-3.5 px-4">{t('offers.colTitle')}</th>
+                <th className="py-3.5 px-3">{t('offers.colLinked')}</th>
+                <th className="py-3.5 px-3 text-end">{t('offers.colNormal')}</th>
+                <th className="py-3.5 px-3 text-end">{t('offers.colOffer')}</th>
+                <th className="py-3.5 px-3 text-center">{t('offers.colDiscount')}</th>
+                <th className="py-3.5 px-3">{t('offers.colValidity')}</th>
+                <th className="py-3.5 px-3 text-center">{t('offers.colToggle')}</th>
+                <th className="py-3.5 px-3 text-center">{t('offers.colVerification')}</th>
+                <th className="py-3.5 px-4 text-end">{t('offers.colActions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-theme-border">
               {offers.map((offerItem) => (
                 <tr key={offerItem.id} className="hover:bg-theme-surface transition-colors">
                   <td className="py-3.5 px-4">
-                    <div className="alata-regular text-theme-ink text-sm max-w-[220px]">
+                    <div dir="auto" className="alata-regular text-theme-ink text-sm max-w-[220px]">
                       {offerItem.title}
                     </div>
-                    <div className="text-[11px] text-theme-muted mt-0.5 line-clamp-1">
+                    <div dir="auto" className="text-[11px] text-theme-muted mt-0.5 line-clamp-1">
                       {offerItem.description}
                     </div>
                   </td>
 
-                  <td className="py-3.5 px-3 text-theme-muted max-w-[180px] truncate">
+                  <td dir="auto" className="py-3.5 px-3 text-theme-muted max-w-[180px] truncate">
                     {offerItem.linkedServiceName}
                   </td>
 
-                  <td className="py-3.5 px-3 text-right text-theme-subtle line-through">
-                    {offerItem.normalPrice} AED
+                  <td className="py-3.5 px-3 text-end text-theme-subtle line-through">
+                    {offerItem.normalPrice} {t('common.aed')}
                   </td>
 
-                  <td className="py-3.5 px-3 text-right alata-regular text-theme-accent text-sm">
-                    {offerItem.offerPrice} AED
+                  <td className="py-3.5 px-3 text-end alata-regular text-theme-accent text-sm">
+                    {offerItem.offerPrice} {t('common.aed')}
                   </td>
 
                   <td className="py-3.5 px-3 text-center">
                     <span className="px-2.5 py-0.5 rounded-full bg-theme-primary text-theme-accent alata-regular text-[11px]">
-                      {offerItem.discountPercent}% OFF
+                      {t('overview.percentOff', { percent: offerItem.discountPercent })}
                     </span>
                   </td>
 
                   <td className="py-3.5 px-3 text-theme-muted whitespace-nowrap text-[11px]">
-                    {offerItem.startDate} to {offerItem.endDate}
+                    {t('offers.toDate', { start: offerItem.startDate, end: offerItem.endDate })}
                   </td>
 
                   <td className="py-3.5 px-3 text-center">
@@ -260,7 +262,7 @@ export default function OffersManagement({ onOpenPreview }) {
                       }`}
                     >
                       <span className={`w-1.5 h-1.5 rounded-full ${offerItem.isActive ? 'bg-[#16A34A] animate-pulse' : 'bg-theme-subtle'}`} />
-                      <span>{offerItem.isActive ? 'Active' : 'Inactive'}</span>
+                      <span>{offerItem.isActive ? t('common.active') : t('common.inactive')}</span>
                     </button>
                   </td>
 
@@ -268,21 +270,21 @@ export default function OffersManagement({ onOpenPreview }) {
                     <VerificationBadge status={offerItem.verificationStatus} />
                   </td>
 
-                  <td className="py-3.5 px-4 text-right">
+                  <td className="py-3.5 px-4 text-end">
                     <div className="flex items-center justify-end gap-1.5">
                       <button
                         onClick={() => openEditModal(offerItem)}
-                        aria-label={`Edit ${offerItem.title}`}
+                        aria-label={`${t('common.edit')} ${offerItem.title}`}
                         className="min-w-[44px] min-h-[44px] rounded-xl text-theme-muted hover:text-theme-primary hover:bg-theme-canvas flex items-center justify-center transition-colors"
-                        title="Edit Offer"
+                        title={t('common.edit')}
                       >
                         <AppIcon name="edit" className="text-sm" />
                       </button>
                       <button
                         onClick={() => setDeleteConfirmId(offerItem.id)}
-                        aria-label={`Delete ${offerItem.title}`}
+                        aria-label={`${t('common.delete')} ${offerItem.title}`}
                         className="min-w-[44px] min-h-[44px] rounded-xl text-theme-subtle hover:text-[#991B1B] hover:bg-[#FEE2E2] flex items-center justify-center transition-colors"
-                        title="Delete Offer"
+                        title={t('common.delete')}
                       >
                         <AppIcon name="trash" className="text-sm" />
                       </button>
@@ -303,15 +305,15 @@ export default function OffersManagement({ onOpenPreview }) {
             <div className="p-6 pb-4 border-b border-theme-border flex items-start justify-between bg-theme-card">
               <div>
                 <h2 className="text-2xl sm:text-3xl alata-regular text-theme-ink">
-                  {editingOffer ? 'Edit offer' : 'New offer'}
+                  {editingOffer ? t('offers.editOffer') : t('offers.newOffer')}
                 </h2>
                 <p className="text-xs text-theme-muted mt-1">
-                  Goes live only after ONSTA rule verification.
+                  {t('offers.modalSubtitle')}
                 </p>
               </div>
               <button
                 onClick={() => setIsModalOpen(false)}
-                aria-label="Close offer dialog"
+                aria-label={t('common.close')}
                 className="text-theme-muted hover:text-theme-ink min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center hover:bg-theme-surface"
               >
                 <AppIcon name="close" className="text-base" />
@@ -321,19 +323,20 @@ export default function OffersManagement({ onOpenPreview }) {
             <div className="p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
               <form onSubmit={handleSubmit} className="lg:col-span-2 bg-theme-card rounded-2xl border border-theme-border p-6 shadow-sm space-y-4">
                 <h3 className="text-base alata-regular text-theme-ink">
-                  Offer details
+                  {t('offers.offerDetails')}
                 </h3>
 
                 <div>
                   <label className="block text-xs font-semibold text-theme-ink mb-1">
-                    Offer title
+                    {t('offers.offerTitleLabel')}
                   </label>
                   <input
                     type="text"
                     required
+                    dir="auto"
                     value={formData.title}
                     onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                    placeholder="e.g. Laser hair removal special offer"
+                    placeholder={t('offers.offerTitlePlaceholder')}
                     className={`w-full px-3.5 py-2.5 rounded-xl border text-sm text-theme-ink focus:outline-none focus:ring-2 ${
                       wordingProhibited
                         ? 'border-[#DC2626] bg-[#FEF2F2] text-[#991B1B] focus:ring-red-400'
@@ -344,7 +347,7 @@ export default function OffersManagement({ onOpenPreview }) {
                   {wordingProhibited && (
                     <div className="mt-2 p-3 bg-[#FEE2E2] border border-[#FECACA] rounded-xl text-xs text-[#991B1B] space-y-1">
                       <p className="alata-regular">
-                        Wording check: "{wordingProhibited[0]}" is an absolute claim and is not allowed. Suggested: "Laser hair removal offer".
+                        {t('offers.wordingCheckError', { word: wordingProhibited[0] })}
                       </p>
                     </div>
                   )}
@@ -352,7 +355,7 @@ export default function OffersManagement({ onOpenPreview }) {
 
                 <div>
                   <label className="block text-xs font-semibold text-theme-ink mb-1">
-                    Linked service
+                    {t('offers.linkedServiceLabel')}
                   </label>
                   <select
                     value={formData.linkedServiceId}
@@ -361,7 +364,7 @@ export default function OffersManagement({ onOpenPreview }) {
                   >
                     {services.map((srv) => (
                       <option key={srv.id} value={srv.id}>
-                        {srv.name} (AED {srv.normalPrice})
+                        {srv.name} ({t('common.aed')} {srv.normalPrice})
                       </option>
                     ))}
                   </select>
@@ -370,11 +373,12 @@ export default function OffersManagement({ onOpenPreview }) {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-semibold text-theme-ink mb-1">
-                      Normal price (AED)
+                      {t('offers.normalPriceLabel')}
                     </label>
                     <input
                       type="number"
                       min={1}
+                      dir="ltr"
                       value={formData.normalPrice}
                       onChange={(e) => setFormData({ ...formData, normalPrice: e.target.value })}
                       className="w-full px-3.5 py-2.5 rounded-xl border border-theme-border-slate text-xs alata-regular text-theme-ink focus:outline-none focus:ring-2 focus:ring-theme-primary/30"
@@ -383,11 +387,12 @@ export default function OffersManagement({ onOpenPreview }) {
 
                   <div>
                     <label className="block text-xs font-semibold text-theme-ink mb-1">
-                      Offer price (AED)
+                      {t('offers.offerPriceLabel')}
                     </label>
                     <input
                       type="number"
                       min={1}
+                      dir="ltr"
                       value={formData.offerPrice}
                       onChange={(e) => setFormData({ ...formData, offerPrice: e.target.value })}
                       className="w-full px-3.5 py-2.5 rounded-xl border border-theme-border-slate text-xs alata-regular text-theme-accent focus:outline-none focus:ring-2 focus:ring-theme-primary/30"
@@ -397,15 +402,15 @@ export default function OffersManagement({ onOpenPreview }) {
 
                 {discountPercent > 0 && (
                   <div className="p-3 bg-theme-accent-soft rounded-xl border border-theme-accent-border text-xs text-theme-accent-text flex items-center justify-between">
-                    <span>Calculated promotional discount:</span>
-                    <strong className="alata-regular text-sm text-theme-accent">{discountPercent}% savings for patients</strong>
+                    <span>{t('offers.calculatedDiscount')}</span>
+                    <strong className="alata-regular text-sm text-theme-accent">{t('offers.savingsForPatients', { percent: discountPercent })}</strong>
                   </div>
                 )}
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-xs font-semibold text-theme-ink mb-1">
-                      Start date
+                      {t('offers.startDate')}
                     </label>
                     <input
                       type="date"
@@ -417,7 +422,7 @@ export default function OffersManagement({ onOpenPreview }) {
 
                   <div>
                     <label className="block text-xs font-semibold text-theme-ink mb-1">
-                      End date
+                      {t('offers.endDate')}
                     </label>
                     <input
                       type="date"
@@ -430,13 +435,14 @@ export default function OffersManagement({ onOpenPreview }) {
 
                 <div>
                   <label className="block text-xs font-semibold text-theme-ink mb-1">
-                    Terms
+                    {t('offers.termsLabel')}
                   </label>
                   <textarea
                     rows={3}
+                    dir="auto"
                     value={formData.terms}
                     onChange={(e) => setFormData({ ...formData, terms: e.target.value })}
-                    placeholder="[Offer terms]"
+                    placeholder={t('offers.termsPlaceholder')}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-theme-border-slate text-xs text-theme-ink focus:outline-none focus:ring-2 focus:ring-theme-primary/30"
                   />
                 </div>
@@ -450,7 +456,7 @@ export default function OffersManagement({ onOpenPreview }) {
                       className="mt-0.5 rounded text-theme-primary focus:ring-theme-primary"
                     />
                     <span className="text-xs text-theme-muted font-medium">
-                      I confirm this content follows the advertising rules and I am responsible for it.
+                      {t('offers.declaration')}
                     </span>
                   </label>
                 </div>
@@ -461,14 +467,14 @@ export default function OffersManagement({ onOpenPreview }) {
                     onClick={() => setIsModalOpen(false)}
                     className="px-5 py-2.5 rounded-full border border-theme-border-slate text-xs font-medium text-theme-muted hover:bg-theme-surface"
                   >
-                    Save draft
+                    {t('offers.saveDraft')}
                   </button>
 
                   <button
                     type="submit"
                     className="px-6 py-2.5 rounded-full bg-theme-primary text-white text-xs alata-regular hover:bg-theme-primary-hover transition-colors shadow-sm"
                   >
-                    Submit for review
+                    {t('offers.submitForReview')}
                   </button>
                 </div>
               </form>
@@ -477,63 +483,63 @@ export default function OffersManagement({ onOpenPreview }) {
                 <div className="bg-theme-card rounded-2xl border border-theme-border p-5 shadow-sm space-y-3">
                   <div className="flex items-center justify-between">
                     <h4 className="text-sm alata-regular text-theme-ink">
-                      Customer preview
+                      {t('offers.customerPreview')}
                     </h4>
                     <span className="px-2.5 py-0.5 rounded-full text-[10px] alata-regular bg-theme-accent-soft border border-theme-accent-border text-theme-accent-text">
-                      Pending version
+                      {t('offers.pendingVersion')}
                     </span>
                   </div>
 
                   <div className="h-32 rounded-2xl bg-theme-primary-soft flex flex-col items-center justify-center text-theme-primary text-xs alata-regular">
                     <AppIcon name="image" className="text-2xl mb-1 opacity-60" />
-                    <span>Promotional Banner</span>
+                    <span>{t('offers.promotionalBanner')}</span>
                   </div>
 
                   <div>
-                    <h5 className="text-sm alata-regular text-theme-ink">
-                      {formData.title || '[Offer title]'}
+                    <h5 dir="auto" className="text-sm alata-regular text-theme-ink">
+                      {formData.title || t('offers.offerTitleFallback')}
                     </h5>
-                    <p className="text-[11px] text-theme-muted mt-0.5">
+                    <p dir="auto" className="text-[11px] text-theme-muted mt-0.5">
                       {clinicDisplayName} • {clinicDisplayArea}
                     </p>
                     <div className="mt-2 flex items-baseline gap-2">
                       <span className="text-base alata-regular text-theme-accent">
-                        {formData.offerPrice || '000'} AED
+                        {formData.offerPrice || '000'} {t('common.aed')}
                       </span>
                       <span className="text-xs text-theme-subtle line-through">
-                        {formData.normalPrice || '000'} AED
+                        {formData.normalPrice || '000'} {t('common.aed')}
                       </span>
                     </div>
                     <p className="text-[10px] text-theme-subtle mt-1">
-                      Valid {formData.startDate} to {formData.endDate}
+                      {t('offers.validRange', { start: formData.startDate, end: formData.endDate })}
                     </p>
                   </div>
                 </div>
 
                 <div className="bg-theme-card rounded-2xl border border-theme-border p-5 shadow-sm space-y-3">
                   <h4 className="text-sm alata-regular text-theme-ink">
-                    Review path
+                    {t('offers.reviewPath')}
                   </h4>
 
                   <div className="space-y-3 text-xs">
                     <div className="flex items-center justify-between pb-2 border-b border-theme-border">
-                      <span className="text-theme-muted">1. Draft and wording check</span>
+                      <span className="text-theme-muted">{t('offers.step1')}</span>
                       <span className="px-2 py-0.5 rounded-full text-[10px] alata-regular bg-[#DCFCE7] text-[#166534]">
-                        Automatic
+                        {t('offers.automatic')}
                       </span>
                     </div>
 
                     <div className="flex items-center justify-between pb-2 border-b border-theme-border">
-                      <span className="text-theme-muted">2. ONSTA Rule Engine</span>
+                      <span className="text-theme-muted">{t('offers.step2')}</span>
                       <span className="px-2 py-0.5 rounded-full text-[10px] alata-regular bg-[#DCFCE7] text-[#166534]">
-                        Autonomous
+                        {t('offers.autonomous')}
                       </span>
                     </div>
 
                     <div className="flex items-center justify-between">
-                      <span className="text-theme-muted">3. Live on ONSTA</span>
+                      <span className="text-theme-muted">{t('offers.step3')}</span>
                       <span className="px-2 py-0.5 rounded-full text-[10px] alata-regular bg-theme-surface text-theme-muted">
-                        Instant upon pass
+                        {t('offers.instantUponPass')}
                       </span>
                     </div>
                   </div>
@@ -551,17 +557,17 @@ export default function OffersManagement({ onOpenPreview }) {
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto bg-theme-overlay/60 backdrop-blur-sm animate-fadeIn">
             <div className="my-auto bg-theme-card rounded-3xl shadow-xl max-w-sm w-full p-6 space-y-4 border border-theme-border">
             <h4 className="text-base alata-regular text-theme-ink">
-              Delete Offer?
+              {t('offers.deleteTitle')}
             </h4>
             <p className="text-xs text-theme-muted leading-relaxed">
-              Are you sure you want to remove this promotional offer? It will be immediately withdrawn from the customer platform.
+              {t('offers.deleteDesc')}
             </p>
             <div className="flex justify-end gap-3 pt-2">
               <button
                 onClick={() => setDeleteConfirmId(null)}
                 className="px-4 py-2 rounded-full border border-theme-border-slate text-xs font-medium text-theme-muted hover:bg-theme-surface"
               >
-                Cancel
+                {t('common.cancel')}
               </button>
               <button
                 onClick={() => {
@@ -570,7 +576,7 @@ export default function OffersManagement({ onOpenPreview }) {
                 }}
                 className="px-5 py-2 rounded-full bg-[#DC2626] text-white text-xs alata-regular hover:bg-[#B91C1C]"
               >
-                Confirm Delete
+                {t('offers.confirmDelete')}
               </button>
             </div>
             </div>

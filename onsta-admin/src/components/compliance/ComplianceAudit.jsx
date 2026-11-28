@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import AppIcon from '../common/AppIcon';
 import { fetchComplianceAudit, approveRenewalRequest, rejectRenewalRequest } from '../../api/adminApi';
 
@@ -82,6 +83,7 @@ function ClinicComplianceStatus({ clinic }) {
 }
 
 function ComplianceDetailPanel({ clinic, onRefresh }) {
+  const { t } = useTranslation();
   const [actionLoading, setActionLoading] = useState(null);
   const [rejectModalReq, setRejectModalReq] = useState(null);
   const [rejectReason, setRejectReason] = useState('');
@@ -92,7 +94,7 @@ function ComplianceDetailPanel({ clinic, onRefresh }) {
         <div className="w-16 h-16 rounded-2xl bg-theme-primary-soft text-theme-primary flex items-center justify-center mb-3 border border-theme-border-strong">
           <AppIcon name="shield-file" size="lg" className="text-2xl" />
         </div>
-        <p className="text-sm alata-regular text-theme-ink">Select a clinic to view its compliance details.</p>
+        <p className="text-sm alata-regular text-theme-ink">{t('complianceAudit.selectPrompt')}</p>
       </div>
     );
   }
@@ -135,13 +137,13 @@ function ComplianceDetailPanel({ clinic, onRefresh }) {
           <div className="bg-theme-card rounded-3xl p-6 max-w-md w-full shadow-2xl border border-theme-border space-y-4">
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="alata-regular text-theme-ink text-base">Request Modification / Re-upload</h3>
+                <h3 className="alata-regular text-theme-ink text-base">{t('complianceAudit.requestModTitle')}</h3>
                 <p className="text-xs text-theme-muted mt-0.5">{rejectModalReq.target_name} ({rejectModalReq.document_code})</p>
               </div>
               <button
                 onClick={() => setRejectModalReq(null)}
                 className="text-theme-muted hover:text-theme-ink min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-theme-canvas transition"
-                aria-label="Close modal"
+                aria-label={t('common.close')}
               >
                 <AppIcon name="close" size="sm" />
               </button>
@@ -149,19 +151,20 @@ function ComplianceDetailPanel({ clinic, onRefresh }) {
             <form onSubmit={handleRejectSubmit} className="space-y-3">
               <div>
                 <label className="block text-xs font-semibold text-theme-ink mb-1.5">
-                  Reason / Modification Note for Clinic
+                  {t('complianceAudit.reasonLabel')}
                 </label>
                 <textarea
                   required
+                  dir="auto"
                   rows={3}
                   value={rejectReason}
                   onChange={(e) => setRejectReason(e.target.value)}
-                  placeholder="e.g. Document image is blurry or truncated. Please re-upload a clear colour PDF of the renewed licence."
+                  placeholder={t('complianceAudit.reasonPlaceholder')}
                   className="w-full text-xs p-3 bg-theme-surface border border-theme-border rounded-xl focus:border-theme-primary focus:ring-2 focus:ring-theme-primary/20 outline-none text-theme-ink"
                 />
               </div>
               <p className="text-[11px] text-theme-muted">
-                This message will be shown directly in the clinic&apos;s Compliance Centre with a button to re-upload.
+                {t('complianceAudit.reasonHint')}
               </p>
               <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-theme-border">
                 <button
@@ -169,14 +172,14 @@ function ComplianceDetailPanel({ clinic, onRefresh }) {
                   onClick={() => setRejectModalReq(null)}
                   className="px-4 py-2 rounded-full border border-theme-border text-xs font-medium text-theme-muted hover:bg-theme-canvas hover:text-theme-ink transition"
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </button>
                 <button
                   type="submit"
                   disabled={actionLoading === rejectModalReq.id || !rejectReason.trim()}
                   className="px-5 py-2 rounded-full bg-rose-600 text-white text-xs alata-regular hover:bg-rose-700 disabled:opacity-50 shadow-sm transition"
                 >
-                  {actionLoading === rejectModalReq.id ? 'Submitting...' : 'Send Modification Request'}
+                  {actionLoading === rejectModalReq.id ? t('complianceAudit.submitting') : t('complianceAudit.sendModRequest')}
                 </button>
               </div>
             </form>
@@ -443,6 +446,7 @@ function ComplianceDetailPanel({ clinic, onRefresh }) {
 }
 
 export default function ComplianceAudit() {
+  const { t } = useTranslation();
   const [clinics, setClinics] = useState([]);
   const [total, setTotal] = useState(0);
   const [search, setSearch] = useState('');
@@ -488,19 +492,19 @@ export default function ComplianceAudit() {
   const pageCount = Math.max(1, Math.ceil(total / PAGE_SIZE));
 
   const FILTERS = [
-    { value: 'ALL', label: 'All' },
-    { value: 'EXPIRED', label: 'Expired' },
-    { value: 'EXPIRING_30', label: 'Due ≤30d' },
-    { value: 'EXPIRING_90', label: 'Due ≤90d' },
-    { value: 'COMPLIANT', label: 'Compliant' },
+    { value: 'ALL', label: t('complianceAudit.filterAll') },
+    { value: 'EXPIRED', label: t('complianceAudit.filterExpired') },
+    { value: 'EXPIRING_30', label: t('complianceAudit.filterDue30') },
+    { value: 'EXPIRING_90', label: t('complianceAudit.filterDue90') },
+    { value: 'COMPLIANT', label: t('complianceAudit.filterCompliant') },
   ];
 
   return (
     <main className="flex h-screen min-w-0 flex-1 flex-col overflow-hidden bg-theme-canvas">
       <header className="flex flex-wrap items-center justify-between gap-4 border-b border-theme-border bg-theme-card px-6 py-5 shadow-sm sm:px-8">
         <div>
-          <h1 className="alata-regular text-xl text-theme-ink">Compliance & Permits</h1>
-          <p className="mt-1 text-xs text-theme-muted">Monitor trade, facility, and practitioner license expiry across all registered clinics.</p>
+          <h1 className="alata-regular text-xl text-theme-ink">{t('complianceAudit.title')}</h1>
+          <p className="mt-1 text-xs text-theme-muted">{t('complianceAudit.subtitle')}</p>
         </div>
         <button
           type="button"
@@ -508,44 +512,45 @@ export default function ComplianceAudit() {
           disabled={loading}
           className="inline-flex items-center gap-2 rounded-full border border-theme-border-strong bg-theme-canvas px-4 py-2 text-xs alata-regular text-theme-primary hover:bg-theme-primary-soft disabled:opacity-60 transition"
         >
-          <AppIcon name="refresh" size="sm" spin={loading} /> Refresh
+          <AppIcon name="refresh" size="sm" spin={loading} /> {t('common.refresh')}
         </button>
       </header>
 
       {error && (
-        <div role="alert" className="border-b border-rose-200 bg-rose-50 px-6 py-3 text-sm text-rose-800">{error}</div>
+        <div role="alert" className="border-b border-rose-200 bg-rose-50 px-6 py-3 text-sm text-rose-800"><span dir="auto">{error}</span></div>
       )}
 
       <div className="grid min-h-0 flex-1 grid-cols-1 overflow-hidden xl:grid-cols-[minmax(0,1.05fr)_minmax(430px,0.95fr)]">
         {/* Left: Clinic List */}
-        <section className="flex min-h-0 flex-col border-r border-theme-border bg-theme-surface">
+        <section className="flex min-h-0 flex-col border-e border-theme-border bg-theme-surface">
           {/* Filters */}
           <div className="space-y-3 border-b border-theme-border bg-theme-card/70 p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-sm alata-regular text-theme-ink">
-                <AppIcon name="hospital" size="sm" className="text-theme-primary" /> Registered clinics
+                <AppIcon name="hospital" size="sm" className="text-theme-primary" /> {t('complianceAudit.registeredClinics')}
               </div>
-              <span className="text-xs alata-regular text-theme-muted">{total} total</span>
+              <span className="text-xs alata-regular text-theme-muted">{t('complianceAudit.totalCount', { count: total })}</span>
             </div>
 
             {/* Search + Emirate */}
             <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_160px]">
               <label className="relative">
-                <AppIcon name="search" size="sm" className="absolute left-3.5 top-2.5 text-theme-muted" />
+                <AppIcon name="search" size="sm" className="absolute start-3.5 top-2.5 text-theme-muted" />
                 <input
+                  dir="auto"
                   value={search}
                   onChange={(e) => { setSearch(e.target.value); setOffset(0); }}
-                  placeholder="Search clinic or tenant code"
-                  className="w-full rounded-xl border border-theme-border bg-theme-card py-2 pl-9 pr-3 text-sm text-theme-ink outline-none focus:border-theme-primary"
+                  placeholder={t('complianceAudit.searchPlaceholder')}
+                  className="w-full rounded-xl border border-theme-border bg-theme-card py-2 ps-9 pe-3 text-sm text-theme-ink outline-none focus:border-theme-primary"
                 />
               </label>
               <select
                 value={emirate}
                 onChange={updateFilter(setEmirate)}
-                aria-label="Filter by emirate"
+                aria-label={t('complianceAudit.allEmirates')}
                 className="rounded-xl border border-theme-border bg-theme-card px-3 py-2 text-sm text-theme-ink outline-none focus:border-theme-primary"
               >
-                <option value="">All emirates</option>
+                <option value="">{t('complianceAudit.allEmirates')}</option>
                 {EMIRATES.map((name) => <option key={name} value={name}>{name}</option>)}
               </select>
             </div>
@@ -572,10 +577,10 @@ export default function ComplianceAudit() {
           {/* List */}
           <div className="min-h-0 flex-1 overflow-auto divide-y divide-theme-border">
             {loading && clinics.length === 0 ? (
-              <p className="p-8 text-center text-sm text-theme-muted">Loading compliance data…</p>
+              <p className="p-8 text-center text-sm text-theme-muted">{t('complianceAudit.loadingData')}</p>
             ) : clinics.length === 0 ? (
               <p className="p-8 text-center text-sm text-theme-muted">
-                {error ? 'Clinic list is unavailable.' : 'No clinics match your search and filters.'}
+                {error ? t('clinics.listUnavailable') : t('clinics.noMatch')}
               </p>
             ) : (
               clinics.map((clinic) => {
@@ -586,14 +591,14 @@ export default function ComplianceAudit() {
                     key={clinic.clinic_id}
                     type="button"
                     onClick={() => setSelectedClinic(clinic)}
-                    className={`w-full px-4 py-4 text-left transition hover:bg-theme-canvas/60 ${
-                      isSelected ? 'border-l-4 border-theme-primary bg-theme-canvas/90' : 'bg-theme-card/60'
+                    className={`w-full px-4 py-4 text-start transition hover:bg-theme-canvas/60 ${
+                      isSelected ? 'border-s-4 border-theme-primary bg-theme-canvas/90' : 'bg-theme-card/60'
                     }`}
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <h2 className="truncate text-sm alata-regular text-theme-ink">{clinic.trading_name}</h2>
-                        <p className="mt-1 truncate text-xs text-theme-muted">{clinic.legal_name}</p>
+                        <h2 dir="auto" className="truncate text-sm alata-regular text-theme-ink">{clinic.trading_name}</h2>
+                        <p dir="auto" className="mt-1 truncate text-xs text-theme-muted">{clinic.legal_name}</p>
                       </div>
                       <div className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[10px] alata-regular ${tone}`}>
                         {icon} {label}
@@ -604,21 +609,21 @@ export default function ComplianceAudit() {
                         <AppIcon name="map-pin" size="sm" className="text-theme-primary/70" />
                         {clinic.emirate || '—'}
                       </span>
-                      <span>{clinic.facility_type}</span>
-                      <span className="alata-regular text-theme-primary">{clinic.tenant_code}</span>
+                      <span dir="auto">{clinic.facility_type}</span>
+                      <span dir="ltr" className="alata-regular text-theme-primary">{clinic.tenant_code}</span>
                     </div>
                     <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[10px] text-theme-muted">
-                      <span>Trade: {formatDate(clinic.trade_license_expiry_date)}</span>
-                      <span>Facility: {formatDate(clinic.facility_license_expiry_date)}</span>
+                      <span>{t('overview.tradeLicense')}: {formatDate(clinic.trade_license_expiry_date)}</span>
+                      <span>{t('overview.facilityLicense')}: {formatDate(clinic.facility_license_expiry_date)}</span>
                       {clinic.pending_renewals_count > 0 ? (
                         <span className="text-theme-primary alata-regular bg-theme-primary-soft px-2 py-0.5 rounded-full border border-theme-border-strong">
-                          Renewals: {clinic.pending_renewals_count} Pending
+                          {clinic.pending_renewals_count}
                         </span>
                       ) : null}
                       {clinic.expired_doctors_count > 0 ? (
-                        <span className="text-rose-700 font-bold">Docs: {clinic.expired_doctors_count} Expired</span>
+                        <span className="text-rose-700 font-bold">Docs: {clinic.expired_doctors_count}</span>
                       ) : clinic.expiring_doctors_count > 0 ? (
-                        <span className="text-amber-700 font-bold">Docs: {clinic.expiring_doctors_count} Expiring</span>
+                        <span className="text-amber-700 font-bold">Docs: {clinic.expiring_doctors_count}</span>
                       ) : (
                         <span>Docs: {clinic.practitioners ? clinic.practitioners.length : 0}</span>
                       )}
@@ -631,25 +636,25 @@ export default function ComplianceAudit() {
 
           {/* Pagination */}
           <footer className="flex items-center justify-between border-t border-theme-border bg-theme-card px-4 py-3 text-xs text-theme-muted">
-            <span className="alata-regular">Page {page} of {pageCount}</span>
+            <span className="alata-regular">{t('clinics.pageOf', { page, pageCount })}</span>
             <div className="flex gap-2">
               <button
                 type="button"
                 disabled={offset === 0 || loading}
                 onClick={() => setOffset(Math.max(0, offset - PAGE_SIZE))}
                 className="rounded-full border border-theme-border min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-theme-canvas hover:text-theme-primary disabled:opacity-40 transition"
-                aria-label="Previous page"
+                aria-label={t('users.prevPage')}
               >
-                <AppIcon name="caret-left" size="sm" />
+                <AppIcon name="caret-left" size="sm" className="rtl:rotate-180" />
               </button>
               <button
                 type="button"
                 disabled={offset + PAGE_SIZE >= total || loading}
                 onClick={() => setOffset(offset + PAGE_SIZE)}
                 className="rounded-full border border-theme-border min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-theme-canvas hover:text-theme-primary disabled:opacity-40 transition"
-                aria-label="Next page"
+                aria-label={t('users.nextPage')}
               >
-                <AppIcon name="caret-right" size="sm" />
+                <AppIcon name="caret-right" size="sm" className="rtl:rotate-180" />
               </button>
             </div>
           </footer>

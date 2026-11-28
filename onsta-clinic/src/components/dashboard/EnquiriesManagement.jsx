@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useClinic } from '../../context/ClinicContext';
 import AppIcon from '../common/AppIcon';
 import ModalPortal from '../common/ModalPortal';
 
 export default function EnquiriesManagement() {
+  const { t } = useTranslation();
   const { enquiries, updateEnquiryStatus, addEnquiryNote, deleteEnquiry, clinicData, showToast, addCustomerEnquiry } = useClinic();
 
   const [searchTerm, setSearchTerm] = useState('');
@@ -63,7 +65,7 @@ export default function EnquiriesManagement() {
       updateEnquiryStatus(current.id, 'contacted');
     }
     addEnquiryNote(current.id, `Sent email response: "${emailDraft.subject}"`);
-    showToast("success", "Email Dispatched", `Email client opened for ${current.patientName}.`);
+    showToast("success", t('enquiries.emailDispatchedTitle'), t('enquiries.emailDispatchedMsg', { name: current.patientName }));
   };
 
   const handleAddNoteSubmit = (e) => {
@@ -90,10 +92,10 @@ export default function EnquiriesManagement() {
           </div>
           <div>
             <h1 className="text-2xl sm:text-3xl alata-regular text-theme-ink tracking-tight">
-              Patient Enquiries & Bookings
+              {t('enquiries.title')}
             </h1>
             <p className="text-xs text-theme-muted mt-0.5">
-              Incoming consultation requests from onsta.ae. Contact patients directly via WhatsApp or Email.
+              {t('enquiries.subtitle')}
             </p>
           </div>
         </div>
@@ -119,16 +121,16 @@ export default function EnquiriesManagement() {
             className="px-4 py-2 rounded-full bg-theme-primary text-white hover:bg-theme-primary-hover text-xs alata-regular flex items-center gap-1.5 shadow-sm transition-all"
           >
             <AppIcon name="bolt" className="text-[11px]" />
-            <span>Simulate Inbound Lead</span>
+            <span>{t('enquiries.simulateLead')}</span>
           </button>
 
           <span className="px-3 py-1.5 rounded-full bg-[#FFEDD5] text-[#9A3412] border border-[#FED7AA] text-xs alata-regular flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-[#EA580C] animate-ping" />
-            <span>{enquiries.filter(e => e.status === 'new').length} New</span>
+            <span>{t('enquiries.newCount', { count: enquiries.filter(e => e.status === 'new').length })}</span>
           </span>
           <span className="px-3 py-1.5 rounded-full bg-[#DCFCE7] text-[#166534] border border-[#BBF7D0] text-xs alata-regular flex items-center gap-1.5">
             <AppIcon name="check-circle" />
-            <span>{enquiries.filter(e => e.status === 'booked').length} Bookings</span>
+            <span>{t('enquiries.bookingsCount', { count: enquiries.filter(e => e.status === 'booked').length })}</span>
           </span>
         </div>
       </div>
@@ -136,13 +138,14 @@ export default function EnquiriesManagement() {
       {/* Filter and Search Bar */}
       <div className="bg-theme-card rounded-2xl border border-theme-border p-4 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="relative w-full sm:w-80">
-          <AppIcon name="search" className="text-xs text-theme-subtle absolute left-4 top-1/2 -translate-y-1/2" />
+          <AppIcon name="search" className="text-xs text-theme-subtle absolute start-4 top-1/2 -translate-y-1/2" />
           <input
             type="text"
+            dir="auto"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Search patient, phone, or service..."
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-theme-border-slate bg-theme-surface text-xs text-theme-ink focus:outline-none focus:bg-theme-card focus:ring-2 focus:ring-theme-primary/30"
+            placeholder={t('enquiries.searchPlaceholder')}
+            className="w-full ps-10 pe-4 py-2.5 rounded-xl border border-theme-border-slate bg-theme-surface text-xs text-theme-ink focus:outline-none focus:bg-theme-card focus:ring-2 focus:ring-theme-primary/30"
           />
         </div>
 
@@ -157,7 +160,7 @@ export default function EnquiriesManagement() {
                   : 'bg-theme-surface text-theme-muted border border-theme-border-slate hover:border-theme-border-strong hover:text-theme-primary'
               }`}
             >
-              {st === 'new' ? 'New (Action Needed)' : st}
+              {st === 'All' ? t('common.all') : st === 'new' ? t('enquiries.newActionNeeded') : t(`status.${st}`)}
             </button>
           ))}
         </div>
@@ -169,15 +172,15 @@ export default function EnquiriesManagement() {
         <div className="lg:col-span-5 bg-theme-card rounded-3xl border border-theme-border shadow-sm overflow-hidden flex flex-col h-[700px]">
           <div className="p-4 bg-theme-canvas border-b border-theme-border flex items-center justify-between">
             <span className="text-xs alata-regular uppercase tracking-wider text-theme-primary-hover">
-              Inbox ({filteredEnquiries.length})
+              {t('enquiries.inboxCount', { count: filteredEnquiries.length })}
             </span>
-            <span className="text-[11px] text-theme-muted">Click to view & contact</span>
+            <span className="text-[11px] text-theme-muted">{t('enquiries.clickToView')}</span>
           </div>
 
           <div className="flex-1 overflow-y-auto divide-y divide-theme-border">
             {filteredEnquiries.length === 0 ? (
               <div className="p-8 text-center text-theme-subtle text-xs">
-                No patient enquiries match the selected filter.
+                {t('enquiries.noMatch')}
               </div>
             ) : (
               filteredEnquiries.map((enq) => {
@@ -188,17 +191,17 @@ export default function EnquiriesManagement() {
                     onClick={() => setActiveEnquiry(enq)}
                     className={`p-4 cursor-pointer transition-all ${
                       isSelected
-                        ? 'bg-theme-canvas border-l-4 border-l-theme-primary'
+                        ? 'bg-theme-canvas border-s-4 border-s-theme-primary'
                         : 'hover:bg-theme-surface'
                     }`}
                   >
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex items-center gap-2">
-                        <strong className="text-sm alata-regular text-theme-ink">
+                        <strong dir="auto" className="text-sm alata-regular text-theme-ink">
                           {enq.patientName}
                         </strong>
                         <span className={`px-2 py-0.5 rounded-full text-[9px] alata-regular border uppercase tracking-wider ${statusColors[enq.status]}`}>
-                          {enq.status}
+                          {t(`status.${enq.status}`, { defaultValue: enq.status })}
                         </span>
                       </div>
                       <span className="text-[10px] text-theme-subtle whitespace-nowrap">
@@ -206,11 +209,11 @@ export default function EnquiriesManagement() {
                       </span>
                     </div>
 
-                    <p className="text-xs font-medium text-theme-primary mt-1 line-clamp-1">
+                    <p dir="auto" className="text-xs font-medium text-theme-primary mt-1 line-clamp-1">
                       {enq.requestedService}
                     </p>
 
-                    <p className="text-[11px] text-theme-muted mt-1 line-clamp-2 leading-relaxed">
+                    <p dir="auto" className="text-[11px] text-theme-muted mt-1 line-clamp-2 leading-relaxed">
                       "{enq.message}"
                     </p>
 
@@ -219,7 +222,7 @@ export default function EnquiriesManagement() {
                         <AppIcon name="calendar" />
                         <span>{enq.preferredDate} ({enq.preferredTime})</span>
                       </span>
-                      <span className="font-medium text-theme-muted">{enq.phone}</span>
+                      <span dir="ltr" className="font-medium text-theme-muted">{enq.phone}</span>
                     </div>
                   </div>
                 );
@@ -235,18 +238,18 @@ export default function EnquiriesManagement() {
               <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 pb-5 border-b border-theme-border">
                 <div>
                   <div className="flex items-center gap-2.5">
-                    <h2 className="text-xl alata-regular text-theme-ink">
+                    <h2 dir="auto" className="text-xl alata-regular text-theme-ink">
                       {current.patientName}
                     </h2>
                     <span className={`px-2.5 py-0.5 rounded-full text-[10px] alata-regular border uppercase tracking-wider ${statusColors[current.status]}`}>
-                      {current.status}
+                      {t(`status.${current.status}`, { defaultValue: current.status })}
                     </span>
                   </div>
 
                   <div className="flex flex-wrap items-center gap-3 mt-1.5 text-xs text-theme-muted">
-                    <span className="font-medium text-theme-ink">{current.phone}</span>
+                    <span dir="ltr" className="font-medium text-theme-ink">{current.phone}</span>
                     <span>•</span>
-                    <span>{current.email}</span>
+                    <span dir="ltr">{current.email}</span>
                     <span>•</span>
                     <span className="text-theme-subtle">{current.createdAt}</span>
                   </div>
@@ -257,26 +260,26 @@ export default function EnquiriesManagement() {
                   <button
                     onClick={() => handleOpenWhatsApp(current)}
                     className="px-4 py-2 rounded-full bg-[#25D366] text-white hover:bg-[#1fb355] text-xs alata-regular flex items-center gap-1.5 transition-colors shadow-sm"
-                    title="Open WhatsApp chat with prefilled reply"
+                    title={t('enquiries.whatsapp')}
                   >
                     <AppIcon name="whatsapp" className="text-sm" />
-                    <span>WhatsApp</span>
+                    <span>{t('enquiries.whatsapp')}</span>
                   </button>
 
                   <button
                     onClick={() => handleOpenEmailModal(current)}
                     className="px-4 py-2 rounded-full bg-theme-primary text-white hover:bg-theme-primary-hover text-xs alata-regular flex items-center gap-1.5 transition-colors shadow-sm"
-                    title="Draft email response"
+                    title={t('enquiries.emailPatient')}
                   >
                     <AppIcon name="mail" />
-                    <span>Email Patient</span>
+                    <span>{t('enquiries.emailPatient')}</span>
                   </button>
 
                   <a
                     href={`tel:${current.phone}`}
-                    aria-label="Call patient"
+                    aria-label={t('enquiries.callPatient')}
                     className="min-w-[44px] min-h-[44px] rounded-full border border-theme-border-strong text-theme-primary hover:bg-theme-canvas flex items-center justify-center transition-colors"
-                    title="Call Patient"
+                    title={t('enquiries.callPatient')}
                   >
                     <AppIcon name="phone" className="text-sm" />
                   </a>
@@ -285,24 +288,19 @@ export default function EnquiriesManagement() {
 
               {/* Status Selector Strip */}
               <div className="p-3.5 bg-theme-surface rounded-2xl border border-theme-border-slate flex flex-wrap items-center justify-between gap-3 text-xs">
-                <span className="alata-regular text-theme-ink">Enquiry Status:</span>
+                <span className="alata-regular text-theme-ink">{t('enquiries.enquiryStatus')}</span>
                 <div className="flex items-center gap-1.5">
-                  {[
-                    { id: 'new', label: 'New' },
-                    { id: 'contacted', label: 'Contacted' },
-                    { id: 'booked', label: 'Booked' },
-                    { id: 'closed', label: 'Closed' }
-                  ].map((s) => (
+                  {['new', 'contacted', 'booked', 'closed'].map((s) => (
                     <button
-                      key={s.id}
-                      onClick={() => updateEnquiryStatus(current.id, s.id)}
+                      key={s}
+                      onClick={() => updateEnquiryStatus(current.id, s)}
                       className={`px-3.5 py-1 rounded-full text-xs alata-regular capitalize transition-all ${
-                        current.status === s.id
+                        current.status === s
                           ? 'bg-theme-primary text-white shadow-xs'
                           : 'bg-theme-card text-theme-muted hover:bg-theme-canvas border border-theme-border-slate'
                       }`}
                     >
-                      {s.label}
+                      {t(`status.${s}`)}
                     </button>
                   ))}
                 </div>
@@ -311,19 +309,19 @@ export default function EnquiriesManagement() {
               {/* Requested Treatment Details */}
               <div className="p-4 bg-theme-canvas rounded-2xl border border-theme-border space-y-2">
                 <span className="text-[10px] alata-regular uppercase tracking-wider text-theme-primary block">
-                  Requested Treatment
+                  {t('enquiries.requestedTreatment')}
                 </span>
-                <h4 className="text-sm alata-regular text-theme-ink">
+                <h4 dir="auto" className="text-sm alata-regular text-theme-ink">
                   {current.requestedService}
                 </h4>
                 <div className="flex items-center gap-4 text-xs text-theme-muted pt-1">
                   <span className="flex items-center gap-1.5">
                     <AppIcon name="calendar" className="text-theme-primary" />
-                    <span>Preferred Date: <strong className="text-theme-ink">{current.preferredDate}</strong></span>
+                    <span>{t('enquiries.preferredDate')} <strong className="text-theme-ink">{current.preferredDate}</strong></span>
                   </span>
                   <span className="flex items-center gap-1.5">
                     <AppIcon name="clock" className="text-theme-primary" />
-                    <span>Time: <strong className="text-theme-ink">{current.preferredTime}</strong></span>
+                    <span>{t('enquiries.time')} <strong className="text-theme-ink">{current.preferredTime}</strong></span>
                   </span>
                 </div>
               </div>
@@ -331,9 +329,9 @@ export default function EnquiriesManagement() {
               {/* Customer Inquiry Message */}
               <div className="space-y-1.5">
                 <span className="text-xs alata-regular uppercase tracking-wider text-theme-muted">
-                  Patient Message / Notes
+                  {t('enquiries.patientMessage')}
                 </span>
-                <div className="p-4 bg-theme-surface rounded-2xl border border-theme-border-slate text-xs text-theme-ink leading-relaxed italic">
+                <div dir="auto" className="p-4 bg-theme-surface rounded-2xl border border-theme-border-slate text-xs text-theme-ink leading-relaxed italic">
                   "{current.message}"
                 </div>
               </div>
@@ -341,44 +339,45 @@ export default function EnquiriesManagement() {
               {/* Follow-up Notes History */}
               <div className="space-y-3 pt-2 border-t border-theme-border">
                 <span className="text-xs alata-regular uppercase tracking-wider text-theme-ink block">
-                  Internal Follow-Up Log ({current.notes?.length || 0})
+                  {t('enquiries.followUpLog', { count: current.notes?.length || 0 })}
                 </span>
 
                 {current.notes && current.notes.length > 0 ? (
-                  <div className="space-y-2 max-h-36 overflow-y-auto pr-1">
+                  <div className="space-y-2 max-h-36 overflow-y-auto pe-1">
                     {current.notes.map((n, i) => (
                       <div key={i} className="p-3 rounded-xl bg-theme-surface border border-theme-border-slate text-xs flex items-start justify-between gap-3">
-                        <span className="text-theme-ink">{n.text}</span>
+                        <span dir="auto" className="text-theme-ink">{n.text}</span>
                         <span className="text-[10px] text-theme-subtle whitespace-nowrap">{n.date}</span>
                       </div>
                     ))}
                   </div>
                 ) : (
                   <p className="text-xs text-theme-subtle italic">
-                    No follow-up notes logged yet. Contact patient or add a clinical note below.
+                    {t('enquiries.noNotes')}
                   </p>
                 )}
 
                 <form onSubmit={handleAddNoteSubmit} className="flex gap-2 pt-1">
                   <input
                     type="text"
+                    dir="auto"
                     value={noteInput}
                     onChange={(e) => setNoteInput(e.target.value)}
-                    placeholder="Add follow-up note (e.g. 'Confirmed appointment for Thursday 4:30 PM')..."
+                    placeholder={t('enquiries.notePlaceholder')}
                     className="flex-1 px-3.5 py-2.5 rounded-xl border border-theme-border-slate bg-theme-surface focus:bg-theme-card text-xs text-theme-ink focus:outline-none focus:ring-2 focus:ring-theme-primary/30"
                   />
                   <button
                     type="submit"
                     className="px-5 py-2.5 rounded-full bg-theme-primary text-white text-xs alata-regular hover:bg-theme-primary-hover transition-colors shadow-sm"
                   >
-                    Add Note
+                    {t('enquiries.addNote')}
                   </button>
                 </form>
               </div>
             </div>
           ) : (
             <div className="h-full flex items-center justify-center text-theme-subtle text-sm">
-              Select an enquiry from the left list to view details and contact the patient.
+              {t('enquiries.selectPrompt')}
             </div>
           )}
         </div>
@@ -391,12 +390,12 @@ export default function EnquiriesManagement() {
             <div className="my-auto bg-theme-card rounded-3xl shadow-2xl max-w-lg w-full max-h-[92vh] overflow-hidden flex flex-col border border-theme-border">
             <div className="p-6 bg-theme-sidebar-bg text-white flex items-center justify-between">
               <div>
-                <h3 className="text-lg alata-regular">Compose Email to {current.patientName}</h3>
-                <p className="text-xs text-theme-sidebar-kicker">Direct response via clinic mail</p>
+                <h3 className="text-lg alata-regular">{t('enquiries.composeEmail', { name: current.patientName })}</h3>
+                <p className="text-xs text-theme-sidebar-kicker">{t('enquiries.directViaMail')}</p>
               </div>
               <button
                 onClick={() => setShowEmailModal(false)}
-                aria-label="Close email composer"
+                aria-label={t('common.close')}
                 className="text-white/70 hover:text-white min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl hover:bg-white/10"
               >
                 <AppIcon name="close" className="text-base" />
@@ -405,19 +404,21 @@ export default function EnquiriesManagement() {
 
             <div className="p-6 space-y-4 text-xs overflow-y-auto flex-1">
               <div>
-                <label className="block text-xs font-semibold text-theme-ink mb-1">To</label>
+                <label className="block text-xs font-semibold text-theme-ink mb-1">{t('enquiries.toLabel')}</label>
                 <input
                   type="text"
                   readOnly
+                  dir="ltr"
                   value={`${current.patientName} <${current.email}>`}
                   className="w-full px-3 py-2 rounded-xl border border-theme-border-slate bg-theme-surface text-theme-muted"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-theme-ink mb-1">Subject</label>
+                <label className="block text-xs font-semibold text-theme-ink mb-1">{t('enquiries.subjectLabel')}</label>
                 <input
                   type="text"
+                  dir="auto"
                   value={emailDraft.subject}
                   onChange={(e) => setEmailDraft({ ...emailDraft, subject: e.target.value })}
                   className="w-full px-3 py-2 rounded-xl border border-theme-border-slate text-theme-ink focus:outline-none focus:ring-2 focus:ring-theme-primary/30"
@@ -425,9 +426,10 @@ export default function EnquiriesManagement() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-theme-ink mb-1">Message Body</label>
+                <label className="block text-xs font-semibold text-theme-ink mb-1">{t('enquiries.messageBodyLabel')}</label>
                 <textarea
                   rows={8}
+                  dir="auto"
                   value={emailDraft.message}
                   onChange={(e) => setEmailDraft({ ...emailDraft, message: e.target.value })}
                   className="w-full px-3 py-2 rounded-xl border border-theme-border-slate text-theme-ink focus:outline-none focus:ring-2 focus:ring-theme-primary/30 leading-relaxed"
@@ -440,7 +442,7 @@ export default function EnquiriesManagement() {
                   onClick={() => setShowEmailModal(false)}
                   className="px-4 py-2 rounded-full border border-theme-border-slate text-theme-muted hover:bg-theme-surface font-medium"
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </button>
                 <button
                   type="button"
@@ -448,7 +450,7 @@ export default function EnquiriesManagement() {
                   className="px-5 py-2 rounded-full bg-theme-primary text-white alata-regular hover:bg-theme-primary-hover flex items-center gap-1.5"
                 >
                   <AppIcon name="paper-plane" />
-                  <span>Send via Email Client</span>
+                  <span>{t('enquiries.sendViaEmail')}</span>
                 </button>
               </div>
             </div>

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useClinic } from '../../context/ClinicContext';
 import AppIcon from '../common/AppIcon';
 import {
@@ -11,6 +12,7 @@ import {
 const PROHIBITED_REGEX = /(?:\bbest\b|#\s*1\b|\bno\.?\s*1\b|\bnumber\s*(?:one|1)\b|\bcheapest\b|\b100%\b|\bguarantee[ds]?\b|\bonly\b|\bunbeatable\b|\blowest\s+price\b|\bmost\s+advanced\b)/i;
 
 export default function ClinicProfile({ onOpenPreview }) {
+  const { t } = useTranslation();
   const {
     clinicData,
     setClinicData,
@@ -80,10 +82,8 @@ export default function ClinicProfile({ onOpenPreview }) {
     setSuccessMessage('');
 
     if (hasComplianceViolation) {
-      setErrorMessage(
-        "MOHAP Compliance Violation: Promotional superlatives like 'best', 'only', '#1', or '100% guarantee' are strictly prohibited under UAE Healthcare Advertising rules (Rule V08). Please use factual medical descriptions."
-      );
-      showToast?.('error', 'MOHAP Wording Violation', 'Remove superlatives before saving.');
+      setErrorMessage(t('profile.mohapViolation'));
+      showToast?.('error', t('profile.mohapToastTitle'), t('profile.mohapToastMsg'));
       return;
     }
 
@@ -105,11 +105,11 @@ export default function ClinicProfile({ onOpenPreview }) {
         );
       }
       setClinicData((prev) => ({ ...prev, ...form }));
-      setSuccessMessage('Clinic profile successfully verified and updated.');
-      showToast?.('success', 'Profile Updated', 'Profile details saved and active.');
+      setSuccessMessage(t('profile.updateSuccess'));
+      showToast?.('success', t('profile.toastUpdatedTitle'), t('profile.toastUpdatedMsg'));
     } catch (err) {
-      setErrorMessage(err.message || 'Could not update clinic profile.');
-      showToast?.('error', 'Update Failed', err.message);
+      setErrorMessage(err.message || t('profile.updateError'));
+      showToast?.('error', t('profile.toastFailedTitle'), err.message);
     } finally {
       setIsSubmitting(false);
     }
@@ -132,7 +132,7 @@ export default function ClinicProfile({ onOpenPreview }) {
           setForm((prev) => ({ ...prev, logo: newUrl }));
           setClinicData((prev) => ({ ...prev, logo: newUrl }));
         }
-        showToast?.('success', 'Brand Asset Updated', `${assetType === 'cover' ? 'Cover banner' : 'Clinic logo'} updated successfully.`);
+        showToast?.('success', t('profile.brandAssetUpdated'), assetType === 'cover' ? t('profile.coverUpdated') : t('profile.logoUpdated'));
       } else {
         const localUrl = URL.createObjectURL(file);
         if (assetType === 'cover') setForm((prev) => ({ ...prev, coverImage: localUrl }));
@@ -159,7 +159,7 @@ export default function ClinicProfile({ onOpenPreview }) {
         setForm((prev) => ({ ...prev, logo: '' }));
         setClinicData((prev) => ({ ...prev, logo: '' }));
       }
-      showToast?.('info', 'Brand Asset Removed', `${assetType === 'cover' ? 'Cover banner' : 'Clinic logo'} removed.`);
+      showToast?.('info', t('profile.brandAssetRemoved'), assetType === 'cover' ? t('profile.coverRemoved') : t('profile.logoRemoved'));
     } catch (err) {
       setErrorMessage(err.message || `Failed to remove ${assetType}.`);
     } finally {
@@ -204,10 +204,10 @@ export default function ClinicProfile({ onOpenPreview }) {
           </div>
           <div>
             <h1 className="text-2xl sm:text-3xl alata-regular text-theme-ink tracking-tight">
-              Clinic Profile
+              {t('profile.title')}
             </h1>
             <p className="text-xs text-theme-muted mt-0.5">
-              Manage your verified business credentials, public details, and brand assets for patient discovery.
+              {t('profile.subtitle')}
             </p>
           </div>
         </div>
@@ -218,14 +218,14 @@ export default function ClinicProfile({ onOpenPreview }) {
             onClick={handleTriggerProhibited}
             className="px-3.5 py-2 rounded-full bg-[#FEE2E2] text-[#991B1B] hover:bg-[#FECACA] border border-[#FECACA] text-xs alata-regular transition"
           >
-            Test "Best" Rejection
+            {t('profile.testBestRejection')}
           </button>
           <button
             type="button"
             onClick={handleResetValid}
             className="px-3.5 py-2 rounded-full bg-theme-canvas text-theme-primary hover:bg-theme-primary-soft border border-theme-border-strong text-xs alata-regular transition"
           >
-            Reset Factual Name
+            {t('profile.resetFactualName')}
           </button>
           <button
             type="button"
@@ -233,7 +233,7 @@ export default function ClinicProfile({ onOpenPreview }) {
             className="px-5 py-2 rounded-full bg-theme-primary text-white hover:bg-theme-primary-hover transition-colors text-xs alata-regular flex items-center gap-2 shadow-sm"
           >
             <AppIcon name="eye" />
-            <span>Customer Preview</span>
+            <span>{t('profile.customerPreview')}</span>
           </button>
         </div>
       </div>
@@ -243,8 +243,8 @@ export default function ClinicProfile({ onOpenPreview }) {
         <div role="alert" className="rounded-2xl border border-[#FECACA] bg-[#FEE2E2] p-4 text-xs text-[#991B1B] flex items-start gap-2.5">
           <AppIcon name="warning-circle" className="text-sm text-[#DC2626] shrink-0 mt-0.5" />
           <div className="flex-1">
-            <span className="alata-regular block mb-0.5">Validation / Compliance Alert:</span>
-            <span>{errorMessage}</span>
+            <span className="alata-regular block mb-0.5">{t('profile.validationAlert')}</span>
+            <span dir="auto">{errorMessage}</span>
           </div>
         </div>
       )}
@@ -261,7 +261,7 @@ export default function ClinicProfile({ onOpenPreview }) {
         {/* Cover & Logo Section */}
         <div className="space-y-3">
           <label className="block text-xs alata-regular text-theme-primary uppercase tracking-wider">
-            Brand Assets (Cover Banner & Clinic Logo)
+            {t('profile.brandAssetsLabel')}
           </label>
 
           <div className="relative h-48 sm:h-64 rounded-2xl overflow-hidden bg-theme-surface border border-theme-border-slate group">
@@ -278,7 +278,7 @@ export default function ClinicProfile({ onOpenPreview }) {
                 className="px-4 py-2 bg-theme-card/95 text-theme-ink rounded-full text-xs alata-regular hover:bg-theme-card shadow-lg flex items-center gap-2 transition"
               >
                 <AppIcon name={uploadingAsset === 'cover' ? 'spinner' : 'cloud-upload'} spin={uploadingAsset === 'cover'} />
-                <span>{uploadingAsset === 'cover' ? 'Uploading...' : 'Change Cover Banner'}</span>
+                <span>{uploadingAsset === 'cover' ? t('profile.uploading') : t('profile.changeCover')}</span>
               </button>
             </div>
             <input
@@ -290,7 +290,7 @@ export default function ClinicProfile({ onOpenPreview }) {
             />
 
             {/* Logo Overlay */}
-            <div className="absolute bottom-4 left-4 flex items-end gap-3">
+            <div className="absolute bottom-4 start-4 flex items-end gap-3">
               <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-2xl bg-theme-card p-1.5 shadow-xl border border-theme-border relative group/logo overflow-hidden">
                 <img
                   src={form.logo}
@@ -303,7 +303,7 @@ export default function ClinicProfile({ onOpenPreview }) {
                   disabled={uploadingAsset === 'logo'}
                   className="absolute inset-1.5 bg-theme-overlay/60 rounded-xl opacity-0 group-hover/logo:opacity-100 transition-opacity flex items-center justify-center text-white text-[10px] alata-regular"
                 >
-                  {uploadingAsset === 'logo' ? <AppIcon name="spinner" spin /> : 'Update'}
+                  {uploadingAsset === 'logo' ? <AppIcon name="spinner" spin /> : t('profile.updateLogo')}
                 </button>
                 <input
                   type="file"
@@ -314,13 +314,13 @@ export default function ClinicProfile({ onOpenPreview }) {
                 />
               </div>
               <div className="text-white drop-shadow-md pb-1 hidden sm:block">
-                <p className="text-sm alata-regular">{form.displayName || 'Clinic Name'}</p>
-                <p className="text-xs text-theme-primary-soft">{form.category || 'Medical Facility'}</p>
+                <p dir="auto" className="text-sm alata-regular">{form.displayName || t('profile.clinicNameFallback')}</p>
+                <p dir="auto" className="text-xs text-theme-primary-soft">{form.category || t('profile.medicalFacilityFallback')}</p>
               </div>
             </div>
           </div>
           <p className="text-[11px] text-theme-muted">
-            Recommended size: 1200×400px for cover banner, 400×400px square for logo. Supported: JPG, PNG, WebP (Max 15MB).
+            {t('profile.assetHint')}
           </p>
         </div>
 
@@ -329,16 +329,17 @@ export default function ClinicProfile({ onOpenPreview }) {
           <div>
             <div className="flex items-center justify-between mb-1.5">
               <label className="text-xs alata-regular text-theme-ink uppercase tracking-wider">
-                Public Display / Trading Name *
+                {t('profile.displayNameLabel')}
               </label>
               {displayNameViolation && (
                 <span className="text-[11px] font-semibold text-[#DC2626] flex items-center gap-1">
-                  <AppIcon name="warning-circle" /> Prohibited Superlative Detected
+                  <AppIcon name="warning-circle" /> {t('profile.prohibitedSuperlative')}
                 </span>
               )}
             </div>
             <input
               type="text"
+              dir="auto"
               value={form.displayName}
               onChange={(e) => setForm({ ...form, displayName: e.target.value })}
               className={`w-full px-3.5 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 transition ${
@@ -346,33 +347,34 @@ export default function ClinicProfile({ onOpenPreview }) {
                   ? 'border-[#DC2626] bg-[#FEF2F2] focus:ring-rose-200 text-[#991B1B] font-medium'
                   : 'border-theme-border-slate bg-theme-surface focus:bg-theme-card focus:ring-theme-primary/20 focus:border-theme-primary'
               }`}
-              placeholder="e.g. Al Noor Aesthetic & Laser Clinic"
+              placeholder={t('profile.displayNamePlaceholder')}
               required
             />
             <p className="text-[11px] text-theme-muted mt-1">
-              Must be factual and match licensed medical naming. Avoid words like <em>best, #1, cheapest, only</em>.
+              {t('profile.displayNameHint')}
             </p>
           </div>
 
           <div>
             <label className="block text-xs alata-regular text-theme-ink uppercase tracking-wider mb-1.5">
-              Legal Registered Entity Name (Read-Only)
+              {t('profile.legalNameLabel')}
             </label>
             <div className="relative">
               <input
                 type="text"
+                dir="auto"
                 value={form.legalName}
                 readOnly
                 disabled
                 className="w-full px-3.5 py-2.5 rounded-xl border border-theme-border-slate bg-theme-surface-muted text-theme-muted text-sm cursor-not-allowed"
               />
-              <span className="absolute right-3 top-2.5 text-[11px] alata-regular text-[#166534] flex items-center gap-1">
+              <span className="absolute end-3 top-2.5 text-[11px] alata-regular text-[#166534] flex items-center gap-1">
                 <AppIcon name="shield-check" className="text-[#16A34A]" />
-                DHA Verified
+                {t('profile.dhaVerified')}
               </span>
             </div>
             <p className="text-[11px] text-theme-muted mt-1">
-              Tied to government commercial trade licence & facility accreditation.
+              {t('profile.legalNameHint')}
             </p>
           </div>
         </div>
@@ -381,20 +383,21 @@ export default function ClinicProfile({ onOpenPreview }) {
         <div className="pt-2">
           <div className="flex items-center justify-between mb-1.5">
             <label className="text-xs alata-regular text-theme-ink uppercase tracking-wider">
-              About Clinic / Public Description *
+              {t('profile.descriptionLabel')}
             </label>
             {descriptionViolation ? (
               <span className="text-[11px] font-semibold text-[#DC2626] flex items-center gap-1">
-                <AppIcon name="warning-circle" /> MOHAP Rule V08: Superlatives Prohibited
+                <AppIcon name="warning-circle" /> {t('profile.mohapRuleV08')}
               </span>
             ) : (
               <span className="text-[11px] font-semibold text-[#166534] flex items-center gap-1">
-                <AppIcon name="shield-check" /> Factual Medical Content
+                <AppIcon name="shield-check" /> {t('profile.factualContent')}
               </span>
             )}
           </div>
           <textarea
             rows={4}
+            dir="auto"
             value={form.description}
             onChange={(e) => setForm({ ...form, description: e.target.value })}
             className={`w-full px-3.5 py-2.5 rounded-xl border text-sm focus:outline-none focus:ring-2 transition ${
@@ -402,14 +405,14 @@ export default function ClinicProfile({ onOpenPreview }) {
                 ? 'border-[#DC2626] bg-[#FEF2F2] focus:ring-rose-200 text-[#991B1B] font-medium'
                 : 'border-theme-border-slate bg-theme-surface focus:bg-theme-card focus:ring-theme-primary/20 focus:border-theme-primary'
             }`}
-            placeholder="Describe clinical scope, diagnostic capabilities, equipment, and medical specializations factually."
+            placeholder={t('profile.descriptionPlaceholder')}
             required
           />
           <div className="flex items-center justify-between mt-1 text-[11px]">
             <span className="text-theme-muted">
-              UAE Health Advertising Law strictly bans promotional claims, superlative cures, or price guarantee claims.
+              {t('profile.descriptionHint')}
             </span>
-            <span className="text-theme-subtle">{form.description.length} chars</span>
+            <span className="text-theme-subtle">{t('profile.charsCount', { count: form.description.length })}</span>
           </div>
         </div>
 
@@ -417,15 +420,16 @@ export default function ClinicProfile({ onOpenPreview }) {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-theme-border">
           <div>
             <label className="block text-xs alata-regular text-theme-ink uppercase tracking-wider mb-1.5">
-              Contact Phone (UAE) *
+              {t('profile.phoneLabel')}
             </label>
             <div className="relative">
-              <AppIcon name="phone" className="text-xs text-theme-subtle absolute left-3.5 top-3.5" />
+              <AppIcon name="phone" className="text-xs text-theme-subtle absolute start-3.5 top-3.5" />
               <input
                 type="text"
+                dir="ltr"
                 value={form.contactPhone}
                 onChange={(e) => setForm({ ...form, contactPhone: e.target.value })}
-                className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-theme-border-slate bg-theme-surface focus:bg-theme-card text-sm focus:outline-none focus:ring-2 focus:ring-theme-primary/20 focus:border-theme-primary"
+                className="w-full ps-9 pe-3.5 py-2.5 rounded-xl border border-theme-border-slate bg-theme-surface focus:bg-theme-card text-sm focus:outline-none focus:ring-2 focus:ring-theme-primary/20 focus:border-theme-primary"
                 placeholder="+971 4 123 4567"
                 required
               />
@@ -434,15 +438,16 @@ export default function ClinicProfile({ onOpenPreview }) {
 
           <div>
             <label className="block text-xs alata-regular text-theme-ink uppercase tracking-wider mb-1.5">
-              Primary Clinic Email *
+              {t('profile.emailLabel')}
             </label>
             <div className="relative">
-              <AppIcon name="mail" className="text-xs text-theme-subtle absolute left-3.5 top-3.5" />
+              <AppIcon name="mail" className="text-xs text-theme-subtle absolute start-3.5 top-3.5" />
               <input
                 type="email"
+                dir="ltr"
                 value={form.companyEmail}
                 onChange={(e) => setForm({ ...form, companyEmail: e.target.value })}
-                className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-theme-border-slate bg-theme-surface focus:bg-theme-card text-sm focus:outline-none focus:ring-2 focus:ring-theme-primary/20 focus:border-theme-primary"
+                className="w-full ps-9 pe-3.5 py-2.5 rounded-xl border border-theme-border-slate bg-theme-surface focus:bg-theme-card text-sm focus:outline-none focus:ring-2 focus:ring-theme-primary/20 focus:border-theme-primary"
                 placeholder="contact@clinic.ae"
                 required
               />
@@ -451,15 +456,16 @@ export default function ClinicProfile({ onOpenPreview }) {
 
           <div>
             <label className="block text-xs alata-regular text-theme-ink uppercase tracking-wider mb-1.5">
-              Official Website
+              {t('profile.websiteLabel')}
             </label>
             <div className="relative">
-              <AppIcon name="globe" className="text-xs text-theme-subtle absolute left-3.5 top-3.5" />
+              <AppIcon name="globe" className="text-xs text-theme-subtle absolute start-3.5 top-3.5" />
               <input
                 type="url"
+                dir="ltr"
                 value={form.website}
                 onChange={(e) => setForm({ ...form, website: e.target.value })}
-                className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-theme-border-slate bg-theme-surface focus:bg-theme-card text-sm focus:outline-none focus:ring-2 focus:ring-theme-primary/20 focus:border-theme-primary"
+                className="w-full ps-9 pe-3.5 py-2.5 rounded-xl border border-theme-border-slate bg-theme-surface focus:bg-theme-card text-sm focus:outline-none focus:ring-2 focus:ring-theme-primary/20 focus:border-theme-primary"
                 placeholder="https://alnoorclinic.ae"
               />
             </div>
@@ -470,15 +476,16 @@ export default function ClinicProfile({ onOpenPreview }) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
           <div>
             <label className="block text-xs alata-regular text-theme-ink uppercase tracking-wider mb-1.5">
-              Physical Street Address *
+              {t('profile.addressLabel')}
             </label>
             <div className="relative">
-              <AppIcon name="map-pin" className="text-xs text-theme-subtle absolute left-3.5 top-3.5" />
+              <AppIcon name="map-pin" className="text-xs text-theme-subtle absolute start-3.5 top-3.5" />
               <input
                 type="text"
+                dir="auto"
                 value={form.address}
                 onChange={(e) => setForm({ ...form, address: e.target.value })}
-                className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-theme-border-slate bg-theme-surface focus:bg-theme-card text-sm focus:outline-none focus:ring-2 focus:ring-theme-primary/20 focus:border-theme-primary"
+                className="w-full ps-9 pe-3.5 py-2.5 rounded-xl border border-theme-border-slate bg-theme-surface focus:bg-theme-card text-sm focus:outline-none focus:ring-2 focus:ring-theme-primary/20 focus:border-theme-primary"
                 placeholder="Villa 14, Al Wasl Road, Jumeirah 1, Dubai"
                 required
               />
@@ -487,15 +494,16 @@ export default function ClinicProfile({ onOpenPreview }) {
 
           <div>
             <label className="block text-xs alata-regular text-theme-ink uppercase tracking-wider mb-1.5">
-              Operating Hours *
+              {t('profile.hoursLabel')}
             </label>
             <div className="relative">
-              <AppIcon name="clock" className="text-xs text-theme-subtle absolute left-3.5 top-3.5" />
+              <AppIcon name="clock" className="text-xs text-theme-subtle absolute start-3.5 top-3.5" />
               <input
                 type="text"
+                dir="auto"
                 value={form.openingHours}
                 onChange={(e) => setForm({ ...form, openingHours: e.target.value })}
-                className="w-full pl-9 pr-3.5 py-2.5 rounded-xl border border-theme-border-slate bg-theme-surface focus:bg-theme-card text-sm focus:outline-none focus:ring-2 focus:ring-theme-primary/20 focus:border-theme-primary"
+                className="w-full ps-9 pe-3.5 py-2.5 rounded-xl border border-theme-border-slate bg-theme-surface focus:bg-theme-card text-sm focus:outline-none focus:ring-2 focus:ring-theme-primary/20 focus:border-theme-primary"
                 placeholder="Mon - Sat: 9:00 AM - 8:00 PM | Sun: Closed"
                 required
               />
@@ -507,7 +515,7 @@ export default function ClinicProfile({ onOpenPreview }) {
         <div className="pt-4 border-t border-theme-border flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="text-xs text-theme-muted flex items-center gap-2">
             <AppIcon name="shield-check" className="text-[#16A34A]" />
-            <span>Updates are validated against MOHAP healthcare advertising guidelines.</span>
+            <span>{t('profile.guidelinesNotice')}</span>
           </div>
 
           <button
@@ -516,7 +524,7 @@ export default function ClinicProfile({ onOpenPreview }) {
             className="px-6 py-2.5 rounded-full bg-theme-primary text-white hover:bg-theme-primary-hover text-xs alata-regular flex items-center justify-center gap-2 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <AppIcon name={isSubmitting ? 'spinner' : 'save'} spin={isSubmitting} />
-            <span>{isSubmitting ? 'Verifying...' : 'Save Profile Details'}</span>
+            <span>{isSubmitting ? t('profile.verifying') : t('profile.saveButton')}</span>
           </button>
         </div>
       </form>

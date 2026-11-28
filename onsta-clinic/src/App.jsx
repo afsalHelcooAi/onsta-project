@@ -1,5 +1,6 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { ClinicProvider, useClinic } from './context/ClinicContext';
 import LoginPage from './components/auth/LoginPage';
 import DashboardLayout from './components/layout/DashboardLayout';
@@ -16,8 +17,9 @@ import ApplicationStatusPage from './components/auth/ApplicationStatusPage';
 
 // Guard for Registration Module: Requires login
 function RequireAuth({ children }) {
+  const { t } = useTranslation();
   const { auth, authReady } = useClinic();
-  if (!authReady) return <div className="flex min-h-screen items-center justify-center">Loading secure session…</div>;
+  if (!authReady) return <div className="flex min-h-screen items-center justify-center">{t('common.loadingSession')}</div>;
   if (!auth.isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
@@ -26,9 +28,10 @@ function RequireAuth({ children }) {
 
 // Guard for Management Dashboard: Requires login AND approved status!
 function RequireApprovedClinic({ children }) {
+  const { t } = useTranslation();
   const { auth, authReady, clinicData } = useClinic();
 
-  if (!authReady) return <div className="flex min-h-screen items-center justify-center">Loading secure session…</div>;
+  if (!authReady) return <div className="flex min-h-screen items-center justify-center">{t('common.loadingSession')}</div>;
 
   if (!auth.isAuthenticated) {
     return <Navigate to="/login" replace />;
@@ -44,9 +47,10 @@ function RequireApprovedClinic({ children }) {
 
 // Smart Root Redirect based on user state
 function RootRedirect() {
+  const { t } = useTranslation();
   const { auth, clinicData, authReady } = useClinic();
 
-  if (!authReady) return <div className="flex min-h-screen items-center justify-center">Loading secure session…</div>;
+  if (!authReady) return <div className="flex min-h-screen items-center justify-center">{t('common.loadingSession')}</div>;
 
   if (!auth.isAuthenticated) {
     return <Navigate to="/login" replace />;

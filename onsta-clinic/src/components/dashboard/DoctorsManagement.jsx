@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useClinic } from '../../context/ClinicContext';
 import {
   scanDoctorLicense,
@@ -14,6 +15,7 @@ import AppIcon from '../common/AppIcon';
 import ModalPortal from '../common/ModalPortal';
 
 export default function DoctorsManagement() {
+  const { t } = useTranslation();
   const {
     doctors = [],
     setDoctors,
@@ -103,12 +105,12 @@ export default function DoctorsManagement() {
     if (token) {
       try {
         await apiUpdateDoctor(doc.id, { service: newService }, token);
-        showToast?.('success', 'Service Assigned', `Assigned "${newService || 'Unassigned'}" to ${doc.fullName}.`);
+        showToast?.('success', t('doctors.toastServiceAssigned'), t('doctors.toastServiceAssignedMsg', { service: newService || t('doctors.unassigned'), name: doc.fullName }));
       } catch (err) {
-        showToast?.('error', 'Update Failed', err.message);
+        showToast?.('error', t('profile.toastFailedTitle'), err.message);
       }
     } else {
-      showToast?.('success', 'Service Assigned', `Assigned "${newService || 'Unassigned'}" to ${doc.fullName}.`);
+      showToast?.('success', t('doctors.toastServiceAssigned'), t('doctors.toastServiceAssignedMsg', { service: newService || t('doctors.unassigned'), name: doc.fullName }));
     }
   };
 
@@ -361,7 +363,7 @@ export default function DoctorsManagement() {
           };
           setDoctors((prev) => [newDoc, ...prev]);
         }
-        showToast?.('success', 'Doctor Saved', `${payload.fullName} saved.`);
+        showToast?.('success', t('doctors.toastSaved'), t('doctors.toastSavedMsg', { name: payload.fullName }));
       }
 
       setIsModalOpen(false);
@@ -385,8 +387,10 @@ export default function DoctorsManagement() {
       );
       showToast?.(
         'info',
-        'Visibility Updated',
-        `${doc.fullName} is now ${nextStatus ? 'active and visible on marketplace' : 'hidden from public view'}.`
+        t('doctors.toastVisibility'),
+        nextStatus
+          ? t('doctors.toastVisibilityVisible', { name: doc.fullName })
+          : t('doctors.toastVisibilityHidden', { name: doc.fullName })
       );
     } catch (err) {
       showToast?.('error', 'Status Update Failed', err.message);
@@ -395,14 +399,14 @@ export default function DoctorsManagement() {
 
   // Delete Doctor
   const handleDelete = async (doc) => {
-    if (!confirm(`Are you sure you want to remove ${doc.fullName} from the clinic roster?`)) return;
+    if (!confirm(t('doctors.confirmRemove', { name: doc.fullName }))) return;
 
     try {
       if (token) {
         await apiDeleteDoctor(doc.id, token);
       }
       setDoctors((prev) => prev.filter((d) => d.id !== doc.id));
-      showToast?.('info', 'Doctor Removed', `${doc.fullName} removed from roster.`);
+      showToast?.('info', t('doctors.toastRemoved'), t('doctors.toastRemovedMsg', { name: doc.fullName }));
     } catch (err) {
       showToast?.('error', 'Deletion Failed', err.message);
     }
@@ -431,10 +435,10 @@ export default function DoctorsManagement() {
           </div>
           <div>
             <h1 className="text-2xl sm:text-3xl alata-regular text-theme-ink tracking-tight">
-              Our Doctors & Clinical Team
+              {t('doctors.title')}
             </h1>
             <p className="text-xs text-theme-muted mt-0.5">
-              Manage licensed medical practitioners. Upload practice licences to auto-extract credentials instantly.
+              {t('doctors.subtitle')}
             </p>
           </div>
         </div>
@@ -445,33 +449,34 @@ export default function DoctorsManagement() {
           className="px-5 py-2.5 rounded-full bg-theme-primary text-white hover:bg-theme-primary-hover text-xs alata-regular flex items-center gap-2 transition-all shadow-sm hover:shadow-md self-start sm:self-center"
         >
           <AppIcon name="plus" className="text-xs" />
-          <span>Add New Doctor</span>
+          <span>{t('doctors.addNewDoctor')}</span>
         </button>
       </div>
 
       {/* Filters and Search Bar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-theme-card p-4 rounded-2xl border border-theme-border shadow-sm">
         <div className="relative flex-1">
-          <AppIcon name="search" className="text-xs text-theme-subtle absolute left-4 top-1/2 -translate-y-1/2" />
+          <AppIcon name="search" className="text-xs text-theme-subtle absolute start-4 top-1/2 -translate-y-1/2" />
           <input
             type="text"
-            placeholder="Search by doctor name, DHA licence no, or treatment service..."
+            dir="auto"
+            placeholder={t('doctors.searchPlaceholder')}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-theme-border-slate bg-theme-surface text-xs text-theme-ink focus:outline-none focus:bg-theme-card focus:ring-2 focus:ring-theme-primary/30 focus:border-theme-primary"
+            className="w-full ps-10 pe-4 py-2.5 rounded-xl border border-theme-border-slate bg-theme-surface text-xs text-theme-ink focus:outline-none focus:bg-theme-card focus:ring-2 focus:ring-theme-primary/30 focus:border-theme-primary"
           />
         </div>
 
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <span className="text-xs text-theme-muted font-medium">Service:</span>
+            <span className="text-xs text-theme-muted font-medium">{t('doctors.serviceFilter')}</span>
             <select
               value={selectedService}
               onChange={(e) => setSelectedService(e.target.value)}
               className="px-3 py-2 rounded-xl border border-theme-border-slate text-xs text-theme-ink bg-theme-surface focus:outline-none focus:ring-2 focus:ring-theme-primary/30 focus:border-theme-primary max-w-[220px]"
             >
               {serviceFilterOptions.map((s) => (
-                <option key={s} value={s}>{s}</option>
+                <option key={s} value={s}>{s === 'All' ? t('common.all') : s}</option>
               ))}
             </select>
           </div>
@@ -481,22 +486,22 @@ export default function DoctorsManagement() {
             <button
               type="button"
               onClick={() => setViewMode('grid')}
-              aria-label="Cards view"
+              aria-label={t('doctors.cardsView')}
               className={`min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-sm transition-all ${
                 viewMode === 'grid' ? 'bg-theme-card shadow-xs text-theme-primary' : 'text-theme-subtle hover:text-theme-ink'
               }`}
-              title="Cards view"
+              title={t('doctors.cardsView')}
             >
               <AppIcon name="grip" />
             </button>
             <button
               type="button"
               onClick={() => setViewMode('table')}
-              aria-label="Table view"
+              aria-label={t('doctors.tableView')}
               className={`min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-sm transition-all ${
                 viewMode === 'table' ? 'bg-theme-card shadow-xs text-theme-primary' : 'text-theme-subtle hover:text-theme-ink'
               }`}
-              title="Table view"
+              title={t('doctors.tableView')}
             >
               <AppIcon name="list" />
             </button>
@@ -508,15 +513,15 @@ export default function DoctorsManagement() {
       {viewMode === 'table' ? (
         <div className="bg-theme-card rounded-3xl border border-theme-border overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
+            <table className="w-full text-start text-xs">
               <thead className="bg-theme-canvas border-b border-theme-border text-theme-primary-hover alata-regular uppercase tracking-wider text-[11px]">
                 <tr>
-                  <th className="py-3.5 px-5">Doctor / Specialist</th>
-                  <th className="py-3.5 px-4">Authority & Licence</th>
-                  <th className="py-3.5 px-4 min-w-[240px]">Assigned Service</th>
-                  <th className="py-3.5 px-4">Consultation Fee</th>
-                  <th className="py-3.5 px-4">Status</th>
-                  <th className="py-3.5 px-4 text-right">Actions</th>
+                  <th className="py-3.5 px-5">{t('doctors.colDoctor')}</th>
+                  <th className="py-3.5 px-4">{t('doctors.colAuthority')}</th>
+                  <th className="py-3.5 px-4 min-w-[240px]">{t('doctors.colAssignedService')}</th>
+                  <th className="py-3.5 px-4">{t('doctors.colFee')}</th>
+                  <th className="py-3.5 px-4">{t('doctors.colStatus')}</th>
+                  <th className="py-3.5 px-4 text-end">{t('doctors.colActions')}</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-theme-border">
@@ -528,16 +533,16 @@ export default function DoctorsManagement() {
                           <DoctorAvatar photo={doc.photo} name={doc.fullName} className="w-10 h-10" iconSize="text-sm" />
                         </div>
                         <div>
-                          <div className="alata-regular text-theme-ink text-sm">{doc.fullName}</div>
-                          <div className="text-[11px] text-theme-primary font-medium">{doc.title || doc.specialty}</div>
+                          <div dir="auto" className="alata-regular text-theme-ink text-sm">{doc.fullName}</div>
+                          <div dir="auto" className="text-[11px] text-theme-primary font-medium">{doc.title || doc.specialty}</div>
                         </div>
                       </div>
                     </td>
                     <td className="py-3.5 px-4">
-                      <span className="alata-regular text-theme-ink bg-theme-surface px-2.5 py-0.5 rounded-lg border border-theme-border-slate text-[11px]">
+                      <span dir="ltr" className="alata-regular text-theme-ink bg-theme-surface px-2.5 py-0.5 rounded-lg border border-theme-border-slate text-[11px]">
                         {doc.licenceNumber}
                       </span>
-                      <div className="text-[10px] text-theme-muted mt-0.5">{doc.authority || 'DHA'} Licensed</div>
+                      <div className="text-[10px] text-theme-muted mt-0.5">{t('doctors.licensedSuffix', { authority: doc.authority || 'DHA' })}</div>
                     </td>
                     <td className="py-3.5 px-4">
                       <select
@@ -545,14 +550,14 @@ export default function DoctorsManagement() {
                         onChange={(e) => handleServiceChange(doc, e.target.value)}
                         className="w-full text-xs py-1.5 px-2.5 rounded-xl border border-theme-border-slate bg-theme-card hover:border-theme-border-strong font-medium text-theme-ink focus:outline-none focus:ring-2 focus:ring-theme-primary/30 cursor-pointer"
                       >
-                        <option value="">Unassigned</option>
+                        <option value="">{t('doctors.unassigned')}</option>
                         {clinicServiceNames.map((s) => (
                           <option key={s} value={s}>{s}</option>
                         ))}
                       </select>
                     </td>
                     <td className="py-3.5 px-4 alata-regular text-theme-primary text-sm">
-                      {doc.consultationFee ? `${doc.consultationFee} AED` : '—'}
+                      {doc.consultationFee ? `${doc.consultationFee} ${t('common.aed')}` : '—'}
                     </td>
                     <td className="py-3.5 px-4">
                       <button
@@ -564,26 +569,26 @@ export default function DoctorsManagement() {
                             : 'bg-theme-surface-muted text-theme-muted hover:bg-theme-border-slate'
                         }`}
                       >
-                        {doc.isActive ? 'Active' : 'Inactive'}
+                        {doc.isActive ? t('common.active') : t('common.inactive')}
                       </button>
                     </td>
-                    <td className="py-3.5 px-4 text-right">
+                    <td className="py-3.5 px-4 text-end">
                       <div className="flex items-center justify-end gap-1.5">
                         <button
                           type="button"
                           onClick={() => openEditModal(doc)}
-                          aria-label={`Edit ${doc.fullName}`}
+                          aria-label={`${t('common.edit')} ${doc.fullName}`}
                           className="min-w-[44px] min-h-[44px] rounded-xl text-theme-muted hover:text-theme-primary hover:bg-theme-canvas flex items-center justify-center transition-colors"
-                          title="Edit doctor"
+                          title={t('common.edit')}
                         >
                           <AppIcon name="edit" className="text-sm" />
                         </button>
                         <button
                           type="button"
                           onClick={() => handleDelete(doc)}
-                          aria-label={`Delete ${doc.fullName}`}
+                          aria-label={`${t('common.delete')} ${doc.fullName}`}
                           className="min-w-[44px] min-h-[44px] rounded-xl text-theme-subtle hover:text-[#991B1B] hover:bg-[#FEE2E2] flex items-center justify-center transition-colors"
-                          title="Delete doctor"
+                          title={t('common.delete')}
                         >
                           <AppIcon name="trash" className="text-sm" />
                         </button>
@@ -613,7 +618,7 @@ export default function DoctorsManagement() {
                     <div className="relative w-16 h-16 rounded-2xl overflow-hidden flex-shrink-0">
                       <DoctorAvatar photo={doc.photo} name={doc.fullName} className="w-full h-full" iconSize="text-xl" />
                       <span
-                        className={`absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-white ${
+                        className={`absolute bottom-0 end-0 w-3.5 h-3.5 rounded-full border-2 border-white ${
                           doc.isActive ? 'bg-[#16A34A]' : 'bg-theme-subtle'
                         }`}
                       />
@@ -631,13 +636,13 @@ export default function DoctorsManagement() {
                           </span>
                         ))}
                       </div>
-                      <h3 className="text-base alata-regular text-theme-ink truncate">
+                      <h3 dir="auto" className="text-base alata-regular text-theme-ink truncate">
                         {doc.fullName}
                       </h3>
-                      <p className="text-xs text-theme-muted truncate mt-0.5">
-                        {doc.title || 'Medical Specialist'}
+                      <p dir="auto" className="text-xs text-theme-muted truncate mt-0.5">
+                        {doc.title || doc.specialty}
                       </p>
-                      <span className="inline-block mt-1.5 px-2.5 py-0.5 rounded-full bg-theme-primary-soft text-theme-primary text-[10px] alata-regular truncate max-w-full">
+                      <span dir="auto" className="inline-block mt-1.5 px-2.5 py-0.5 rounded-full bg-theme-primary-soft text-theme-primary text-[10px] alata-regular truncate max-w-full">
                         {doc.specialty}
                       </span>
                     </div>
@@ -648,19 +653,19 @@ export default function DoctorsManagement() {
                     <div className="flex items-center justify-between bg-theme-canvas px-3.5 py-2 rounded-xl border border-theme-border">
                       <span className="text-[11px] font-medium text-theme-muted inline-flex items-center gap-1.5">
                         <AppIcon name="id-card" className="text-theme-primary" />
-                        <span>{doc.authority || 'DHA'} Licence</span>
+                        <span>{t('doctors.licenceLabel', { authority: doc.authority || 'DHA' })}</span>
                       </span>
-                      <span className="alata-regular text-theme-ink text-[11px]">{doc.licenceNumber}</span>
+                      <span dir="ltr" className="alata-regular text-theme-ink text-[11px]">{doc.licenceNumber}</span>
                     </div>
 
                     <div className="flex items-center justify-between text-[11px] px-1">
-                      <span className="font-medium text-theme-muted">Assigned Service</span>
+                      <span className="font-medium text-theme-muted">{t('doctors.colAssignedService')}</span>
                       <select
                         value={doc.service || ''}
                         onChange={(e) => handleServiceChange(doc, e.target.value)}
                         className="text-[11px] py-1 px-2.5 rounded-xl border border-theme-border-slate bg-theme-surface font-medium text-theme-ink max-w-[175px] truncate focus:outline-none focus:ring-1 focus:ring-theme-primary"
                       >
-                        <option value="">Unassigned</option>
+                        <option value="">{t('doctors.unassigned')}</option>
                         {clinicServiceNames.map((s) => (
                           <option key={s} value={s}>{s}</option>
                         ))}
@@ -668,14 +673,14 @@ export default function DoctorsManagement() {
                     </div>
 
                     <div className="flex items-center justify-between text-[11px] px-1">
-                      <span className="text-theme-muted">Consultation Fee</span>
-                      <span className="alata-regular text-theme-primary text-xs">{doc.consultationFee} AED</span>
+                      <span className="text-theme-muted">{t('doctors.colFee')}</span>
+                      <span className="alata-regular text-theme-primary text-xs">{doc.consultationFee} {t('common.aed')}</span>
                     </div>
 
                     {doc.licenceExpiry && (
                       <div className="flex items-center justify-between text-[11px] px-1">
-                        <span className="text-theme-muted">Valid Until</span>
-                        <span className="alata-regular text-[#166534]">{doc.licenceExpiry}</span>
+                        <span className="text-theme-muted">{t('doctors.validUntil')}</span>
+                        <span dir="ltr" className="alata-regular text-[#166534]">{doc.licenceExpiry}</span>
                       </div>
                     )}
                   </div>
@@ -692,25 +697,25 @@ export default function DoctorsManagement() {
                         : 'bg-theme-surface-muted text-theme-muted hover:bg-theme-border-slate'
                     }`}
                   >
-                    {doc.isActive ? 'Active on onsta.ae' : 'Hidden'}
+                    {doc.isActive ? t('doctors.activeOnOnsta') : t('doctors.hidden')}
                   </button>
 
                   <div className="flex items-center gap-1.5">
                     <button
                       type="button"
                       onClick={() => openEditModal(doc)}
-                      aria-label={`Edit ${doc.fullName}`}
+                      aria-label={`${t('common.edit')} ${doc.fullName}`}
                       className="min-w-[44px] min-h-[44px] rounded-xl text-theme-muted hover:text-theme-primary hover:bg-theme-canvas flex items-center justify-center transition-colors"
-                      title="Edit doctor"
+                      title={t('common.edit')}
                     >
                       <AppIcon name="edit" className="text-sm" />
                     </button>
                     <button
                       type="button"
                       onClick={() => handleDelete(doc)}
-                      aria-label={`Remove ${doc.fullName}`}
+                      aria-label={`${t('common.delete')} ${doc.fullName}`}
                       className="min-w-[44px] min-h-[44px] rounded-xl text-theme-subtle hover:text-[#991B1B] hover:bg-[#FEE2E2] flex items-center justify-center transition-colors"
-                      title="Remove doctor"
+                      title={t('common.delete')}
                     >
                       <AppIcon name="trash" className="text-sm" />
                     </button>
@@ -727,8 +732,8 @@ export default function DoctorsManagement() {
           <div className="w-14 h-14 rounded-2xl bg-theme-canvas text-theme-primary flex items-center justify-center mx-auto mb-3">
             <AppIcon name="doctor" className="text-2xl" />
           </div>
-          <p className="text-base alata-regular text-theme-ink">No doctors registered yet</p>
-          <p className="text-xs text-theme-muted mt-1">Click "Add New Doctor" to upload a DHA licence and register your clinical team.</p>
+          <p className="text-base alata-regular text-theme-ink">{t('doctors.emptyTitle')}</p>
+          <p className="text-xs text-theme-muted mt-1">{t('doctors.emptyDesc')}</p>
         </div>
       )}
 
@@ -746,17 +751,17 @@ export default function DoctorsManagement() {
                 </div>
                 <div>
                   <h3 className="alata-regular text-base">
-                    {editingDoctor ? 'Edit Doctor Profile' : 'Add Healthcare Practitioner'}
+                    {editingDoctor ? t('doctors.editTitle') : t('doctors.addTitle')}
                   </h3>
                   <p className="text-theme-sidebar-kicker text-xs">
-                    {modalStep === 1 ? 'Step 1: Upload doctor medical licence' : 'Step 2: Review auto-filled details'}
+                    {modalStep === 1 ? t('doctors.step1Subtitle') : t('doctors.step2Subtitle')}
                   </p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                aria-label="Close doctor modal"
+                aria-label={t('common.close')}
                 className="text-white/70 hover:text-white min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center transition-colors hover:bg-white/10"
               >
                 <AppIcon name="close" className="text-base" />
@@ -769,7 +774,7 @@ export default function DoctorsManagement() {
                 <button
                   type="button"
                   onClick={() => setModalStep(1)}
-                  className={`rounded-xl px-3.5 py-2 text-left text-xs alata-regular flex items-center gap-2 transition ${
+                  className={`rounded-xl px-3.5 py-2 text-start text-xs alata-regular flex items-center gap-2 transition ${
                     modalStep === 1
                       ? 'bg-theme-primary text-white shadow-sm'
                       : scanResult
@@ -782,7 +787,7 @@ export default function DoctorsManagement() {
                   }`}>
                     {scanResult ? <AppIcon name="check" className="text-[11px]" /> : '1'}
                   </span>
-                  <span className="truncate">1. Licence Upload</span>
+                  <span className="truncate">{t('doctors.tab1')}</span>
                 </button>
 
                 <button
@@ -791,7 +796,7 @@ export default function DoctorsManagement() {
                     if (scanResult) setModalStep(2);
                   }}
                   disabled={!scanResult}
-                  className={`rounded-xl px-3.5 py-2 text-left text-xs alata-regular flex items-center gap-2 transition ${
+                  className={`rounded-xl px-3.5 py-2 text-start text-xs alata-regular flex items-center gap-2 transition ${
                     modalStep === 2
                       ? 'bg-theme-primary text-white shadow-sm'
                       : scanResult
@@ -804,7 +809,7 @@ export default function DoctorsManagement() {
                   }`}>
                     2
                   </span>
-                  <span className="truncate">2. Review & Details</span>
+                  <span className="truncate">{t('doctors.tab2')}</span>
                 </button>
               </div>
             )}
@@ -813,7 +818,7 @@ export default function DoctorsManagement() {
             {errorMessage && (
               <div role="alert" className="mx-6 mt-4 p-3.5 rounded-2xl bg-[#FEE2E2] border border-[#FECACA] text-xs text-[#991B1B] flex items-start gap-2.5">
                 <AppIcon name="warning-circle" className="text-sm text-[#DC2626] shrink-0 mt-0.5" />
-                <span>{errorMessage}</span>
+                <span dir="auto">{errorMessage}</span>
               </div>
             )}
 
@@ -823,13 +828,13 @@ export default function DoctorsManagement() {
                 <div className="space-y-4">
                   <div>
                     <span className="text-[11px] alata-regular uppercase tracking-wider text-theme-primary">
-                      AI Powered Registration
+                      {t('doctors.aiRegistration')}
                     </span>
                     <h2 className="text-xl alata-regular text-theme-ink mt-0.5">
-                      Upload Medical Practice Licence
+                      {t('doctors.uploadLicenceTitle')}
                     </h2>
                     <p className="text-xs text-theme-muted mt-1 leading-relaxed">
-                      Upload the doctor's UAE healthcare professional licence (DHA, DoH Abu Dhabi, or MOHAP). Our AI scanner extracts credentials automatically.
+                      {t('doctors.uploadLicenceDesc')}
                     </p>
                   </div>
 
@@ -858,10 +863,10 @@ export default function DoctorsManagement() {
                         </div>
                         <div>
                           <p className="text-sm alata-regular text-theme-ink">
-                            AI Analyzing Medical Licence...
+                            {t('doctors.analyzingTitle')}
                           </p>
                           <p className="text-xs text-theme-muted mt-0.5">
-                            Extracting full name, licence number, specialty, and authority.
+                            {t('doctors.analyzingDesc')}
                           </p>
                         </div>
                       </div>
@@ -872,14 +877,14 @@ export default function DoctorsManagement() {
                         </div>
                         <div>
                           <p className="text-sm alata-regular text-[#166534]">
-                            Licence Successfully Analyzed!
+                            {t('doctors.analyzedTitle')}
                           </p>
                           <p className="text-xs text-[#15803D] mt-0.5">
-                            {scannedFileName || 'Medical Licence File'} • {scanResult.authority || 'DHA'} Verified
+                            {t('doctors.analyzedSub', { file: scannedFileName || 'Licence', authority: scanResult.authority || 'DHA' })}
                           </p>
                         </div>
                         <span className="text-xs text-theme-muted underline pt-1">
-                          Click to upload a different file
+                          {t('doctors.clickDifferent')}
                         </span>
                       </div>
                     ) : (
@@ -889,10 +894,10 @@ export default function DoctorsManagement() {
                         </div>
                         <div>
                           <p className="text-sm alata-regular text-theme-ink">
-                            Drop licence document here, or <span className="text-theme-primary underline">browse</span>
+                            {t('doctors.dropLicence')}
                           </p>
                           <p className="text-xs text-theme-subtle mt-1">
-                            Supports PDF, JPEG, PNG • DHA, DoH, MOHAP Licences (Up to 15MB)
+                            {t('doctors.supportedFormats')}
                           </p>
                         </div>
                       </div>
@@ -904,8 +909,8 @@ export default function DoctorsManagement() {
                     <div className="flex items-center gap-2.5">
                       <AppIcon name="ai" className="text-theme-primary text-base" />
                       <div>
-                        <p className="text-xs alata-regular text-theme-ink">Don't have a licence file handy?</p>
-                        <p className="text-[11px] text-theme-muted">Test the auto-fill flow with a sample DHA licence.</p>
+                        <p className="text-xs alata-regular text-theme-ink">{t('doctors.noFileHandy')}</p>
+                        <p className="text-[11px] text-theme-muted">{t('doctors.sampleHint')}</p>
                       </div>
                     </div>
 
@@ -915,7 +920,7 @@ export default function DoctorsManagement() {
                       onClick={handleSampleDhaLicense}
                       className="px-4 py-1.5 bg-theme-card text-theme-primary border border-theme-border-strong hover:bg-theme-canvas rounded-full text-xs alata-regular transition-colors disabled:opacity-50"
                     >
-                      Try Sample Licence
+                      {t('doctors.trySample')}
                     </button>
                   </div>
                 </div>
@@ -927,7 +932,7 @@ export default function DoctorsManagement() {
                     onClick={() => setIsModalOpen(false)}
                     className="px-4 py-2 rounded-full border border-theme-border-slate text-theme-muted text-xs font-medium hover:bg-theme-surface"
                   >
-                    Cancel
+                    {t('common.cancel')}
                   </button>
 
                   {scanResult && (
@@ -936,8 +941,8 @@ export default function DoctorsManagement() {
                       onClick={() => setModalStep(2)}
                       className="px-5 py-2.5 rounded-full bg-theme-primary text-white text-xs alata-regular hover:bg-theme-primary-hover shadow-sm flex items-center gap-2 transition-all"
                     >
-                      <span>Continue to Doctor Details</span>
-                      <AppIcon name="caret-right" className="text-[10px]" />
+                      <span>{t('doctors.continueDetails')}</span>
+                      <AppIcon name="caret-right" className="text-[10px] rtl:rotate-180" />
                     </button>
                   )}
                 </div>
@@ -952,7 +957,7 @@ export default function DoctorsManagement() {
                     <div className="flex items-center gap-2">
                       <AppIcon name="check-circle" className="text-[#166534]" />
                       <span className="text-xs alata-regular text-[#166534]">
-                        Auto-Extracted from {formData.authority || 'DHA'} Licence ({scannedFileName || 'Uploaded file'})
+                        {t('doctors.autoExtracted', { authority: formData.authority || 'DHA', file: scannedFileName || '' })}
                       </span>
                     </div>
                     <button
@@ -960,7 +965,7 @@ export default function DoctorsManagement() {
                       onClick={() => setModalStep(1)}
                       className="text-xs text-[#166534] hover:underline alata-regular"
                     >
-                      Change Licence
+                      {t('doctors.changeLicence')}
                     </button>
                   </div>
                 )}
@@ -969,8 +974,8 @@ export default function DoctorsManagement() {
                   <div className="p-3.5 rounded-2xl bg-[#FFEDD5] border border-[#FED7AA] text-xs text-[#9A3412] flex items-start gap-2.5">
                     <AppIcon name="warning" className="text-[#C2410C] shrink-0 mt-0.5" />
                     <div>
-                      <p className="alata-regular">Verification Notice</p>
-                      <p className="text-[11px] mt-0.5 leading-relaxed">{scanWarning}</p>
+                      <p className="alata-regular">{t('doctors.verificationNotice')}</p>
+                      <p dir="auto" className="text-[11px] mt-0.5 leading-relaxed">{scanWarning}</p>
                     </div>
                   </div>
                 )}
@@ -980,19 +985,20 @@ export default function DoctorsManagement() {
                   <div className="flex items-center justify-between pb-2 border-b border-theme-border">
                     <h4 className="text-xs alata-regular uppercase tracking-wider text-theme-ink flex items-center gap-2">
                       <span className="w-2 h-2 rounded-full bg-theme-primary" />
-                      Essential Details (Required)
+                      {t('doctors.essentialDetails')}
                     </h4>
-                    <span className="text-[10px] text-theme-subtle font-medium">* Required for discovery</span>
+                    <span className="text-[10px] text-theme-subtle font-medium">{t('doctors.requiredForDiscovery')}</span>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-semibold text-theme-ink mb-1">
-                        Doctor Full Name *
+                        {t('doctors.fullNameLabel')}
                       </label>
                       <input
                         type="text"
                         required
+                        dir="auto"
                         value={formData.fullName}
                         onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                         placeholder="e.g. Dr. Sarah Al Mansoori"
@@ -1002,11 +1008,12 @@ export default function DoctorsManagement() {
 
                     <div>
                       <label className="block text-xs font-semibold text-theme-ink mb-1">
-                        Medical Licence Number *
+                        {t('doctors.licenceNumberLabel')}
                       </label>
                       <input
                         type="text"
                         required
+                        dir="ltr"
                         value={formData.licenceNumber}
                         onChange={(e) => setFormData({ ...formData, licenceNumber: e.target.value })}
                         placeholder="e.g. DHA-P-0091823"
@@ -1016,11 +1023,12 @@ export default function DoctorsManagement() {
 
                     <div>
                       <label className="block text-xs font-semibold text-theme-ink mb-1">
-                        Primary Medical Specialty *
+                        {t('doctors.specialtyLabel')}
                       </label>
                       <input
                         type="text"
                         required
+                        dir="auto"
                         value={formData.specialty}
                         onChange={(e) => setFormData({ ...formData, specialty: e.target.value })}
                         placeholder="e.g. Dermatology & Aesthetic Medicine"
@@ -1030,12 +1038,13 @@ export default function DoctorsManagement() {
 
                     <div>
                       <label className="block text-xs font-semibold text-theme-ink mb-1">
-                        Consultation Fee (AED) *
+                        {t('doctors.feeLabel')}
                       </label>
                       <input
                         type="number"
                         required
                         min="0"
+                        dir="ltr"
                         value={formData.consultationFee}
                         onChange={(e) => setFormData({ ...formData, consultationFee: e.target.value })}
                         placeholder="e.g. 350"
@@ -1045,14 +1054,14 @@ export default function DoctorsManagement() {
 
                     <div className="sm:col-span-2">
                       <label className="block text-xs font-semibold text-theme-ink mb-1">
-                        Assigned Service
+                        {t('doctors.assignedServiceLabel')}
                       </label>
                       <select
                         value={formData.service}
                         onChange={(e) => setFormData({ ...formData, service: e.target.value })}
                         className="w-full px-3.5 py-2.5 rounded-xl border border-theme-border-slate text-xs font-medium text-theme-ink bg-theme-card focus:outline-none focus:ring-2 focus:ring-theme-primary/30 focus:border-theme-primary"
                       >
-                        <option value="">Unassigned (Assign now or later from roster)</option>
+                        <option value="">{t('doctors.unassignedHint')}</option>
                         {clinicServiceNames.map((s) => (
                           <option key={s} value={s}>{s}</option>
                         ))}
@@ -1066,9 +1075,9 @@ export default function DoctorsManagement() {
                   <div className="flex items-center justify-between pb-2 border-b border-theme-border">
                     <h4 className="text-xs alata-regular uppercase tracking-wider text-theme-muted flex items-center gap-2">
                       <span className="w-2 h-2 rounded-full bg-theme-border-strong" />
-                      Additional Profile Details (Optional)
+                      {t('doctors.optionalDetails')}
                     </h4>
-                    <span className="text-[10px] text-theme-subtle">Can be added anytime</span>
+                    <span className="text-[10px] text-theme-subtle">{t('doctors.addAnytime')}</span>
                   </div>
 
                   {/* Headshot Upload */}
@@ -1078,17 +1087,17 @@ export default function DoctorsManagement() {
                       <button
                         type="button"
                         onClick={() => photoInputRef.current?.click()}
-                        aria-label="Upload headshot photo"
+                        aria-label={t('doctors.uploadPhoto')}
                         className="absolute inset-0 bg-theme-overlay/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white"
-                        title="Upload photo"
+                        title={t('doctors.uploadPhoto')}
                       >
                         <AppIcon name="camera" className="text-sm" />
                       </button>
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs alata-regular text-theme-ink">Doctor Headshot Photo</p>
-                      <p className="text-[11px] text-theme-muted">Professional portrait shown to patients.</p>
+                      <p className="text-xs alata-regular text-theme-ink">{t('doctors.headshotTitle')}</p>
+                      <p className="text-[11px] text-theme-muted">{t('doctors.headshotDesc')}</p>
                       <input
                         type="file"
                         ref={photoInputRef}
@@ -1102,7 +1111,7 @@ export default function DoctorsManagement() {
                         className="mt-1 text-xs alata-regular text-theme-primary hover:underline inline-flex items-center gap-1.5"
                       >
                         <AppIcon name="upload" className="text-[10px]" />
-                        <span>Upload photo</span>
+                        <span>{t('doctors.uploadPhoto')}</span>
                       </button>
                     </div>
                   </div>
@@ -1110,10 +1119,11 @@ export default function DoctorsManagement() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-xs font-semibold text-theme-muted mb-1">
-                        Professional Title / Designation
+                        {t('doctors.professionalTitle')}
                       </label>
                       <input
                         type="text"
+                        dir="auto"
                         value={formData.title}
                         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                         placeholder="e.g. Consultant Dermatologist"
@@ -1123,7 +1133,7 @@ export default function DoctorsManagement() {
 
                     <div>
                       <label className="block text-xs font-semibold text-theme-muted mb-1">
-                        Licensing Authority
+                        {t('doctors.licensingAuthority')}
                       </label>
                       <select
                         value={formData.authority}
@@ -1138,7 +1148,7 @@ export default function DoctorsManagement() {
 
                     <div>
                       <label className="block text-xs font-semibold text-theme-muted mb-1">
-                        Licence Expiry Date
+                        {t('doctors.licenceExpiry')}
                       </label>
                       <input
                         type="date"
@@ -1150,10 +1160,11 @@ export default function DoctorsManagement() {
 
                     <div>
                       <label className="block text-xs font-semibold text-theme-muted mb-1">
-                        Spoken Languages
+                        {t('doctors.spokenLanguages')}
                       </label>
                       <input
                         type="text"
+                        dir="auto"
                         value={formData.languages}
                         onChange={(e) => setFormData({ ...formData, languages: e.target.value })}
                         placeholder="e.g. English, Arabic, French"
@@ -1163,10 +1174,11 @@ export default function DoctorsManagement() {
 
                     <div>
                       <label className="block text-xs font-semibold text-theme-muted mb-1">
-                        Available Schedule
+                        {t('doctors.availableSchedule')}
                       </label>
                       <input
                         type="text"
+                        dir="auto"
                         value={formData.availableDays}
                         onChange={(e) => setFormData({ ...formData, availableDays: e.target.value })}
                         placeholder="e.g. Mon, Wed, Fri"
@@ -1176,10 +1188,11 @@ export default function DoctorsManagement() {
 
                     <div>
                       <label className="block text-xs font-semibold text-theme-muted mb-1">
-                        Contact Phone
+                        {t('doctors.contactPhone')}
                       </label>
                       <input
                         type="text"
+                        dir="ltr"
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                         placeholder="+971 50 123 4567"
@@ -1190,10 +1203,11 @@ export default function DoctorsManagement() {
 
                   <div>
                     <label className="block text-xs font-semibold text-theme-muted mb-1">
-                      Qualifications Summary
+                      {t('doctors.qualifications')}
                     </label>
                     <textarea
                       rows={2}
+                      dir="auto"
                       value={formData.qualifications}
                       onChange={(e) => setFormData({ ...formData, qualifications: e.target.value })}
                       className="w-full px-3 py-2 rounded-xl border border-theme-border-slate text-xs text-theme-ink focus:outline-none focus:ring-2 focus:ring-theme-primary/30"
@@ -1210,8 +1224,8 @@ export default function DoctorsManagement() {
                       onClick={() => setModalStep(1)}
                       className="text-xs text-theme-muted hover:text-theme-ink alata-regular flex items-center gap-1.5"
                     >
-                      <AppIcon name="arrow-left" className="text-[11px]" />
-                      <span>Back to Licence Upload</span>
+                      <AppIcon name="arrow-left" className="text-[11px] rtl:rotate-180" />
+                      <span>{t('doctors.backToUpload')}</span>
                     </button>
                   ) : (
                     <div />
@@ -1223,7 +1237,7 @@ export default function DoctorsManagement() {
                       onClick={() => setIsModalOpen(false)}
                       className="px-4 py-2 rounded-full border border-theme-border-slate text-theme-muted text-xs font-medium hover:bg-theme-surface transition-colors"
                     >
-                      Cancel
+                      {t('common.cancel')}
                     </button>
                     <button
                       type="submit"
@@ -1231,7 +1245,7 @@ export default function DoctorsManagement() {
                       className="px-6 py-2.5 rounded-full bg-theme-primary text-white text-xs alata-regular hover:bg-theme-primary-hover shadow-sm flex items-center gap-2 disabled:opacity-50 transition-all"
                     >
                       <AppIcon name={isSubmitting ? 'spinner' : 'check-circle'} spin={isSubmitting} />
-                      <span>{isSubmitting ? 'Saving...' : editingDoctor ? 'Update Doctor' : 'Save & Add Doctor'}</span>
+                      <span>{isSubmitting ? t('doctors.saving') : editingDoctor ? t('doctors.updateDoctor') : t('doctors.saveDoctor')}</span>
                     </button>
                   </div>
                 </div>

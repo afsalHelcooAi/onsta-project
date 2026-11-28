@@ -1,10 +1,13 @@
 import React from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useClinic } from '../../context/ClinicContext';
 import AppIcon from '../common/AppIcon';
 import BrandLogo from '../common/BrandLogo';
+import LanguageSwitcher from '../common/LanguageSwitcher';
 
 export default function Sidebar() {
+  const { t } = useTranslation();
   const { clinicData, logout, enquiries } = useClinic();
   const location = useLocation();
   const navigate = useNavigate();
@@ -17,22 +20,23 @@ export default function Sidebar() {
   const newEnquiriesCount = enquiries ? enquiries.filter(e => e.status === 'new').length : 0;
 
   const navItems = [
-    { name: 'Overview', path: '/dashboard/overview', icon: 'overview' },
-    { name: 'Clinic profile', path: '/dashboard/profile', icon: 'hospital' },
-    { name: 'Doctors', path: '/dashboard/doctors', icon: 'doctor' },
-    { name: 'Services & prices', path: '/dashboard/services', icon: 'stethoscope' },
-    { name: 'Offers', path: '/dashboard/offers', icon: 'tag' },
+    { key: 'overview', name: t('sidebar.overview'), path: '/dashboard/overview', icon: 'overview' },
+    { key: 'profile', name: t('sidebar.clinicProfile'), path: '/dashboard/profile', icon: 'hospital' },
+    { key: 'doctors', name: t('sidebar.doctors'), path: '/dashboard/doctors', icon: 'doctor' },
+    { key: 'services', name: t('sidebar.servicesPrices'), path: '/dashboard/services', icon: 'stethoscope' },
+    { key: 'offers', name: t('sidebar.offers'), path: '/dashboard/offers', icon: 'tag' },
     {
-      name: 'Enquiries',
+      key: 'enquiries',
+      name: t('sidebar.enquiries'),
       path: '/dashboard/enquiries',
       icon: 'calendar-check',
       badge: newEnquiriesCount > 0 ? newEnquiriesCount.toString() : null
     },
-    { name: 'Compliance', path: '/dashboard/compliance', icon: 'shield-check' }
+    { key: 'compliance', name: t('sidebar.compliance'), path: '/dashboard/compliance', icon: 'shield-check' }
   ];
 
   return (
-    <aside className="w-64 bg-theme-sidebar-bg text-white flex flex-col justify-between h-screen sticky top-0 flex-shrink-0 select-none border-r border-theme-sidebar-border">
+    <aside className="w-64 bg-theme-sidebar-bg text-white flex flex-col justify-between h-screen sticky top-0 flex-shrink-0 select-none border-e border-theme-sidebar-border">
       {/* Brand & Clinic Identity */}
       <div>
         <div className="p-6 pb-4">
@@ -40,7 +44,7 @@ export default function Sidebar() {
             <BrandLogo className="w-10 h-10 rounded-xl shadow-sm ring-1 ring-white/15" />
             <div>
               <span className="alata-regular text-sm tracking-wide text-theme-sidebar-heading block leading-tight">
-                Clinic Partner
+                {t('sidebar.clinicPartner')}
               </span>
               <span className="text-[10px] font-medium uppercase tracking-wider text-theme-sidebar-kicker">
                 onsta.ai
@@ -50,15 +54,15 @@ export default function Sidebar() {
 
           <div className="mt-5 p-3.5 rounded-2xl bg-theme-sidebar-surface border border-theme-sidebar-border">
             <p className="text-[10px] uppercase tracking-wider text-theme-sidebar-kicker font-semibold">
-              Active Medical Facility
+              {t('sidebar.activeFacility')}
             </p>
-            <h2 className="text-sm alata-regular text-white truncate mt-0.5">
+            <h2 dir="auto" className="text-sm alata-regular text-white truncate mt-0.5">
               {clinicData.displayName || clinicData.legalName}
             </h2>
             <div className="flex items-center gap-1.5 mt-1.5">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               <span className="text-[11px] text-emerald-200 font-medium">
-                DHA Licensed • Approved
+                {t('sidebar.dhaApproved')}
               </span>
             </div>
           </div>
@@ -73,7 +77,7 @@ export default function Sidebar() {
 
             return (
               <NavLink
-                key={item.name}
+                key={item.key}
                 to={item.path}
                 className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm transition-all duration-150 ${
                   isActive
@@ -106,8 +110,11 @@ export default function Sidebar() {
         </nav>
       </div>
 
-      {/* Bottom Actions: Clean Prominent Log Out Button */}
-      <div className="p-4 border-t border-theme-sidebar-border">
+      {/* Bottom Actions: Language Switcher & Log Out Button */}
+      <div className="p-4 border-t border-theme-sidebar-border space-y-3">
+        <div className="flex justify-center">
+          <LanguageSwitcher variant="sidebar" />
+        </div>
         <button
           onClick={handleSignOut}
           className="flex items-center justify-center gap-2.5 w-full px-4 py-2.5 rounded-xl text-xs alata-regular tracking-wide text-theme-sidebar-logout-text bg-theme-sidebar-logout-bg hover:bg-theme-primary hover:text-white border border-theme-sidebar-logout-border transition-all shadow-sm group"
@@ -116,7 +123,7 @@ export default function Sidebar() {
             name="sign-out"
             className="text-base text-theme-sidebar-logout-icon group-hover:text-white transition-colors"
           />
-          <span>Log Out</span>
+          <span>{t('sidebar.logOut')}</span>
         </button>
       </div>
     </aside>
