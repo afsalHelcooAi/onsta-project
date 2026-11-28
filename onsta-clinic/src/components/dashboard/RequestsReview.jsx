@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useClinic } from '../../context/ClinicContext';
-import { Clock, CheckCircle2, AlertTriangle, XCircle, ArrowRight, Check, X } from 'lucide-react';
 
 export default function RequestsReview() {
   const { showToast } = useClinic();

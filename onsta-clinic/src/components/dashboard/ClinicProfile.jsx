@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useClinic } from '../../context/ClinicContext';
-import FaIcon from '../common/FaIcon';
+import AppIcon from '../common/AppIcon';
 import {
   fetchClinicProfile,
   saveClinicProfile,
@@ -200,7 +200,7 @@ export default function ClinicProfile({ onOpenPreview }) {
       <div className="bg-theme-card rounded-3xl border border-theme-border p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
           <div className="w-11 h-11 rounded-2xl bg-theme-primary-soft text-theme-primary flex items-center justify-center flex-shrink-0">
-            <FaIcon icon="fa-solid fa-hospital" className="text-lg" />
+            <AppIcon name="hospital" className="text-lg" />
           </div>
           <div>
             <h1 className="text-2xl sm:text-3xl alata-regular text-theme-ink tracking-tight">
@@ -232,7 +232,7 @@ export default function ClinicProfile({ onOpenPreview }) {
             onClick={onOpenPreview || (() => setShowCustomerPreview && setShowCustomerPreview(true))}
             className="px-5 py-2 rounded-full bg-theme-primary text-white hover:bg-theme-primary-hover transition-colors text-xs alata-regular flex items-center gap-2 shadow-sm"
           >
-            <FaIcon icon="fa-regular fa-eye" />
+            <AppIcon name="eye" />
             <span>Customer Preview</span>
           </button>
         </div>
@@ -241,7 +241,7 @@ export default function ClinicProfile({ onOpenPreview }) {
       {/* Error & Success Banners */}
       {errorMessage && (
         <div role="alert" className="rounded-2xl border border-[#FECACA] bg-[#FEE2E2] p-4 text-xs text-[#991B1B] flex items-start gap-2.5">
-          <FaIcon icon="fa-solid fa-circle-exclamation" className="text-sm text-[#DC2626] shrink-0 mt-0.5" />
+          <AppIcon name="warning-circle" className="text-sm text-[#DC2626] shrink-0 mt-0.5" />
           <div className="flex-1">
             <span className="alata-regular block mb-0.5">Validation / Compliance Alert:</span>
             <span>{errorMessage}</span>
@@ -251,7 +251,7 @@ export default function ClinicProfile({ onOpenPreview }) {
 
       {successMessage && (
         <div role="status" className="rounded-2xl border border-[#BBF7D0] bg-[#DCFCE7] p-4 text-xs text-[#166534] flex items-start gap-2.5">
-          <FaIcon icon="fa-solid fa-circle-check" className="text-sm text-[#16A34A] shrink-0 mt-0.5" />
+          <AppIcon name="check-circle" className="text-sm text-[#16A34A] shrink-0 mt-0.5" />
           <span className="alata-regular">{successMessage}</span>
         </div>
       )}
@@ -277,7 +277,7 @@ export default function ClinicProfile({ onOpenPreview }) {
                 disabled={uploadingAsset === 'cover'}
                 className="px-4 py-2 bg-theme-card/95 text-theme-ink rounded-full text-xs alata-regular hover:bg-theme-card shadow-lg flex items-center gap-2 transition"
               >
-                <FaIcon icon={uploadingAsset === 'cover' ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-cloud-arrow-up'} />
+                <AppIcon name={uploadingAsset === 'cover' ? 'spinner' : 'cloud-upload'} spin={uploadingAsset === 'cover'} />
                 <span>{uploadingAsset === 'cover' ? 'Uploading...' : 'Change Cover Banner'}</span>
               </button>
             </div>
@@ -303,7 +303,7 @@ export default function ClinicProfile({ onOpenPreview }) {
                   disabled={uploadingAsset === 'logo'}
                   className="absolute inset-1.5 bg-theme-overlay/60 rounded-xl opacity-0 group-hover/logo:opacity-100 transition-opacity flex items-center justify-center text-white text-[10px] alata-regular"
                 >
-                  {uploadingAsset === 'logo' ? <FaIcon icon="fa-solid fa-spinner fa-spin" /> : 'Update'}
+                  {uploadingAsset === 'logo' ? <AppIcon name="spinner" spin /> : 'Update'}
                 </button>
                 <input
                   type="file"
@@ -333,7 +333,7 @@ export default function ClinicProfile({ onOpenPreview }) {
               </label>
               {displayNameViolation && (
                 <span className="text-[11px] font-semibold text-[#DC2626] flex items-center gap-1">
-                  <FaIcon icon="fa-solid fa-circle-exclamation" /> Prohibited Superlative Detected
+                  <AppIcon name="warning-circle" /> Prohibited Superlative Detected
                 </span>
               )}
             </div>
@@ -367,7 +367,7 @@ export default function ClinicProfile({ onOpenPreview }) {
                 className="w-full px-3.5 py-2.5 rounded-xl border border-theme-border-slate bg-theme-surface-muted text-theme-muted text-sm cursor-not-allowed"
               />
               <span className="absolute right-3 top-2.5 text-[11px] alata-regular text-[#166534] flex items-center gap-1">
-                <FaIcon icon="fa-solid fa-shield-halved" className="text-[#16A34A]" />
+                <AppIcon name="shield-check" className="text-[#16A34A]" />
                 DHA Verified
               </span>
             </div>
@@ -385,11 +385,11 @@ export default function ClinicProfile({ onOpenPreview }) {
             </label>
             {descriptionViolation ? (
               <span className="text-[11px] font-semibold text-[#DC2626] flex items-center gap-1">
-                <FaIcon icon="fa-solid fa-circle-exclamation" /> MOHAP Rule V08: Superlatives Prohibited
+                <AppIcon name="warning-circle" /> MOHAP Rule V08: Superlatives Prohibited
               </span>
             ) : (
               <span className="text-[11px] font-semibold text-[#166534] flex items-center gap-1">
-                <FaIcon icon="fa-solid fa-shield-halved" /> Factual Medical Content
+                <AppIcon name="shield-check" /> Factual Medical Content
               </span>
             )}
           </div>
@@ -420,7 +420,7 @@ export default function ClinicProfile({ onOpenPreview }) {
               Contact Phone (UAE) *
             </label>
             <div className="relative">
-              <FaIcon icon="fa-solid fa-phone" className="text-xs text-theme-subtle absolute left-3.5 top-3.5" />
+              <AppIcon name="phone" className="text-xs text-theme-subtle absolute left-3.5 top-3.5" />
               <input
                 type="text"
                 value={form.contactPhone}
@@ -437,7 +437,7 @@ export default function ClinicProfile({ onOpenPreview }) {
               Primary Clinic Email *
             </label>
             <div className="relative">
-              <FaIcon icon="fa-solid fa-envelope" className="text-xs text-theme-subtle absolute left-3.5 top-3.5" />
+              <AppIcon name="mail" className="text-xs text-theme-subtle absolute left-3.5 top-3.5" />
               <input
                 type="email"
                 value={form.companyEmail}
@@ -454,7 +454,7 @@ export default function ClinicProfile({ onOpenPreview }) {
               Official Website
             </label>
             <div className="relative">
-              <FaIcon icon="fa-solid fa-globe" className="text-xs text-theme-subtle absolute left-3.5 top-3.5" />
+              <AppIcon name="globe" className="text-xs text-theme-subtle absolute left-3.5 top-3.5" />
               <input
                 type="url"
                 value={form.website}
@@ -473,7 +473,7 @@ export default function ClinicProfile({ onOpenPreview }) {
               Physical Street Address *
             </label>
             <div className="relative">
-              <FaIcon icon="fa-solid fa-location-dot" className="text-xs text-theme-subtle absolute left-3.5 top-3.5" />
+              <AppIcon name="map-pin" className="text-xs text-theme-subtle absolute left-3.5 top-3.5" />
               <input
                 type="text"
                 value={form.address}
@@ -490,7 +490,7 @@ export default function ClinicProfile({ onOpenPreview }) {
               Operating Hours *
             </label>
             <div className="relative">
-              <FaIcon icon="fa-regular fa-clock" className="text-xs text-theme-subtle absolute left-3.5 top-3.5" />
+              <AppIcon name="clock" className="text-xs text-theme-subtle absolute left-3.5 top-3.5" />
               <input
                 type="text"
                 value={form.openingHours}
@@ -506,7 +506,7 @@ export default function ClinicProfile({ onOpenPreview }) {
         {/* Submit Actions */}
         <div className="pt-4 border-t border-theme-border flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="text-xs text-theme-muted flex items-center gap-2">
-            <FaIcon icon="fa-solid fa-shield-halved" className="text-[#16A34A]" />
+            <AppIcon name="shield-check" className="text-[#16A34A]" />
             <span>Updates are validated against MOHAP healthcare advertising guidelines.</span>
           </div>
 
@@ -515,7 +515,7 @@ export default function ClinicProfile({ onOpenPreview }) {
             disabled={isSubmitting || hasComplianceViolation}
             className="px-6 py-2.5 rounded-full bg-theme-primary text-white hover:bg-theme-primary-hover text-xs alata-regular flex items-center justify-center gap-2 transition-all shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <FaIcon icon={isSubmitting ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-floppy-disk'} />
+            <AppIcon name={isSubmitting ? 'spinner' : 'save'} spin={isSubmitting} />
             <span>{isSubmitting ? 'Verifying...' : 'Save Profile Details'}</span>
           </button>
         </div>

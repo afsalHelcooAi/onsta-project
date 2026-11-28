@@ -7,11 +7,7 @@ import Tab2LicenceDetails from './Tab2LicenceDetails';
 import Tab3MedicalDirector from './Tab3MedicalDirector';
 import Tab4AdvertisingServices from './Tab4AdvertisingServices';
 import Tab5ReviewSubmit from './Tab5ReviewSubmit';
-import {
-  ArrowLeft, Check, Sparkles, ShieldCheck, Lock, LogOut,
-  AlertTriangle, Clock, CheckCircle2, ArrowRight, Upload,
-  Cpu, FileText, CheckSquare, Loader2, Zap, Paperclip, X
-} from 'lucide-react';
+import AppIcon from '../common/AppIcon';
 
 export default function RegistrationWizard() {
   const navigate = useNavigate();
@@ -189,12 +185,12 @@ export default function RegistrationWizard() {
                 onClick={() => navigate('/dashboard/overview')}
                 className="bg-emerald-700/80 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1.5 text-xs font-semibold shadow-sm"
               >
-                <ArrowLeft className="w-3.5 h-3.5" />
+                <AppIcon name="arrow-left" className="w-3.5 h-3.5" />
                 <span>Enter Dashboard</span>
               </button>
             ) : (
               <div className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-black/30 border border-white/10 text-gray-300 text-xs">
-                <Lock className="w-3.5 h-3.5 text-amber-400" />
+                <AppIcon name="lock" className="w-3.5 h-3.5 text-amber-400" />
                 <span>Dashboard Locked</span>
               </div>
             )}
@@ -213,22 +209,22 @@ export default function RegistrationWizard() {
               <span className="text-gray-300">Approval Status:</span>
               {status === 'approved' && (
                 <span className="font-bold text-emerald-300 flex items-center gap-1">
-                  <CheckCircle2 className="w-3.5 h-3.5" /> Approved (Live)
+                  <AppIcon name="check-circle" className="w-3.5 h-3.5" /> Approved (Live)
                 </span>
               )}
               {status === 'in_review' && (
                 <span className="font-bold text-amber-300 flex items-center gap-1 animate-pulse">
-                  <Clock className="w-3.5 h-3.5" /> Under ONSTA Review
+                  <AppIcon name="clock" className="w-3.5 h-3.5" /> Under ONSTA Review
                 </span>
               )}
               {status === 'submitted' && (
                 <span className="font-bold text-blue-300 flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5" /> Submitted
+                  <AppIcon name="clock" className="w-3.5 h-3.5" /> Submitted
                 </span>
               )}
               {status === 'draft' && (
                 <span className="font-bold text-amber-200 flex items-center gap-1">
-                  <AlertTriangle className="w-3.5 h-3.5 text-amber-400" /> Draft (Not Submitted)
+                  <AppIcon name="warning" className="w-3.5 h-3.5 text-amber-400" /> Draft (Not Submitted)
                 </span>
               )}
             </div>
@@ -265,7 +261,7 @@ export default function RegistrationWizard() {
               className="text-gray-300 hover:text-white p-1 rounded transition-colors flex items-center gap-1"
               title="Sign Out"
             >
-              <LogOut className="w-3.5 h-3.5" />
+              <AppIcon name="sign-out" className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">Sign Out</span>
             </button>
           </div>
@@ -291,13 +287,13 @@ export default function RegistrationWizard() {
           </div>
         </div>
 
-        {/* ⚡ 3-DOCUMENT AI FAST ONBOARDING HERO CARD */}
+        {/* 3-DOCUMENT AI FAST ONBOARDING HERO CARD */}
         <div className="bg-white rounded-2xl border-2 border-[#137333]/30 p-5 sm:p-6 mb-8 shadow-sm">
           <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 pb-4 border-b border-gray-100">
             <div>
               <div className="flex flex-wrap items-center gap-2">
                 <span className="p-1 rounded bg-emerald-100 text-[#137333]">
-                  <Sparkles className="w-4 h-4" />
+                  <AppIcon name="ai" className="w-4 h-4" />
                 </span>
                 <h3 className="text-base font-serif font-bold text-[#0d281e]">
                   AI 3-Document Fast Onboarding (Sub-60s Registration)
@@ -309,7 +305,7 @@ export default function RegistrationWizard() {
                 {/* Speed & Latency Benchmark Pill */}
                 {latencyMs && (
                   <span className="text-[11px] font-mono font-semibold bg-emerald-50 text-emerald-800 px-2.5 py-0.5 rounded-full border border-emerald-300 flex items-center gap-1 animate-fadeIn">
-                    <Zap className="w-3 h-3 text-amber-500 fill-amber-500" />
+                    <AppIcon name="bolt" weight="fill" className="w-3 h-3 text-amber-500" />
                     <span>Parsed in {(latencyMs / 1000).toFixed(2)}s ({aiModelUsed})</span>
                   </span>
                 )}
@@ -325,7 +321,7 @@ export default function RegistrationWizard() {
                 className="px-6 py-2.5 rounded-xl bg-[#0d281e] text-white hover:bg-[#153f2f] text-xs font-semibold shadow-md flex items-center gap-2 self-start lg:self-center transition-all animate-bounce"
               >
                 <span>Jump Directly to Review & Submit</span>
-                <ArrowRight className="w-4 h-4 text-emerald-300" />
+                <AppIcon name="arrow-right" className="w-4 h-4 text-emerald-300" />
               </button>
             ) : (
               <button
@@ -335,12 +331,12 @@ export default function RegistrationWizard() {
               >
                 {isAiProcessing ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin text-emerald-300" />
+                    <AppIcon name="spinner" spin className="w-4 h-4 text-emerald-300" />
                     <span>Uploading & Parsing with FastAPI...</span>
                   </>
                 ) : (
                   <>
-                    <Cpu className="w-4 h-4 text-emerald-300" />
+                    <AppIcon name="cpu" className="w-4 h-4 text-emerald-300" />
                     <span>Upload & Auto-Fill from 3 Documents</span>
                   </>
                 )}
@@ -358,10 +354,10 @@ export default function RegistrationWizard() {
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-bold text-gray-900 flex items-center gap-1.5">
-                    <FileText className="w-4 h-4 text-emerald-700" />
+                    <AppIcon name="file-text" className="w-4 h-4 text-emerald-700" />
                     1. Trade Licence (DED)
                   </span>
-                  {tradeFile && <CheckCircle2 className="w-4 h-4 text-emerald-600" />}
+                  {tradeFile && <AppIcon name="check-circle" className="w-4 h-4 text-emerald-600" />}
                 </div>
                 
                 {tradeFile ? (
@@ -391,7 +387,7 @@ export default function RegistrationWizard() {
                   onClick={() => tradeInputRef.current?.click()}
                   className="w-full py-1.5 px-3 rounded-lg bg-white border border-gray-300 hover:bg-gray-50 text-[11px] font-semibold text-gray-700 flex items-center justify-center gap-1.5 transition-colors"
                 >
-                  <Paperclip className="w-3.5 h-3.5 text-gray-400" />
+                  <AppIcon name="paperclip" className="w-3.5 h-3.5 text-gray-400" />
                   <span>{tradeFile ? "Change File" : "Choose PDF / Photo"}</span>
                 </button>
               </div>
@@ -404,10 +400,10 @@ export default function RegistrationWizard() {
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-bold text-gray-900 flex items-center gap-1.5">
-                    <FileText className="w-4 h-4 text-emerald-700" />
+                    <AppIcon name="file-text" className="w-4 h-4 text-emerald-700" />
                     2. Facility Licence (DHA/DoH)
                   </span>
-                  {facilityFile && <CheckCircle2 className="w-4 h-4 text-emerald-600" />}
+                  {facilityFile && <AppIcon name="check-circle" className="w-4 h-4 text-emerald-600" />}
                 </div>
                 
                 {facilityFile ? (
@@ -437,7 +433,7 @@ export default function RegistrationWizard() {
                   onClick={() => facilityInputRef.current?.click()}
                   className="w-full py-1.5 px-3 rounded-lg bg-white border border-gray-300 hover:bg-gray-50 text-[11px] font-semibold text-gray-700 flex items-center justify-center gap-1.5 transition-colors"
                 >
-                  <Paperclip className="w-3.5 h-3.5 text-gray-400" />
+                  <AppIcon name="paperclip" className="w-3.5 h-3.5 text-gray-400" />
                   <span>{facilityFile ? "Change File" : "Choose PDF / Photo"}</span>
                 </button>
               </div>
@@ -450,10 +446,10 @@ export default function RegistrationWizard() {
               <div>
                 <div className="flex items-center justify-between mb-2">
                   <span className="font-bold text-gray-900 flex items-center gap-1.5">
-                    <FileText className="w-4 h-4 text-emerald-700" />
+                    <AppIcon name="file-text" className="w-4 h-4 text-emerald-700" />
                     3. MOHAP Advertising Permit
                   </span>
-                  {advertisingFile && <CheckCircle2 className="w-4 h-4 text-emerald-600" />}
+                  {advertisingFile && <AppIcon name="check-circle" className="w-4 h-4 text-emerald-600" />}
                 </div>
                 
                 {advertisingFile ? (
@@ -483,7 +479,7 @@ export default function RegistrationWizard() {
                   onClick={() => adInputRef.current?.click()}
                   className="w-full py-1.5 px-3 rounded-lg bg-white border border-gray-300 hover:bg-gray-50 text-[11px] font-semibold text-gray-700 flex items-center justify-center gap-1.5 transition-colors"
                 >
-                  <Paperclip className="w-3.5 h-3.5 text-gray-400" />
+                  <AppIcon name="paperclip" className="w-3.5 h-3.5 text-gray-400" />
                   <span>{advertisingFile ? "Change File" : "Choose PDF / Photo"}</span>
                 </button>
               </div>

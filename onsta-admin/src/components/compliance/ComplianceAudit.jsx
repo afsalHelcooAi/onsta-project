@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import FaIcon from '../common/FaIcon';
+import AppIcon from '../common/AppIcon';
 import { fetchComplianceAudit, approveRenewalRequest, rejectRenewalRequest } from '../../api/adminApi';
 
 const PAGE_SIZE = 25;
@@ -22,22 +22,22 @@ function ExpiryBadge({ date }) {
   if (days === null) return <span className="text-theme-muted text-xs">No expiry</span>;
   if (days < 0) return (
     <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-50 border border-rose-200 px-2.5 py-0.5 text-[10px] alata-regular uppercase tracking-wide text-rose-700">
-      <FaIcon icon="fa-solid fa-circle-xmark" className="text-[11px]" /> Expired {Math.abs(days)}d ago
+      <AppIcon name="x-circle" size="sm" className="text-[11px]" /> Expired {Math.abs(days)}d ago
     </span>
   );
   if (days <= 30) return (
     <span className="inline-flex items-center gap-1.5 rounded-full bg-theme-accent-soft border border-theme-accent-border px-2.5 py-0.5 text-[10px] alata-regular uppercase tracking-wide text-theme-accent-text">
-      <FaIcon icon="fa-solid fa-triangle-exclamation" className="text-[11px] text-theme-accent" /> Expires in {days}d
+      <AppIcon name="warning" size="sm" className="text-[11px] text-theme-accent" /> Expires in {days}d
     </span>
   );
   if (days <= 90) return (
     <span className="inline-flex items-center gap-1.5 rounded-full bg-theme-accent-soft border border-theme-accent-border px-2.5 py-0.5 text-[10px] alata-regular uppercase tracking-wide text-theme-accent-text">
-      <FaIcon icon="fa-regular fa-clock" className="text-[11px] text-theme-accent" /> {days}d left
+      <AppIcon name="clock" size="sm" className="text-[11px] text-theme-accent" /> {days}d left
     </span>
   );
   return (
     <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 text-[10px] alata-regular uppercase tracking-wide text-emerald-700">
-      <FaIcon icon="fa-solid fa-circle-check" className="text-[11px]" /> Valid · {formatDate(date)}
+      <AppIcon name="check-circle" size="sm" className="text-[11px]" /> Valid · {formatDate(date)}
     </span>
   );
 }
@@ -55,27 +55,27 @@ function ClinicComplianceStatus({ clinic }) {
   if (hasExpired) {
     const label = hasExpiredDoctor ? 'EXPIRED (Doc)' : 'EXPIRED';
     return {
-      icon: <FaIcon icon="fa-solid fa-shield-halved" className="text-rose-600 text-xs" />,
+      icon: <AppIcon name="shield-alert" size="sm" className="text-rose-600 text-xs" />,
       label,
       tone: 'text-rose-700 bg-rose-50 border-rose-200',
     };
   }
   if (hasUrgent) {
     return {
-      icon: <FaIcon icon="fa-solid fa-triangle-exclamation" className="text-theme-accent text-xs" />,
+      icon: <AppIcon name="warning" size="sm" className="text-theme-accent text-xs" />,
       label: 'EXPIRING SOON',
       tone: 'text-theme-accent-text bg-theme-accent-soft border-theme-accent-border',
     };
   }
   if (hasWarning) {
     return {
-      icon: <FaIcon icon="fa-regular fa-clock" className="text-theme-accent text-xs" />,
+      icon: <AppIcon name="clock" size="sm" className="text-theme-accent text-xs" />,
       label: 'REVIEW DUE',
       tone: 'text-theme-accent-text bg-theme-accent-soft border-theme-accent-border',
     };
   }
   return {
-    icon: <FaIcon icon="fa-solid fa-shield-halved" className="text-emerald-600 text-xs" />,
+    icon: <AppIcon name="shield-check" size="sm" className="text-emerald-600 text-xs" />,
     label: 'COMPLIANT',
     tone: 'text-emerald-700 bg-emerald-50 border-emerald-200',
   };
@@ -90,7 +90,7 @@ function ComplianceDetailPanel({ clinic, onRefresh }) {
     return (
       <div className="flex min-h-64 flex-col items-center justify-center text-center text-theme-muted py-16">
         <div className="w-16 h-16 rounded-2xl bg-theme-primary-soft text-theme-primary flex items-center justify-center mb-3 border border-theme-border-strong">
-          <FaIcon icon="fa-solid fa-file-shield" className="text-2xl" />
+          <AppIcon name="shield-file" size="lg" className="text-2xl" />
         </div>
         <p className="text-sm alata-regular text-theme-ink">Select a clinic to view its compliance details.</p>
       </div>
@@ -140,10 +140,10 @@ function ComplianceDetailPanel({ clinic, onRefresh }) {
               </div>
               <button
                 onClick={() => setRejectModalReq(null)}
-                className="text-theme-muted hover:text-theme-ink p-1.5 rounded-full hover:bg-theme-canvas transition"
+                className="text-theme-muted hover:text-theme-ink min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-theme-canvas transition"
                 aria-label="Close modal"
               >
-                <FaIcon icon="fa-solid fa-xmark" className="text-sm" />
+                <AppIcon name="close" size="sm" />
               </button>
             </div>
             <form onSubmit={handleRejectSubmit} className="space-y-3">
@@ -203,7 +203,7 @@ function ComplianceDetailPanel({ clinic, onRefresh }) {
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2.5">
               <div className="w-8 h-8 rounded-full bg-theme-primary text-white flex items-center justify-center shrink-0">
-                <FaIcon icon="fa-solid fa-circle-exclamation" className="text-sm" />
+                <AppIcon name="warning-circle" size="sm" />
               </div>
               <h3 className="alata-regular text-theme-ink text-sm">
                 Regulatory Renewal Requests ({clinic.renewal_requests.filter(r => r.status === 'PENDING_REVIEW').length} Pending)
@@ -257,7 +257,7 @@ function ComplianceDetailPanel({ clinic, onRefresh }) {
 
                 {req.file_name && (
                   <div className="text-[11px] text-theme-muted flex items-center gap-1.5">
-                    <FaIcon icon="fa-solid fa-file-lines" className="text-theme-primary" />
+                    <AppIcon name="file-text" size="sm" className="text-theme-primary" />
                     <span>Attached Document: <strong className="text-theme-ink font-mono">{req.file_name}</strong></span>
                   </div>
                 )}
@@ -272,7 +272,7 @@ function ComplianceDetailPanel({ clinic, onRefresh }) {
                       disabled={actionLoading === req.id}
                       className="px-4 py-1.5 rounded-full border border-rose-200 bg-rose-50/40 text-rose-700 text-xs alata-regular hover:bg-rose-50 transition-colors flex items-center gap-1.5"
                     >
-                      <FaIcon icon="fa-solid fa-xmark" className="text-[11px]" />
+                      <AppIcon name="close" size="sm" />
                       <span>Request Modification</span>
                     </button>
                     <button
@@ -281,9 +281,9 @@ function ComplianceDetailPanel({ clinic, onRefresh }) {
                       className="px-4 py-1.5 rounded-full bg-theme-primary hover:bg-theme-primary-hover text-white text-xs alata-regular transition-colors flex items-center gap-1.5 shadow-sm"
                     >
                       {actionLoading === req.id ? (
-                        <FaIcon icon="fa-solid fa-spinner fa-spin" className="text-xs" />
+                        <AppIcon name="spinner" size="sm" spin />
                       ) : (
-                        <FaIcon icon="fa-solid fa-check" className="text-xs" />
+                        <AppIcon name="check" size="sm" />
                       )}
                       <span>Approve & Restore Listing</span>
                     </button>
@@ -508,7 +508,7 @@ export default function ComplianceAudit() {
           disabled={loading}
           className="inline-flex items-center gap-2 rounded-full border border-theme-border-strong bg-theme-canvas px-4 py-2 text-xs alata-regular text-theme-primary hover:bg-theme-primary-soft disabled:opacity-60 transition"
         >
-          <FaIcon icon="fa-solid fa-arrows-rotate" className={loading ? 'fa-spin' : ''} /> Refresh
+          <AppIcon name="refresh" size="sm" spin={loading} /> Refresh
         </button>
       </header>
 
@@ -523,7 +523,7 @@ export default function ComplianceAudit() {
           <div className="space-y-3 border-b border-theme-border bg-theme-card/70 p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-sm alata-regular text-theme-ink">
-                <FaIcon icon="fa-solid fa-hospital" className="text-theme-primary" /> Registered clinics
+                <AppIcon name="hospital" size="sm" className="text-theme-primary" /> Registered clinics
               </div>
               <span className="text-xs alata-regular text-theme-muted">{total} total</span>
             </div>
@@ -531,7 +531,7 @@ export default function ComplianceAudit() {
             {/* Search + Emirate */}
             <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_160px]">
               <label className="relative">
-                <FaIcon icon="fa-solid fa-magnifying-glass" className="absolute left-3.5 top-3 text-xs text-theme-muted" />
+                <AppIcon name="search" size="sm" className="absolute left-3.5 top-2.5 text-theme-muted" />
                 <input
                   value={search}
                   onChange={(e) => { setSearch(e.target.value); setOffset(0); }}
@@ -601,7 +601,7 @@ export default function ComplianceAudit() {
                     </div>
                     <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-theme-muted">
                       <span className="inline-flex items-center gap-1">
-                        <FaIcon icon="fa-solid fa-location-dot" className="text-theme-primary/70" />
+                        <AppIcon name="map-pin" size="sm" className="text-theme-primary/70" />
                         {clinic.emirate || '—'}
                       </span>
                       <span>{clinic.facility_type}</span>
@@ -637,19 +637,19 @@ export default function ComplianceAudit() {
                 type="button"
                 disabled={offset === 0 || loading}
                 onClick={() => setOffset(Math.max(0, offset - PAGE_SIZE))}
-                className="rounded-full border border-theme-border w-8 h-8 flex items-center justify-center hover:bg-theme-canvas hover:text-theme-primary disabled:opacity-40 transition"
+                className="rounded-full border border-theme-border min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-theme-canvas hover:text-theme-primary disabled:opacity-40 transition"
                 aria-label="Previous page"
               >
-                <FaIcon icon="fa-solid fa-chevron-left" className="text-xs" />
+                <AppIcon name="caret-left" size="sm" />
               </button>
               <button
                 type="button"
                 disabled={offset + PAGE_SIZE >= total || loading}
                 onClick={() => setOffset(offset + PAGE_SIZE)}
-                className="rounded-full border border-theme-border w-8 h-8 flex items-center justify-center hover:bg-theme-canvas hover:text-theme-primary disabled:opacity-40 transition"
+                className="rounded-full border border-theme-border min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-theme-canvas hover:text-theme-primary disabled:opacity-40 transition"
                 aria-label="Next page"
               >
-                <FaIcon icon="fa-solid fa-chevron-right" className="text-xs" />
+                <AppIcon name="caret-right" size="sm" />
               </button>
             </div>
           </footer>

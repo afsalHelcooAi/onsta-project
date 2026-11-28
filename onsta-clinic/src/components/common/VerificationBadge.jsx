@@ -1,5 +1,5 @@
 import React from 'react';
-import FaIcon from './FaIcon';
+import AppIcon from './AppIcon';
 
 export default function VerificationBadge({ status, text, size = 'sm' }) {
   const norm = (status || '').toLowerCase().trim();
@@ -8,7 +8,7 @@ export default function VerificationBadge({ status, text, size = 'sm' }) {
   if (norm === 'pass' || norm === 'verified' || norm === 'approved' || norm === 'live' || norm === 'valid') {
     return (
       <span className={`inline-flex items-center gap-1.5 alata-regular rounded-full bg-[#DCFCE7] text-[#166534] border border-[#BBF7D0] ${paddingClass}`}>
-        <FaIcon icon="fa-solid fa-circle-check" className="text-[11px]" />
+        <AppIcon name="check-circle" className="text-[11px]" />
         <span>{text || (norm === 'approved' ? 'Application approved' : norm === 'valid' ? 'Valid' : 'Verified')}</span>
       </span>
     );
@@ -17,7 +17,7 @@ export default function VerificationBadge({ status, text, size = 'sm' }) {
   if (norm === 'fail' || norm === 'failed' || norm === 'rejected' || norm === 'expired') {
     return (
       <span className={`inline-flex items-center gap-1.5 alata-regular rounded-full bg-[#FEE2E2] text-[#991B1B] border border-[#FECACA] ${paddingClass}`}>
-        <FaIcon icon="fa-solid fa-circle-xmark" className="text-[11px]" />
+        <AppIcon name="x-circle" className="text-[11px]" />
         <span>{text || (norm === 'expired' ? 'Expired' : 'Verification failed')}</span>
       </span>
     );
@@ -26,7 +26,7 @@ export default function VerificationBadge({ status, text, size = 'sm' }) {
   if (norm === 'warning' || norm === 'expiring_soon' || norm === 'changes requested' || norm === 'changes_requested' || norm === 'review' || norm === 'review_required') {
     return (
       <span className={`inline-flex items-center gap-1.5 alata-regular rounded-full bg-theme-accent-soft text-theme-accent-text border border-theme-accent-border ${paddingClass}`}>
-        <FaIcon icon="fa-solid fa-triangle-exclamation" className="text-[11px] text-theme-accent" />
+        <AppIcon name="warning" className="text-[11px] text-theme-accent" />
         <span>{text || (norm === 'expiring_soon' ? 'Expiring soon' : norm.includes('changes') ? 'Changes requested' : 'Review required')}</span>
       </span>
     );
@@ -44,7 +44,7 @@ export default function VerificationBadge({ status, text, size = 'sm' }) {
   if (norm === 'inactive') {
     return (
       <span className={`inline-flex items-center gap-1.5 alata-regular rounded-full bg-[#F1F5F9] text-[#475569] border border-[#E2E8F0] ${paddingClass}`}>
-        <FaIcon icon="fa-solid fa-eye-slash" className="text-[10px]" />
+        <AppIcon name="eye-off" className="text-[10px]" />
         <span>{text || 'Inactive'}</span>
       </span>
     );
@@ -52,7 +52,7 @@ export default function VerificationBadge({ status, text, size = 'sm' }) {
 
   return (
     <span className={`inline-flex items-center gap-1.5 alata-regular rounded-full bg-theme-primary-soft text-theme-primary-hover border border-theme-border-strong ${paddingClass}`}>
-      <FaIcon icon="fa-regular fa-clock" className="text-[11px]" />
+      <AppIcon name="clock" className="text-[11px]" />
       <span>{text || (norm === 'pending_review' ? 'Pending review' : 'Draft')}</span>
     </span>
   );

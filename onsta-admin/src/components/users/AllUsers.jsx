@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import FaIcon from '../common/FaIcon';
+import AppIcon from '../common/AppIcon';
 import { fetchUserRoles, fetchUsers, updateUserStatus } from '../../api/adminApi';
 
 const PAGE_SIZE = 25;
@@ -120,14 +120,14 @@ export default function AllUsers({ currentUserId }) {
             onClick={() => setRefreshIndex((current) => current + 1)}
             className="inline-flex items-center gap-2 rounded-full border border-theme-border-strong bg-theme-card px-4 py-2 text-xs alata-regular text-theme-primary hover:bg-theme-primary-soft shadow-sm transition"
           >
-            <FaIcon icon="fa-solid fa-arrows-rotate" className={loading ? 'fa-spin' : ''} /> Refresh
+            <AppIcon name="refresh" spin={loading} /> Refresh
           </button>
         </div>
 
         <section className="mb-5 grid gap-3 rounded-2xl border border-theme-border bg-theme-card p-4 shadow-sm md:grid-cols-2 xl:grid-cols-5">
           <label className="relative md:col-span-2 xl:col-span-1">
             <span className="sr-only">Search users</span>
-            <FaIcon icon="fa-solid fa-magnifying-glass" className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-xs text-theme-muted" />
+            <AppIcon name="search" className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-xs text-theme-muted" />
             <input
               value={search}
               onChange={updateFilter(setSearch)}
@@ -170,7 +170,7 @@ export default function AllUsers({ currentUserId }) {
 
         {displayError && (
           <div role="alert" className="mb-4 flex items-center gap-2 rounded-2xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
-            <FaIcon icon="fa-solid fa-circle-exclamation" className="shrink-0" /> {displayError}
+            <AppIcon name="warning-circle" className="shrink-0" /> {displayError}
           </div>
         )}
 
@@ -194,7 +194,7 @@ export default function AllUsers({ currentUserId }) {
                 ) : users.length === 0 ? (
                   <tr>
                     <td colSpan="7" className="px-5 py-12 text-center text-theme-muted">
-                      <FaIcon icon="fa-solid fa-users" className="mx-auto mb-2 text-xl text-theme-border-strong block" />
+                      <AppIcon name="users" className="mx-auto mb-2 text-xl text-theme-border-strong block" />
                       No users match these filters.
                     </td>
                   </tr>
@@ -255,18 +255,18 @@ export default function AllUsers({ currentUserId }) {
                 disabled={offset === 0 || loading}
                 onClick={() => setOffset(Math.max(0, offset - PAGE_SIZE))}
                 aria-label="Previous page"
-                className="rounded-full border border-theme-border bg-theme-card w-8 h-8 flex items-center justify-center hover:bg-theme-canvas hover:text-theme-primary disabled:opacity-40 transition"
+                className="rounded-full border border-theme-border bg-theme-card min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-theme-canvas hover:text-theme-primary disabled:opacity-40 transition"
               >
-                <FaIcon icon="fa-solid fa-chevron-left" className="text-xs" />
+                <AppIcon name="caret-left" className="text-sm" />
               </button>
               <button
                 type="button"
                 disabled={offset + PAGE_SIZE >= total || loading}
                 onClick={() => setOffset(offset + PAGE_SIZE)}
                 aria-label="Next page"
-                className="rounded-full border border-theme-border bg-theme-card w-8 h-8 flex items-center justify-center hover:bg-theme-canvas hover:text-theme-primary disabled:opacity-40 transition"
+                className="rounded-full border border-theme-border bg-theme-card min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-theme-canvas hover:text-theme-primary disabled:opacity-40 transition"
               >
-                <FaIcon icon="fa-solid fa-chevron-right" className="text-xs" />
+                <AppIcon name="caret-right" className="text-sm" />
               </button>
             </div>
           </div>
@@ -290,9 +290,9 @@ export default function AllUsers({ currentUserId }) {
                 type="button"
                 onClick={() => setStatusDialog(null)}
                 aria-label="Close dialog"
-                className="rounded-full p-1.5 text-theme-muted hover:bg-theme-canvas hover:text-theme-ink"
+                className="rounded-full min-w-[44px] min-h-[44px] flex items-center justify-center text-theme-muted hover:bg-theme-canvas hover:text-theme-ink"
               >
-                <FaIcon icon="fa-solid fa-xmark" />
+                <AppIcon name="close" />
               </button>
             </div>
             <p className="mt-4 text-sm text-theme-muted">
@@ -313,7 +313,7 @@ export default function AllUsers({ currentUserId }) {
             </label>
             {statusError && (
               <p role="alert" className="mt-3 flex items-center gap-2 text-sm text-rose-700">
-                <FaIcon icon="fa-solid fa-circle-exclamation" className="shrink-0" />{statusError}
+                <AppIcon name="warning-circle" className="shrink-0" />{statusError}
               </p>
             )}
             <div className="mt-5 flex justify-end gap-2">

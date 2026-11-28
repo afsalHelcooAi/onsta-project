@@ -1,10 +1,6 @@
 import React, { useState } from 'react';
 import { useClinic } from '../../context/ClinicContext';
-import {
-  X, MapPin, Phone, Star, ShieldCheck, Tag,
-  Calendar, Clock, Smartphone, Monitor, Hourglass,
-  Sparkles, User, ChevronRight, CheckCircle2, Building2
-} from 'lucide-react';
+import AppIcon from './AppIcon';
 import DoctorAvatar from './DoctorAvatar';
 import BrandLogo from './BrandLogo';
 
@@ -64,7 +60,7 @@ export default function CustomerPreviewModal({ isOpen, onClose }) {
               </span>
             </div>
             <span className="hidden md:inline-flex items-center gap-1.5 text-xs text-theme-border-strong">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              <AppIcon name="shield-check" className="w-4 h-4 text-emerald-400" />
               Verified Public Layout (onsta.ae)
             </span>
           </div>
@@ -79,7 +75,7 @@ export default function CustomerPreviewModal({ isOpen, onClose }) {
                   deviceMode === 'desktop' ? 'bg-theme-card text-theme-primary shadow-sm' : 'text-theme-sidebar-text hover:text-white'
                 }`}
               >
-                <Monitor className="w-3.5 h-3.5" />
+                <AppIcon name="monitor" className="w-3.5 h-3.5" />
                 Desktop
               </button>
               <button
@@ -89,7 +85,7 @@ export default function CustomerPreviewModal({ isOpen, onClose }) {
                   deviceMode === 'mobile' ? 'bg-theme-card text-theme-primary shadow-sm' : 'text-theme-sidebar-text hover:text-white'
                 }`}
               >
-                <Smartphone className="w-3.5 h-3.5" />
+                <AppIcon name="smartphone" className="w-3.5 h-3.5" />
                 Mobile
               </button>
             </div>
@@ -97,10 +93,10 @@ export default function CustomerPreviewModal({ isOpen, onClose }) {
             <button
               type="button"
               onClick={onClose}
-              className="text-white/70 hover:text-white p-1.5 rounded-full transition-colors hover:bg-white/10"
+              className="text-white/70 hover:text-white min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full transition-colors hover:bg-white/10"
               aria-label="Close Preview"
             >
-              <X className="w-5 h-5" />
+              <AppIcon name="close" className="w-5 h-5" />
             </button>
           </div>
         </div>
@@ -116,17 +112,18 @@ export default function CustomerPreviewModal({ isOpen, onClose }) {
           >
             {/* Top Navigation Row in Public Page */}
             <div className="flex items-center justify-end gap-2.5 pb-4 sm:pb-6">
-              {/* UAE Flag icon */}
+              {/* UAE Location Pill */}
               <div
-                className="w-8 h-8 rounded-full bg-white border border-gray-200/80 shadow-xs flex items-center justify-center text-sm"
+                className="px-2.5 h-8 rounded-full bg-white border border-gray-200/80 shadow-xs flex items-center gap-1 text-[11px] font-semibold text-gray-700"
                 title="United Arab Emirates"
               >
-                🇦🇪
+                <AppIcon name="map-pin" className="w-3.5 h-3.5 text-theme-primary" />
+                <span>UAE</span>
               </div>
 
               {/* User Avatar */}
               <div className="w-8 h-8 rounded-full bg-white border border-gray-200/80 shadow-xs flex items-center justify-center text-gray-700">
-                <User className="w-4 h-4" />
+                <AppIcon name="user" className="w-4 h-4" />
               </div>
 
               {/* Back > pill button */}
@@ -136,7 +133,7 @@ export default function CustomerPreviewModal({ isOpen, onClose }) {
                 className="flex items-center gap-1 px-3.5 py-1.5 rounded-full bg-white border border-gray-200/80 shadow-xs text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors"
               >
                 <span>Back</span>
-                <ChevronRight className="w-3.5 h-3.5" />
+                <AppIcon name="caret-right" className="w-3.5 h-3.5" />
               </button>
             </div>
 
@@ -160,7 +157,7 @@ export default function CustomerPreviewModal({ isOpen, onClose }) {
                   {/* Badge & Title at Bottom Left of Hero */}
                   <div className="absolute bottom-6 left-6 right-6">
                     <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-theme-accent-soft border border-theme-accent-border backdrop-blur text-xs font-semibold text-theme-accent-text shadow-sm mb-2.5">
-                      <Sparkles className="w-3.5 h-3.5 text-theme-accent fill-theme-accent" />
+                      <AppIcon name="star" weight="fill" className="w-3.5 h-3.5 text-theme-accent" />
                       <span>Featured</span>
                     </div>
 
@@ -173,17 +170,17 @@ export default function CustomerPreviewModal({ isOpen, onClose }) {
                 {/* Metadata Row */}
                 <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs sm:text-sm text-gray-600">
                   <div className="flex items-center gap-1.5">
-                    <MapPin className="w-4 h-4 text-gray-400" />
+                    <AppIcon name="map-pin" className="w-4 h-4 text-gray-400" />
                     <span>{clinicCity}, {clinicEmirate}</span>
                   </div>
 
                   <div className="flex items-center gap-1.5">
-                    <Phone className="w-4 h-4 text-gray-400" />
+                    <AppIcon name="phone" className="w-4 h-4 text-gray-400" />
                     <span>{clinicPhone}</span>
                   </div>
 
                   <div className="flex items-center gap-1 text-gray-900 font-semibold">
-                    <Star className="w-4 h-4 text-theme-accent fill-theme-accent" />
+                    <AppIcon name="star" weight="fill" className="w-4 h-4 text-theme-accent" />
                     <span>{clinicRating}</span>
                     <span className="text-gray-400 font-normal">({clinicReviewsCount})</span>
                   </div>
@@ -236,7 +233,7 @@ export default function CustomerPreviewModal({ isOpen, onClose }) {
                   <div className="mt-4 space-y-3">
                     {displayServices.length === 0 ? (
                       <div className="bg-white rounded-2xl p-8 text-center border border-gray-100 shadow-xs">
-                        <Sparkles className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                        <AppIcon name="stethoscope" className="w-8 h-8 text-gray-300 mx-auto mb-2" />
                         <p className="font-semibold text-sm text-gray-700">No active treatments published yet</p>
                         <p className="text-xs text-gray-400 mt-1">Services added in the clinic portal will appear here for customers.</p>
                       </div>
@@ -259,7 +256,7 @@ export default function CustomerPreviewModal({ isOpen, onClose }) {
                                 {srv.name}
                               </h3>
                               <div className="flex items-center gap-1.5 text-xs text-gray-500 mt-1">
-                                <Clock className="w-3.5 h-3.5 text-gray-400" />
+                                <AppIcon name="clock" className="w-3.5 h-3.5 text-gray-400" />
                                 <span>{srv.duration || '30 min'}</span>
                               </div>
                             </div>
@@ -281,7 +278,7 @@ export default function CustomerPreviewModal({ isOpen, onClose }) {
                               type="button"
                               className="flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-xl text-xs font-semibold bg-[#f4f3f0] hover:bg-[#eae7e0] text-gray-700 border border-gray-200/60 transition-colors"
                             >
-                              <Hourglass className="w-3.5 h-3.5 text-gray-500" />
+                              <AppIcon name="hourglass" className="w-3.5 h-3.5 text-gray-500" />
                               <span>Booking soon</span>
                             </button>
                           </div>
@@ -299,7 +296,7 @@ export default function CustomerPreviewModal({ isOpen, onClose }) {
                       <div>
                         <div className="flex items-center gap-1">
                           {[1, 2, 3, 4, 5].map((i) => (
-                            <Star key={i} className="w-4 h-4 text-theme-accent fill-theme-accent" />
+                            <AppIcon key={i} name="star" weight="fill" className="w-4 h-4 text-theme-accent" />
                           ))}
                         </div>
                         <p className="text-xs text-gray-500 mt-0.5">Based on {clinicReviewsCount} verified visits</p>
@@ -410,14 +407,14 @@ export default function CustomerPreviewModal({ isOpen, onClose }) {
                 {/* Card 1: Book Appointment */}
                 <div className="bg-white rounded-3xl p-5 sm:p-6 shadow-xs border border-gray-100">
                   <div className="flex items-center gap-2 mb-4">
-                    <Calendar className="w-4 h-4 text-gray-700" />
+                    <AppIcon name="calendar" className="w-4 h-4 text-gray-700" />
                     <h2 className="font-serif font-bold text-gray-900 text-base">
                       Book Appointment
                     </h2>
                   </div>
 
                   <div className="bg-[#f4f3f0] rounded-2xl p-6 text-center border border-gray-200/40 flex flex-col items-center justify-center min-h-[120px]">
-                    <Hourglass className="w-5 h-5 text-gray-600 mb-2" />
+                    <AppIcon name="hourglass" className="w-5 h-5 text-gray-600 mb-2" />
                     <p className="text-xs text-gray-600 font-medium">
                       Booking at this place is coming soon
                     </p>
@@ -428,7 +425,7 @@ export default function CustomerPreviewModal({ isOpen, onClose }) {
                 {displayOffers.length > 0 && (
                   <div className="bg-white rounded-3xl p-5 sm:p-6 shadow-xs border border-gray-100">
                     <div className="flex items-center gap-2 mb-4">
-                      <Tag className="w-4 h-4 text-theme-accent" />
+                      <AppIcon name="tag" className="w-4 h-4 text-theme-accent" />
                       <h2 className="font-serif font-bold text-gray-900 text-base">
                         Offers
                       </h2>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import FaIcon from '../common/FaIcon';
+import AppIcon from '../common/AppIcon';
 
 export default function MasterCatalog() {
   const [catalog, setCatalog] = useState({ categories: [], treatments: [], concerns: [] });
@@ -227,7 +227,7 @@ export default function MasterCatalog() {
       <header className="px-8 py-6 border-b border-theme-border bg-theme-card flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-sm">
         <div>
           <div className="flex items-center gap-2 text-theme-primary text-xs alata-regular uppercase tracking-wider mb-1">
-            <FaIcon icon="fa-solid fa-wand-magic-sparkles" className="text-theme-primary" />
+            <AppIcon name="ai" size="sm" className="text-theme-primary" />
             AI Detection & Clinical Taxonomy
           </div>
           <h1 className="text-2xl alata-regular text-theme-ink">
@@ -243,14 +243,14 @@ export default function MasterCatalog() {
             onClick={() => setShowAddCategoryModal(true)}
             className="flex items-center gap-2 px-4 py-2 bg-theme-canvas border border-theme-border-strong hover:bg-theme-primary-soft text-theme-primary rounded-full text-sm alata-regular shadow-sm transition-all"
           >
-            <FaIcon icon="fa-solid fa-folder-plus" />
+            <AppIcon name="folder-plus" size="sm" />
             Add Dynamic Category
           </button>
           <button
             onClick={() => setShowAddModal(true)}
             className="flex items-center gap-2 px-5 py-2 bg-theme-primary hover:bg-theme-primary-hover text-white rounded-full text-sm alata-regular shadow-sm transition-all"
           >
-            <FaIcon icon="fa-solid fa-plus" />
+            <AppIcon name="plus" size="sm" />
             Add Master Treatment
           </button>
         </div>
@@ -264,7 +264,7 @@ export default function MasterCatalog() {
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-theme-muted uppercase tracking-wider">Dynamic Categories</span>
               <span className="w-9 h-9 rounded-2xl bg-theme-primary-soft text-theme-primary flex items-center justify-center">
-                <FaIcon icon="fa-solid fa-layer-group" />
+                <AppIcon name="layers" size="sm" />
               </span>
             </div>
             <div className="mt-3 flex items-baseline gap-2">
@@ -277,7 +277,7 @@ export default function MasterCatalog() {
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-theme-muted uppercase tracking-wider">Standard Treatments</span>
               <span className="w-9 h-9 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
-                <FaIcon icon="fa-solid fa-wand-magic-sparkles" />
+                <AppIcon name="stethoscope" size="sm" />
               </span>
             </div>
             <div className="mt-3 flex items-baseline gap-2">
@@ -290,7 +290,7 @@ export default function MasterCatalog() {
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-theme-muted uppercase tracking-wider">AI Face Scan Concerns</span>
               <span className="w-9 h-9 rounded-2xl bg-amber-50 text-amber-700 flex items-center justify-center">
-                <FaIcon icon="fa-solid fa-star" />
+                <AppIcon name="ai" size="sm" />
               </span>
             </div>
             <div className="mt-3 flex items-baseline gap-2">
@@ -303,7 +303,7 @@ export default function MasterCatalog() {
             <div className="flex items-center justify-between">
               <span className="text-xs font-semibold text-theme-muted uppercase tracking-wider">AI Mapping Rules</span>
               <span className="w-9 h-9 rounded-2xl bg-theme-primary-soft text-theme-primary flex items-center justify-center">
-                <FaIcon icon="fa-solid fa-shield-halved" />
+                <AppIcon name="shield-check" size="sm" />
               </span>
             </div>
             <div className="mt-3 flex items-baseline gap-2">
@@ -318,7 +318,7 @@ export default function MasterCatalog() {
         {/* Filters and Search */}
         <div className="bg-theme-card p-4 rounded-2xl border border-theme-border shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="relative w-full md:w-96">
-            <FaIcon icon="fa-solid fa-magnifying-glass" className="text-xs text-theme-muted absolute left-3.5 top-3" />
+            <AppIcon name="search" size="sm" className="text-theme-muted absolute left-3.5 top-2.5" />
             <input
               type="text"
               placeholder="Search treatments or concerns..."
@@ -361,7 +361,7 @@ export default function MasterCatalog() {
             <div className="p-12 text-center text-theme-muted">Loading master catalog…</div>
           ) : error ? (
             <div className="p-8 text-center text-rose-600 flex items-center justify-center gap-2">
-              <FaIcon icon="fa-solid fa-circle-exclamation" />
+              <AppIcon name="warning-circle" size="sm" />
               {error}
             </div>
           ) : filteredTreatments.length === 0 ? (
@@ -396,11 +396,11 @@ export default function MasterCatalog() {
                           title="Upload default treatment image"
                         >
                           {uploadingTreatmentId === t.id ? (
-                            <FaIcon icon="fa-solid fa-spinner fa-spin" className="text-[#6B3B66]" />
+                            <AppIcon name="spinner" spin size="sm" className="text-[#6B3B66]" />
                           ) : t.default_image_url ? (
                             <img src={t.default_image_url} alt={t.name} className="w-full h-full object-cover" />
                           ) : (
-                            <FaIcon icon="fa-regular fa-image" className="text-[#9E77AD]" />
+                            <AppIcon name="image" size="sm" className="text-[#9E77AD]" />
                           )}
                           <span className="absolute inset-0 bg-[#1A1320]/55 text-white text-[9px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
                             Edit
@@ -425,7 +425,7 @@ export default function MasterCatalog() {
                               key={mc.id}
                               className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-amber-50 text-amber-800 border border-amber-200/70"
                             >
-                              <FaIcon icon="fa-solid fa-wand-magic-sparkles" className="text-[10px] text-amber-600" />
+                              <AppIcon name="ai" size="sm" className="text-[10px] text-amber-600" />
                               {mc.name}
                             </span>
                           ))
@@ -436,7 +436,7 @@ export default function MasterCatalog() {
                     </td>
                     <td className="py-4 px-6 text-theme-muted">
                       <div className="flex items-center gap-1.5">
-                        <FaIcon icon="fa-regular fa-clock" className="text-theme-primary/70" />
+                        <AppIcon name="clock" size="sm" className="text-theme-primary/70" />
                         {t.standard_duration_minutes} min
                       </div>
                     </td>
@@ -461,7 +461,7 @@ export default function MasterCatalog() {
                             : 'bg-theme-surface text-theme-muted border-theme-border hover:bg-theme-primary-soft'
                         }`}
                       >
-                        <FaIcon icon={t.is_active ? 'fa-solid fa-circle-check' : 'fa-solid fa-circle-xmark'} />
+                        <AppIcon name={t.is_active ? 'check-circle' : 'x-circle'} size="sm" />
                         {t.is_active ? 'Active' : 'Disabled'}
                       </button>
                     </td>
@@ -487,8 +487,12 @@ export default function MasterCatalog() {
           <div className="bg-theme-card rounded-3xl max-w-md w-full p-6 shadow-2xl border border-theme-border">
             <div className="flex items-center justify-between pb-4 border-b border-theme-border">
               <h2 className="text-lg alata-regular text-theme-ink">Add Dynamic Category</h2>
-              <button onClick={() => setShowAddCategoryModal(false)} className="text-theme-muted hover:text-theme-ink p-1 rounded-full hover:bg-theme-canvas">
-                <FaIcon icon="fa-solid fa-xmark" />
+              <button
+                onClick={() => setShowAddCategoryModal(false)}
+                aria-label="Close modal"
+                className="text-theme-muted hover:text-theme-ink min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-theme-canvas"
+              >
+                <AppIcon name="close" size="sm" />
               </button>
             </div>
 
@@ -547,8 +551,12 @@ export default function MasterCatalog() {
           <div className="bg-theme-card rounded-3xl max-w-xl w-full p-6 shadow-2xl border border-theme-border max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-4 border-b border-theme-border">
               <h2 className="text-lg alata-regular text-theme-ink">Add Master Clinical Treatment</h2>
-              <button onClick={() => setShowAddModal(false)} className="text-theme-muted hover:text-theme-ink p-1 rounded-full hover:bg-theme-canvas">
-                <FaIcon icon="fa-solid fa-xmark" />
+              <button
+                onClick={() => setShowAddModal(false)}
+                aria-label="Close modal"
+                className="text-theme-muted hover:text-theme-ink min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full hover:bg-theme-canvas"
+              >
+                <AppIcon name="close" size="sm" />
               </button>
             </div>
 
@@ -686,7 +694,7 @@ export default function MasterCatalog() {
                     {imagePreviewUrl ? (
                       <img src={imagePreviewUrl} alt="Preview" className="w-full h-full object-cover" />
                     ) : (
-                      <FaIcon icon="fa-regular fa-image" className="text-[#9E77AD]" />
+                      <AppIcon name="image" size="md" className="text-[#9E77AD]" />
                     )}
                   </div>
                   <div className="flex-1">
@@ -695,7 +703,7 @@ export default function MasterCatalog() {
                       onClick={() => modalImgInputRef.current?.click()}
                       className="px-3.5 py-1.5 bg-white border border-[#DECBE9] text-[#6B3B66] hover:bg-[#F0E6F6] rounded-full text-xs alata-regular inline-flex items-center gap-1.5 transition"
                     >
-                      <FaIcon icon="fa-solid fa-cloud-arrow-up" />
+                      <AppIcon name="cloud-upload" size="sm" />
                       <span>{imagePreviewUrl ? 'Change Default Photo' : 'Upload Default Photo'}</span>
                     </button>
                     <p className="text-[10px] text-[#64748B] mt-1">
@@ -728,7 +736,7 @@ export default function MasterCatalog() {
                     {imagePreviewUrl ? (
                       <img src={imagePreviewUrl} alt="Preview" className="w-full h-full object-cover" />
                     ) : (
-                      <FaIcon icon="fa-regular fa-image" className="text-[#9E77AD]" />
+                      <AppIcon name="image" size="md" className="text-[#9E77AD]" />
                     )}
                   </div>
                   <div className="flex-1">
@@ -737,7 +745,7 @@ export default function MasterCatalog() {
                       onClick={() => modalImgInputRef.current?.click()}
                       className="px-3.5 py-1.5 bg-white border border-[#DECBE9] text-[#6B3B66] hover:bg-[#F0E6F6] rounded-full text-xs alata-regular inline-flex items-center gap-1.5 transition"
                     >
-                      <FaIcon icon="fa-solid fa-cloud-arrow-up" />
+                      <AppIcon name="cloud-upload" size="sm" />
                       <span>{imagePreviewUrl ? 'Change Default Photo' : 'Upload Default Photo'}</span>
                     </button>
                     <p className="text-[10px] text-[#64748B] mt-1">

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useClinic } from '../../context/ClinicContext';
 import VerificationBadge from '../common/VerificationBadge';
-import FaIcon from '../common/FaIcon';
+import AppIcon from '../common/AppIcon';
 import ModalPortal from '../common/ModalPortal';
 import { parseTariffSheet, fetchMasterTreatments, uploadServiceImage, deleteServiceImage } from '../../api/serviceApi';
 
@@ -329,7 +329,7 @@ export default function ServicesPrices() {
       <div className="bg-theme-card rounded-3xl border border-theme-border p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
           <div className="w-11 h-11 rounded-2xl bg-theme-primary-soft text-theme-primary flex items-center justify-center flex-shrink-0">
-            <FaIcon icon="fa-solid fa-stethoscope" className="text-lg" />
+            <AppIcon name="stethoscope" className="text-lg" />
           </div>
           <div>
             <h1 className="text-2xl sm:text-3xl alata-regular text-theme-ink tracking-tight">
@@ -351,7 +351,7 @@ export default function ServicesPrices() {
             }}
             className="px-4 py-2.5 rounded-full bg-theme-canvas text-theme-primary border border-theme-border-strong hover:bg-theme-primary-soft text-xs alata-regular flex items-center gap-2 transition-colors shadow-xs"
           >
-            <FaIcon icon="fa-solid fa-file-pdf" />
+            <AppIcon name="file-pdf" />
             <span>Import PDF Tariff</span>
           </button>
 
@@ -359,7 +359,7 @@ export default function ServicesPrices() {
             onClick={openAddModal}
             className="px-5 py-2.5 rounded-full bg-theme-primary text-white hover:bg-theme-primary-hover text-xs alata-regular flex items-center gap-2 transition-all shadow-sm hover:shadow-md"
           >
-            <FaIcon icon="fa-solid fa-plus" className="text-xs" />
+            <AppIcon name="plus" className="text-xs" />
             <span>Add Single Service</span>
           </button>
         </div>
@@ -369,7 +369,7 @@ export default function ServicesPrices() {
       <div className="bg-theme-card p-4 rounded-2xl border border-theme-border shadow-sm space-y-3">
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
           <div className="relative flex-1">
-            <FaIcon icon="fa-solid fa-magnifying-glass" className="text-xs text-theme-subtle absolute left-4 top-1/2 -translate-y-1/2" />
+            <AppIcon name="search" className="text-xs text-theme-subtle absolute left-4 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Search treatments by name, category, or clinical description..."
@@ -434,7 +434,7 @@ export default function ServicesPrices() {
                 <tr>
                   <td colSpan={7} className="py-14 text-center text-theme-muted">
                     <div className="w-12 h-12 rounded-2xl bg-theme-canvas text-theme-primary flex items-center justify-center mx-auto mb-3">
-                      <FaIcon icon="fa-solid fa-stethoscope" className="text-xl" />
+                      <AppIcon name="stethoscope" className="text-xl" />
                     </div>
                     <p className="alata-regular text-sm text-theme-ink">
                       {services.length === 0 ? 'No services in catalogue yet' : 'No services match your criteria'}
@@ -455,7 +455,7 @@ export default function ServicesPrices() {
                           {srv.imageUrl ? (
                             <img src={srv.imageUrl} alt={srv.name} className="w-full h-full object-cover" />
                           ) : (
-                            <FaIcon icon="fa-solid fa-spa" className="text-[#9E77AD] text-sm" />
+                            <AppIcon name="stethoscope" size="sm" className="text-[#9E77AD]" />
                           )}
                         </div>
                         <div className="min-w-0">
@@ -472,8 +472,10 @@ export default function ServicesPrices() {
                       </span>
                     </td>
                     <td className="py-3.5 px-4 text-theme-muted font-medium">
-                      <FaIcon icon="fa-regular fa-clock" className="mr-1.5 text-theme-subtle" />
-                      {srv.duration}
+                      <span className="inline-flex items-center gap-1.5">
+                        <AppIcon name="clock" className="text-theme-subtle" />
+                        <span>{srv.duration}</span>
+                      </span>
                     </td>
                     <td className="py-3.5 px-4">
                       <div className="flex items-baseline gap-1.5">
@@ -508,10 +510,11 @@ export default function ServicesPrices() {
                       <div className="flex items-center justify-end gap-1.5">
                         <button
                           onClick={() => openEditModal(srv)}
-                          className="w-8 h-8 rounded-xl text-theme-muted hover:text-theme-primary hover:bg-theme-canvas flex items-center justify-center transition-colors"
+                          aria-label={`Edit ${srv.name}`}
+                          className="min-w-[44px] min-h-[44px] rounded-xl text-theme-muted hover:text-theme-primary hover:bg-theme-canvas flex items-center justify-center transition-colors"
                           title="Edit service"
                         >
-                          <FaIcon icon="fa-solid fa-pen-to-square" className="text-xs" />
+                          <AppIcon name="edit" className="text-sm" />
                         </button>
                         <button
                           onClick={() => {
@@ -519,10 +522,11 @@ export default function ServicesPrices() {
                               deleteService(srv.id);
                             }
                           }}
-                          className="w-8 h-8 rounded-xl text-theme-subtle hover:text-[#991B1B] hover:bg-[#FEE2E2] flex items-center justify-center transition-colors"
+                          aria-label={`Delete ${srv.name}`}
+                          className="min-w-[44px] min-h-[44px] rounded-xl text-theme-subtle hover:text-[#991B1B] hover:bg-[#FEE2E2] flex items-center justify-center transition-colors"
                           title="Delete service"
                         >
-                          <FaIcon icon="fa-solid fa-trash-can" className="text-xs" />
+                          <AppIcon name="trash" className="text-sm" />
                         </button>
                       </div>
                     </td>
@@ -542,7 +546,7 @@ export default function ServicesPrices() {
             <div className="p-5 bg-theme-sidebar-bg text-white flex items-center justify-between flex-shrink-0">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-xl bg-theme-primary text-white flex items-center justify-center">
-                  <FaIcon icon="fa-solid fa-file-pdf" className="text-sm" />
+                  <AppIcon name="file-pdf" className="text-sm" />
                 </div>
                 <div>
                   <h3 className="alata-regular text-base">
@@ -555,9 +559,10 @@ export default function ServicesPrices() {
               </div>
               <button
                 onClick={() => setIsPdfImportOpen(false)}
-                className="text-white/70 hover:text-white w-8 h-8 rounded-xl flex items-center justify-center hover:bg-white/10"
+                aria-label="Close tariff import modal"
+                className="text-white/70 hover:text-white min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center hover:bg-white/10"
               >
-                <FaIcon icon="fa-solid fa-xmark" className="text-base" />
+                <AppIcon name="close" className="text-base" />
               </button>
             </div>
 
@@ -575,7 +580,7 @@ export default function ServicesPrices() {
                     onChange={handleFileSelect}
                   />
                   <div className="w-16 h-16 bg-theme-primary-soft text-theme-primary rounded-2xl flex items-center justify-center mx-auto mb-4 border border-theme-border-strong">
-                    <FaIcon icon="fa-solid fa-cloud-arrow-up" className="text-2xl" />
+                    <AppIcon name="cloud-upload" className="text-2xl" />
                   </div>
                   <h4 className="alata-regular text-theme-ink text-base">
                     {selectedFile ? selectedFile.name : 'Drop your Clinic Price List or Treatment Menu'}
@@ -595,7 +600,7 @@ export default function ServicesPrices() {
                         }}
                         className="px-6 py-2.5 bg-theme-primary hover:bg-theme-primary-hover text-white rounded-full text-xs alata-regular shadow-sm inline-flex items-center gap-2"
                       >
-                        <FaIcon icon="fa-solid fa-wand-magic-sparkles" />
+                        <AppIcon name="ai" />
                         <span>Run AI Extraction on Uploaded File</span>
                       </button>
                     ) : (
@@ -608,7 +613,7 @@ export default function ServicesPrices() {
 
                 {parseError && (
                   <div className="p-3.5 bg-[#FEE2E2] border border-[#FECACA] rounded-2xl text-xs text-[#991B1B] flex items-center gap-2 text-left">
-                    <FaIcon icon="fa-solid fa-circle-exclamation" className="flex-shrink-0 text-[#DC2626]" />
+                    <AppIcon name="warning-circle" className="flex-shrink-0 text-[#DC2626]" />
                     <span>{parseError}</span>
                   </div>
                 )}
@@ -634,7 +639,7 @@ export default function ServicesPrices() {
                     onClick={() => executeTariffParse(true)}
                     className="px-4 py-2 bg-theme-primary hover:bg-theme-primary-hover text-white rounded-full text-xs alata-regular shadow-sm inline-flex items-center gap-1.5 flex-shrink-0"
                   >
-                    <FaIcon icon="fa-solid fa-wand-magic-sparkles" />
+                    <AppIcon name="ai" />
                     <span>Parse Sample Menu</span>
                   </button>
                 </div>
@@ -644,7 +649,7 @@ export default function ServicesPrices() {
             {pdfParsingStep === 'parsing' && (
               <div className="p-16 text-center space-y-4">
                 <div className="w-16 h-16 bg-theme-primary-soft text-theme-primary rounded-2xl flex items-center justify-center mx-auto border border-theme-border-strong">
-                  <FaIcon icon="fa-solid fa-spinner fa-spin" className="text-2xl" />
+                  <AppIcon name="spinner" spin className="text-2xl" />
                 </div>
                 <h4 className="alata-regular text-theme-ink text-lg">
                   AI Reading & Structuring Services from Tariff...
@@ -653,7 +658,7 @@ export default function ServicesPrices() {
                   Detecting treatments, duration times, categories, and matching against permitted DHA facility scopes.
                 </p>
                 <div className="flex items-center justify-center gap-2 text-[11px] text-theme-primary font-medium">
-                  <FaIcon icon="fa-solid fa-microchip" />
+                  <AppIcon name="cpu" />
                   <span>Multimodal Vision AI + UAE Regulatory Scope Engine</span>
                 </div>
               </div>
@@ -663,14 +668,14 @@ export default function ServicesPrices() {
               <div className="flex flex-col flex-1 overflow-hidden">
                 <div className="p-4 bg-[#DCFCE7] border-b border-[#BBF7D0] flex flex-wrap items-center justify-between gap-2 flex-shrink-0">
                   <div className="flex items-center gap-2">
-                    <FaIcon icon="fa-solid fa-circle-check" className="text-[#166534]" />
+                    <AppIcon name="check-circle" className="text-[#166534]" />
                     <span className="text-xs alata-regular text-[#166534]">
                       AI Extracted {parsedServices.length} Treatments from {parsedFileName} (Confidence: {Math.round(parseConfidence * 100)}%)
                     </span>
                   </div>
                   {duplicatesCount > 0 && (
                     <span className="px-2.5 py-0.5 rounded-full text-[10px] alata-regular bg-[#FFEDD5] text-[#9A3412] border border-[#FED7AA] flex items-center gap-1">
-                      <FaIcon icon="fa-solid fa-triangle-exclamation" />
+                      <AppIcon name="warning" />
                       {duplicatesCount} already in catalogue
                     </span>
                   )}
@@ -701,7 +706,7 @@ export default function ServicesPrices() {
                             />
                             {item.isDuplicate && (
                               <div className="text-[10px] text-[#9A3412] font-semibold mt-0.5 flex items-center gap-1">
-                                <FaIcon icon="fa-solid fa-triangle-exclamation" />
+                                <AppIcon name="warning" />
                                 <span>Already in catalogue</span>
                               </div>
                             )}
@@ -752,10 +757,11 @@ export default function ServicesPrices() {
                           <td className="py-2 px-3 text-center">
                             <button
                               onClick={() => handleDeleteParsedItem(idx)}
-                              className="text-theme-subtle hover:text-[#991B1B] p-1 rounded"
+                              aria-label={`Remove ${item.name}`}
+                              className="text-theme-subtle hover:text-[#991B1B] min-w-[44px] min-h-[44px] inline-flex items-center justify-center rounded-lg hover:bg-red-50"
                               title="Remove item"
                             >
-                              <FaIcon icon="fa-solid fa-trash-can" />
+                              <AppIcon name="trash" />
                             </button>
                           </td>
                         </tr>
@@ -768,7 +774,7 @@ export default function ServicesPrices() {
                       onClick={handleAddCustomParsedItem}
                       className="text-xs text-theme-primary hover:text-theme-primary-hover alata-regular inline-flex items-center gap-1.5"
                     >
-                      <FaIcon icon="fa-solid fa-plus" className="text-[10px]" />
+                      <AppIcon name="plus" className="text-[10px]" />
                       <span>Add another treatment row</span>
                     </button>
                   </div>
@@ -793,7 +799,7 @@ export default function ServicesPrices() {
                       onClick={handleSaveAllParsedServices}
                       className="px-6 py-2 bg-theme-primary hover:bg-theme-primary-hover text-white rounded-full text-xs alata-regular shadow-sm flex items-center gap-2"
                     >
-                      <FaIcon icon="fa-solid fa-circle-check" />
+                      <AppIcon name="check-circle" />
                       <span>Confirm & Save All ({parsedServices.length} Services)</span>
                     </button>
                   </div>
@@ -813,7 +819,7 @@ export default function ServicesPrices() {
               <div className="p-5 bg-theme-sidebar-bg text-white flex items-center justify-between flex-shrink-0">
                 <div className="flex items-center gap-2.5">
                   <div className="w-8 h-8 rounded-xl bg-theme-primary flex items-center justify-center">
-                    <FaIcon icon="fa-solid fa-stethoscope" className="text-sm" />
+                    <AppIcon name="stethoscope" className="text-sm" />
                   </div>
                   <h3 className="alata-regular text-base">
                     {editingService ? 'Edit Treatment Offering' : 'Add Treatment Service'}
@@ -821,16 +827,17 @@ export default function ServicesPrices() {
                 </div>
                 <button
                   onClick={() => setIsModalOpen(false)}
-                  className="text-white/70 hover:text-white w-8 h-8 rounded-xl flex items-center justify-center hover:bg-white/10"
+                  aria-label="Close service modal"
+                  className="text-white/70 hover:text-white min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center hover:bg-white/10"
                 >
-                  <FaIcon icon="fa-solid fa-xmark" />
+                  <AppIcon name="close" />
                 </button>
               </div>
 
               <form onSubmit={handleFormSubmit} className="p-6 space-y-4 overflow-y-auto flex-1">
               <div className="bg-theme-canvas p-4 rounded-2xl border border-theme-border">
                 <div className="flex items-center gap-1.5 text-xs alata-regular text-theme-primary mb-1">
-                  <FaIcon icon="fa-solid fa-wand-magic-sparkles" />
+                  <AppIcon name="ai" />
                   <span>Map to Onsta Master Treatment (AI Face Detection)</span>
                 </div>
                 <p className="text-[11px] text-theme-muted mb-2">
@@ -851,8 +858,9 @@ export default function ServicesPrices() {
                 {formData.masterTreatmentId && (
                   <div className="mt-2 flex flex-wrap gap-1">
                     {masterTreatments.find(t => t.id === formData.masterTreatmentId)?.target_concerns?.map((c) => (
-                      <span key={c.id} className="text-[10px] bg-theme-card border border-theme-border-strong text-theme-primary px-2.5 py-0.5 rounded-full alata-regular">
-                        ✓ Treats: {c.name}
+                      <span key={c.id} className="inline-flex items-center gap-1 text-[10px] bg-theme-card border border-theme-border-strong text-theme-primary px-2.5 py-0.5 rounded-full alata-regular">
+                        <AppIcon name="check" className="text-[10px]" />
+                        <span>Treats: {c.name}</span>
                       </span>
                     ))}
                   </div>
@@ -949,7 +957,7 @@ export default function ServicesPrices() {
 
               {formError && (
                 <div role="alert" className="rounded-xl border border-[#FECACA] bg-[#FEE2E2] px-3.5 py-2.5 text-xs text-[#991B1B] flex items-center gap-2">
-                  <FaIcon icon="fa-solid fa-circle-exclamation" className="text-[#DC2626] shrink-0" />
+                  <AppIcon name="warning-circle" size="sm" className="text-[#DC2626] shrink-0" />
                   <span>{formError}</span>
                 </div>
               )}
@@ -1000,7 +1008,7 @@ export default function ServicesPrices() {
                     {imagePreviewUrl ? (
                       <img src={imagePreviewUrl} alt="Service Preview" className="w-full h-full object-cover" />
                     ) : (
-                      <FaIcon icon="fa-regular fa-image" className="text-[#9E77AD] text-lg" />
+                      <AppIcon name="image" size="md" className="text-[#9E77AD]" />
                     )}
                   </div>
                   <div className="flex-1">
@@ -1009,7 +1017,7 @@ export default function ServicesPrices() {
                       onClick={() => serviceImgInputRef.current?.click()}
                       className="px-3.5 py-1.5 rounded-full bg-white border border-[#DECBE9] text-[#6B3B66] hover:bg-[#F0E6F6] text-xs alata-regular inline-flex items-center gap-1.5 transition"
                     >
-                      <FaIcon icon="fa-solid fa-cloud-arrow-up" />
+                      <AppIcon name="cloud-upload" size="sm" />
                       <span>{imagePreviewUrl ? 'Change Photo' : 'Upload Treatment Photo'}</span>
                     </button>
                     <p className="text-[10px] text-[#64748B] mt-1">
@@ -1038,8 +1046,8 @@ export default function ServicesPrices() {
                   type="submit"
                   className="px-6 py-2.5 bg-[#6B3B66] hover:bg-[#552B51] text-white rounded-full text-xs alata-regular shadow-sm flex items-center gap-2"
                 >
-                  <FaIcon icon={uploadingImage ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-circle-check'} />
-                  <span>{uploadingImage ? 'Uploading Photo...' : editingService ? 'Update Service' : 'Save Service'}</span>
+                  <AppIcon name="check-circle" />
+                  <span>{editingService ? 'Update Service' : 'Save Service'}</span>
                 </button>
               </div>
             </form>

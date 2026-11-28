@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import FaIcon from '../common/FaIcon';
+import AppIcon from '../common/AppIcon';
 import {
   downloadApplicationDocument,
   fetchRegisteredClinicDetail,
@@ -117,7 +117,7 @@ function RegisteredClinicDetails({ clinic, tab, onDownload }) {
               <StatusBadge value={branch.status} />
             </div>
             <p className="mt-3 flex items-start gap-2 text-sm text-theme-muted">
-              <FaIcon icon="fa-solid fa-location-dot" className="mt-1 shrink-0 text-theme-primary" />
+              <AppIcon name="map-pin" className="mt-1 shrink-0 text-theme-primary" />
               {[branch.street_address, branch.area, branch.emirate].filter(Boolean).join(', ')}
             </p>
             <p className="mt-2 text-xs text-theme-muted">{[branch.phone, branch.email].filter(Boolean).join(' · ') || 'No branch contact details'}</p>
@@ -167,7 +167,7 @@ function RegisteredClinicDetails({ clinic, tab, onDownload }) {
                     onClick={() => onDownload(document)}
                     className="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-theme-border-strong bg-theme-canvas px-4 py-2 text-xs alata-regular text-theme-primary hover:bg-theme-primary-soft transition"
                   >
-                    <FaIcon icon="fa-solid fa-download" />Download
+                    <AppIcon name="download" size="sm" /> Download
                   </button>
                 </div>
               ))}
@@ -371,7 +371,7 @@ export default function RegisteredClinics() {
           disabled={loading}
           className="inline-flex items-center gap-2 rounded-full border border-theme-border-strong bg-theme-canvas px-4 py-2 text-xs alata-regular text-theme-primary hover:bg-theme-primary-soft disabled:opacity-60 transition"
         >
-          <FaIcon icon="fa-solid fa-arrows-rotate" className={loading ? 'fa-spin' : ''} />Refresh
+          <AppIcon name="refresh" spin={loading} />Refresh
         </button>
       </header>
 
@@ -382,13 +382,13 @@ export default function RegisteredClinics() {
           <div className="space-y-3 border-b border-theme-border bg-theme-card/70 p-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-sm alata-regular text-theme-ink">
-                <FaIcon icon="fa-solid fa-hospital" className="text-theme-primary" />Approved clinics
+                <AppIcon name="hospital" className="text-theme-primary" />Approved clinics
               </div>
               <span className="text-xs alata-regular text-theme-muted">{total} total</span>
             </div>
             <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_170px_145px]">
               <label className="relative">
-                <FaIcon icon="fa-solid fa-magnifying-glass" className="absolute left-3.5 top-3 text-xs text-theme-muted" />
+                <AppIcon name="search" className="absolute left-3.5 top-3 text-xs text-theme-muted" />
                 <input
                   value={search}
                   onChange={(event) => { setSearch(event.target.value); setOffset(0); }}
@@ -447,7 +447,7 @@ export default function RegisteredClinics() {
                     </div>
                     <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-theme-muted">
                       <span className="inline-flex items-center gap-1">
-                        <FaIcon icon="fa-solid fa-location-dot" className="text-theme-primary/70" />
+                        <AppIcon name="map-pin" className="text-theme-primary/70" />
                         {clinic.emirate || 'Emirate not set'}
                       </span>
                       <span>{clinic.facility_type}</span>
@@ -471,19 +471,19 @@ export default function RegisteredClinics() {
                 type="button"
                 disabled={offset === 0 || loading}
                 onClick={() => setOffset(Math.max(0, offset - PAGE_SIZE))}
-                className="rounded-full border border-theme-border w-8 h-8 flex items-center justify-center hover:bg-theme-canvas hover:text-theme-primary disabled:opacity-40 transition"
+                className="rounded-full border border-theme-border min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-theme-canvas hover:text-theme-primary disabled:opacity-40 transition"
                 aria-label="Previous page"
               >
-                <FaIcon icon="fa-solid fa-chevron-left" className="text-xs" />
+                <AppIcon name="caret-left" className="text-sm" />
               </button>
               <button
                 type="button"
                 disabled={offset + PAGE_SIZE >= total || loading}
                 onClick={() => setOffset(offset + PAGE_SIZE)}
-                className="rounded-full border border-theme-border w-8 h-8 flex items-center justify-center hover:bg-theme-canvas hover:text-theme-primary disabled:opacity-40 transition"
+                className="rounded-full border border-theme-border min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-theme-canvas hover:text-theme-primary disabled:opacity-40 transition"
                 aria-label="Next page"
               >
-                <FaIcon icon="fa-solid fa-chevron-right" className="text-xs" />
+                <AppIcon name="caret-right" className="text-sm" />
               </button>
             </div>
           </footer>
@@ -497,7 +497,7 @@ export default function RegisteredClinics() {
           ) : !detail ? (
             <div className="flex min-h-64 flex-col items-center justify-center text-center text-theme-muted py-16 bg-theme-card rounded-3xl border border-theme-border">
               <div className="w-16 h-16 rounded-2xl bg-theme-primary-soft text-theme-primary flex items-center justify-center mb-3 border border-theme-border-strong">
-                <FaIcon icon="fa-solid fa-shield-halved" className="text-2xl" />
+                <AppIcon name="shield-check" className="text-2xl" />
               </div>
               <p className="text-sm alata-regular text-theme-ink">Select an approved clinic to view its details.</p>
             </div>
@@ -515,13 +515,13 @@ export default function RegisteredClinics() {
                 </div>
                 <div className="flex flex-wrap gap-2 text-[11px] text-theme-muted">
                   <span className="inline-flex items-center gap-1.5 rounded-full bg-theme-canvas border border-theme-border px-3 py-1 alata-regular text-theme-primary">
-                    <FaIcon icon="fa-solid fa-location-dot" />{detail.emirate || '—'}
+                    <AppIcon name="map-pin" />{detail.emirate || '—'}
                   </span>
                   <span className="inline-flex items-center gap-1.5 rounded-full bg-theme-surface border border-theme-border px-3 py-1 alata-regular text-theme-ink">
-                    <FaIcon icon="fa-solid fa-users" className="text-theme-primary" />{detail.member_count ?? detail.memberships.length} team
+                    <AppIcon name="users" className="text-theme-primary" />{detail.member_count ?? detail.memberships.length} team
                   </span>
                   <span className="inline-flex items-center gap-1.5 rounded-full bg-theme-surface border border-theme-border px-3 py-1 alata-regular text-theme-ink">
-                    <FaIcon icon="fa-solid fa-file-lines" className="text-theme-primary" />{detail.application_documents.length + detail.clinic_documents.length} docs
+                    <AppIcon name="file-text" className="text-theme-primary" />{detail.application_documents.length + detail.clinic_documents.length} docs
                   </span>
                 </div>
               </div>

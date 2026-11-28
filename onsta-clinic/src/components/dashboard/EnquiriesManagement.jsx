@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useClinic } from '../../context/ClinicContext';
-import FaIcon from '../common/FaIcon';
+import AppIcon from '../common/AppIcon';
 import ModalPortal from '../common/ModalPortal';
 
 export default function EnquiriesManagement() {
@@ -86,7 +86,7 @@ export default function EnquiriesManagement() {
       <div className="bg-theme-card rounded-3xl border border-theme-border p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
           <div className="w-11 h-11 rounded-2xl bg-theme-primary-soft text-theme-primary flex items-center justify-center flex-shrink-0">
-            <FaIcon icon="fa-solid fa-calendar-check" className="text-lg" />
+            <AppIcon name="calendar-check" className="text-lg" />
           </div>
           <div>
             <h1 className="text-2xl sm:text-3xl alata-regular text-theme-ink tracking-tight">
@@ -118,7 +118,7 @@ export default function EnquiriesManagement() {
             }}
             className="px-4 py-2 rounded-full bg-theme-primary text-white hover:bg-theme-primary-hover text-xs alata-regular flex items-center gap-1.5 shadow-sm transition-all"
           >
-            <FaIcon icon="fa-solid fa-bolt" className="text-[11px]" />
+            <AppIcon name="bolt" className="text-[11px]" />
             <span>Simulate Inbound Lead</span>
           </button>
 
@@ -127,7 +127,7 @@ export default function EnquiriesManagement() {
             <span>{enquiries.filter(e => e.status === 'new').length} New</span>
           </span>
           <span className="px-3 py-1.5 rounded-full bg-[#DCFCE7] text-[#166534] border border-[#BBF7D0] text-xs alata-regular flex items-center gap-1.5">
-            <FaIcon icon="fa-solid fa-circle-check" />
+            <AppIcon name="check-circle" />
             <span>{enquiries.filter(e => e.status === 'booked').length} Bookings</span>
           </span>
         </div>
@@ -136,7 +136,7 @@ export default function EnquiriesManagement() {
       {/* Filter and Search Bar */}
       <div className="bg-theme-card rounded-2xl border border-theme-border p-4 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
         <div className="relative w-full sm:w-80">
-          <FaIcon icon="fa-solid fa-magnifying-glass" className="text-xs text-theme-subtle absolute left-4 top-1/2 -translate-y-1/2" />
+          <AppIcon name="search" className="text-xs text-theme-subtle absolute left-4 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={searchTerm}
@@ -216,7 +216,7 @@ export default function EnquiriesManagement() {
 
                     <div className="mt-2.5 flex items-center justify-between text-[11px] text-theme-subtle">
                       <span className="flex items-center gap-1.5">
-                        <FaIcon icon="fa-regular fa-calendar" />
+                        <AppIcon name="calendar" />
                         <span>{enq.preferredDate} ({enq.preferredTime})</span>
                       </span>
                       <span className="font-medium text-theme-muted">{enq.phone}</span>
@@ -259,7 +259,7 @@ export default function EnquiriesManagement() {
                     className="px-4 py-2 rounded-full bg-[#25D366] text-white hover:bg-[#1fb355] text-xs alata-regular flex items-center gap-1.5 transition-colors shadow-sm"
                     title="Open WhatsApp chat with prefilled reply"
                   >
-                    <FaIcon icon="fa-brands fa-whatsapp" className="text-sm" />
+                    <AppIcon name="whatsapp" className="text-sm" />
                     <span>WhatsApp</span>
                   </button>
 
@@ -268,16 +268,17 @@ export default function EnquiriesManagement() {
                     className="px-4 py-2 rounded-full bg-theme-primary text-white hover:bg-theme-primary-hover text-xs alata-regular flex items-center gap-1.5 transition-colors shadow-sm"
                     title="Draft email response"
                   >
-                    <FaIcon icon="fa-solid fa-envelope" />
+                    <AppIcon name="mail" />
                     <span>Email Patient</span>
                   </button>
 
                   <a
                     href={`tel:${current.phone}`}
-                    className="w-9 h-9 rounded-full border border-theme-border-strong text-theme-primary hover:bg-theme-canvas flex items-center justify-center transition-colors"
+                    aria-label="Call patient"
+                    className="min-w-[44px] min-h-[44px] rounded-full border border-theme-border-strong text-theme-primary hover:bg-theme-canvas flex items-center justify-center transition-colors"
                     title="Call Patient"
                   >
-                    <FaIcon icon="fa-solid fa-phone" className="text-xs" />
+                    <AppIcon name="phone" className="text-sm" />
                   </a>
                 </div>
               </div>
@@ -317,11 +318,11 @@ export default function EnquiriesManagement() {
                 </h4>
                 <div className="flex items-center gap-4 text-xs text-theme-muted pt-1">
                   <span className="flex items-center gap-1.5">
-                    <FaIcon icon="fa-regular fa-calendar" className="text-theme-primary" />
+                    <AppIcon name="calendar" className="text-theme-primary" />
                     <span>Preferred Date: <strong className="text-theme-ink">{current.preferredDate}</strong></span>
                   </span>
                   <span className="flex items-center gap-1.5">
-                    <FaIcon icon="fa-regular fa-clock" className="text-theme-primary" />
+                    <AppIcon name="clock" className="text-theme-primary" />
                     <span>Time: <strong className="text-theme-ink">{current.preferredTime}</strong></span>
                   </span>
                 </div>
@@ -393,8 +394,12 @@ export default function EnquiriesManagement() {
                 <h3 className="text-lg alata-regular">Compose Email to {current.patientName}</h3>
                 <p className="text-xs text-theme-sidebar-kicker">Direct response via clinic mail</p>
               </div>
-              <button onClick={() => setShowEmailModal(false)} className="text-white/70 hover:text-white">
-                <FaIcon icon="fa-solid fa-xmark" className="text-base" />
+              <button
+                onClick={() => setShowEmailModal(false)}
+                aria-label="Close email composer"
+                className="text-white/70 hover:text-white min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl hover:bg-white/10"
+              >
+                <AppIcon name="close" className="text-base" />
               </button>
             </div>
 
@@ -442,7 +447,7 @@ export default function EnquiriesManagement() {
                   onClick={handleSendEmailDraft}
                   className="px-5 py-2 rounded-full bg-theme-primary text-white alata-regular hover:bg-theme-primary-hover flex items-center gap-1.5"
                 >
-                  <FaIcon icon="fa-solid fa-paper-plane" />
+                  <AppIcon name="paper-plane" />
                   <span>Send via Email Client</span>
                 </button>
               </div>

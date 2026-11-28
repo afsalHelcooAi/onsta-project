@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import FaIcon from './FaIcon';
+import AppIcon from './AppIcon';
 
 export default function DoctorAvatar({
   photo,
@@ -36,7 +36,7 @@ export default function DoctorAvatar({
       className={`${className} rounded-2xl bg-gradient-to-br from-theme-primary-soft via-theme-canvas to-theme-primary-tint text-theme-primary flex flex-col items-center justify-center border border-theme-border-strong select-none flex-shrink-0 relative overflow-hidden shadow-xs`}
       title={name || 'Healthcare Practitioner'}
     >
-      <FaIcon icon="fa-solid fa-user-doctor" className={`${iconSize} text-theme-primary`} />
+      <AppIcon name="doctor" className={`${iconSize} text-theme-primary`} />
       <span className="text-[10px] alata-regular text-theme-primary-hover tracking-wider uppercase mt-0.5">
         {initials}
       </span>

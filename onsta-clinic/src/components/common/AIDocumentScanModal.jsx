@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import FaIcon from './FaIcon';
+import AppIcon from './AppIcon';
 import ModalPortal from './ModalPortal';
 import { scanComplianceDocumentApi, submitRenewalRequestApi, renewDocumentCredential } from '../../api/complianceApi';
 import { scanDoctorLicense, renewDoctorLicenseApi } from '../../api/doctorApi';
@@ -162,12 +162,12 @@ export default function AIDocumentScanModal({
         <div className="p-6 bg-theme-sidebar-bg text-white flex items-start justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-theme-primary text-white flex items-center justify-center">
-              <FaIcon icon="fa-solid fa-microchip" className="text-base" />
+              <AppIcon name="cpu" className="text-base" />
             </div>
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-[11px] alata-regular uppercase tracking-wider text-theme-border-strong flex items-center gap-1.5">
-                  <FaIcon icon="fa-solid fa-wand-magic-sparkles" /> UAE Regulatory Vision Engine
+                  <AppIcon name="ai" /> UAE Regulatory Vision Engine
                 </span>
               </div>
               <h3 className="text-xl alata-regular mt-0.5">
@@ -177,9 +177,10 @@ export default function AIDocumentScanModal({
           </div>
           <button
             onClick={onClose}
-            className="text-white/70 hover:text-white transition-colors w-8 h-8 rounded-xl flex items-center justify-center hover:bg-white/10"
+            aria-label="Close document scan modal"
+            className="text-white/70 hover:text-white transition-colors min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center hover:bg-white/10"
           >
-            <FaIcon icon="fa-solid fa-xmark" className="text-base" />
+            <AppIcon name="close" className="text-base" />
           </button>
         </div>
 
@@ -190,7 +191,7 @@ export default function AIDocumentScanModal({
               <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs mb-1 ${
                 pipelineStep > 1 ? 'bg-[#16A34A] text-white' : pipelineStep === 1 ? 'bg-theme-primary text-white ring-2 ring-theme-border-strong' : 'bg-theme-border-slate text-theme-muted'
               }`}>
-                {pipelineStep > 1 ? <FaIcon icon="fa-solid fa-check" className="text-[10px]" /> : '1'}
+                {pipelineStep > 1 ? <AppIcon name="check" className="text-[10px]" /> : '1'}
               </div>
               <span>Upload Doc</span>
             </div>
@@ -199,7 +200,7 @@ export default function AIDocumentScanModal({
               <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs mb-1 ${
                 pipelineStep > 2 ? 'bg-[#16A34A] text-white' : pipelineStep === 2 ? 'bg-theme-primary text-white ring-2 ring-theme-border-strong' : 'bg-theme-border-slate text-theme-muted'
               }`}>
-                {pipelineStep > 2 ? <FaIcon icon="fa-solid fa-check" className="text-[10px]" /> : '2'}
+                {pipelineStep > 2 ? <AppIcon name="check" className="text-[10px]" /> : '2'}
               </div>
               <span>Multimodal AI</span>
             </div>
@@ -208,7 +209,7 @@ export default function AIDocumentScanModal({
               <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs mb-1 ${
                 pipelineStep > 2 ? 'bg-[#16A34A] text-white' : pipelineStep === 2 ? 'bg-theme-primary text-white ring-2 ring-theme-border-strong' : 'bg-theme-border-slate text-theme-muted'
               }`}>
-                {pipelineStep > 2 ? <FaIcon icon="fa-solid fa-check" className="text-[10px]" /> : '3'}
+                {pipelineStep > 2 ? <AppIcon name="check" className="text-[10px]" /> : '3'}
               </div>
               <span>Sanity Checks</span>
             </div>
@@ -228,7 +229,7 @@ export default function AIDocumentScanModal({
         <div className="p-6">
           {errorMsg && (
             <div className="mb-4 p-3.5 bg-[#FEE2E2] border border-[#FECACA] rounded-2xl flex items-center gap-2 text-xs text-[#991B1B]">
-              <FaIcon icon="fa-solid fa-triangle-exclamation" className="flex-shrink-0 text-[#DC2626]" />
+              <AppIcon name="warning" className="flex-shrink-0 text-[#DC2626]" />
               <span>{errorMsg}</span>
             </div>
           )}
@@ -245,7 +246,7 @@ export default function AIDocumentScanModal({
                 />
                 <label htmlFor="renewal-doc-file" className="cursor-pointer block space-y-3">
                   <div className="w-14 h-14 rounded-2xl bg-theme-primary-soft flex items-center justify-center mx-auto text-theme-primary border border-theme-border-strong">
-                    <FaIcon icon="fa-solid fa-cloud-arrow-up" className="text-2xl" />
+                    <AppIcon name="cloud-upload" className="text-2xl" />
                   </div>
                   <div>
                     <span className="text-sm alata-regular text-theme-ink block">
@@ -272,10 +273,10 @@ export default function AIDocumentScanModal({
             <div className="py-8 text-center space-y-5">
               <div className="relative inline-block">
                 <div className="w-16 h-16 rounded-2xl bg-theme-primary-soft border border-theme-border-strong flex items-center justify-center text-theme-primary mx-auto shadow-sm">
-                  <FaIcon icon="fa-solid fa-file-contract" className="text-2xl animate-pulse" />
+                  <AppIcon name="file-contract" className="text-2xl animate-pulse" />
                 </div>
                 <div className="w-7 h-7 rounded-full bg-theme-card border border-theme-border flex items-center justify-center text-theme-primary absolute -bottom-1 -right-1 shadow-xs">
-                  <FaIcon icon="fa-solid fa-spinner fa-spin" className="text-xs" />
+                  <AppIcon name="spinner" spin className="text-xs" />
                 </div>
               </div>
               <div className="space-y-1">
@@ -288,15 +289,15 @@ export default function AIDocumentScanModal({
               </div>
               <div className="p-3.5 bg-theme-surface border border-theme-border-slate rounded-2xl text-left text-xs text-theme-ink space-y-2 max-w-md mx-auto">
                 <div className="flex items-center gap-2">
-                  <FaIcon icon="fa-solid fa-circle-check" className="text-[#16A34A]" />
+                  <AppIcon name="check-circle" className="text-[#16A34A]" />
                   <span>1. Multimodal Vision AI: Parsed header & issuing authority</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <FaIcon icon="fa-solid fa-circle-check" className="text-[#16A34A]" />
+                  <AppIcon name="check-circle" className="text-[#16A34A]" />
                   <span>2. Certified Subject: Health Facility verified</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <FaIcon icon="fa-solid fa-circle-check" className="text-[#16A34A]" />
+                  <AppIcon name="check-circle" className="text-[#16A34A]" />
                   <span>3. Sanity Rules & Duplicate Pre-Check: Active horizon verified</span>
                 </div>
               </div>
@@ -307,7 +308,7 @@ export default function AIDocumentScanModal({
             <div className="space-y-4 animate-fadeIn">
               <div className="p-3.5 bg-[#DCFCE7] border border-[#BBF7D0] rounded-2xl flex items-center justify-between">
                 <div className="flex items-center gap-2 text-[#166534] text-xs alata-regular">
-                  <FaIcon icon="fa-solid fa-circle-check" />
+                  <AppIcon name="check-circle" />
                   <span>AI Extraction Complete • Ready for Confirmation</span>
                 </div>
                 <span className="px-2.5 py-0.5 rounded-full text-[10px] alata-regular bg-white text-[#166534] border border-[#BBF7D0]">
@@ -317,7 +318,7 @@ export default function AIDocumentScanModal({
 
               {extractedData.warning && (
                 <div className="p-3.5 bg-[#FFEDD5] border border-[#FED7AA] rounded-2xl text-xs text-[#9A3412] flex items-start gap-2.5">
-                  <FaIcon icon="fa-solid fa-triangle-exclamation" className="text-[#EA580C] flex-shrink-0 mt-0.5" />
+                  <AppIcon name="warning" className="text-[#EA580C] flex-shrink-0 mt-0.5" />
                   <div>
                     <strong className="block alata-regular">AI Extraction Notice:</strong>
                     <span>{extractedData.warning}</span>
@@ -329,7 +330,7 @@ export default function AIDocumentScanModal({
                 {extractedData.doctorName && (
                   <div>
                     <label className="block text-xs font-semibold text-theme-ink mb-1 flex items-center gap-1.5">
-                      <FaIcon icon="fa-solid fa-user-doctor" className="text-theme-primary" />
+                      <AppIcon name="doctor" className="text-theme-primary" />
                       <span>Doctor / Professional Full Name</span>
                     </label>
                     <input
@@ -343,7 +344,7 @@ export default function AIDocumentScanModal({
 
                 <div>
                   <label className="block text-xs font-semibold text-theme-ink mb-1 flex items-center gap-1.5">
-                    <FaIcon icon="fa-solid fa-hashtag" className="text-theme-primary" />
+                    <AppIcon name="hash" className="text-theme-primary" />
                     <span>Licence Number</span>
                   </label>
                   <input
@@ -357,7 +358,7 @@ export default function AIDocumentScanModal({
                 <div className="grid grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs font-semibold text-theme-ink mb-1 flex items-center gap-1.5">
-                      <FaIcon icon="fa-solid fa-building" className="text-theme-primary" />
+                      <AppIcon name="building" className="text-theme-primary" />
                       <span>Issuing Authority</span>
                     </label>
                     <input
@@ -370,7 +371,7 @@ export default function AIDocumentScanModal({
 
                   <div>
                     <label className="block text-xs font-semibold text-theme-ink mb-1 flex items-center gap-1.5">
-                      <FaIcon icon="fa-regular fa-calendar" className="text-theme-primary" />
+                      <AppIcon name="calendar" className="text-theme-primary" />
                       <span>New Expiry Date</span>
                     </label>
                     <input
@@ -407,12 +408,12 @@ export default function AIDocumentScanModal({
             >
               {isSubmitting ? (
                 <>
-                  <FaIcon icon="fa-solid fa-spinner fa-spin" />
+                  <AppIcon name="spinner" spin />
                   <span>Submitting to Admin...</span>
                 </>
               ) : (
                 <>
-                  <FaIcon icon="fa-solid fa-circle-check" />
+                  <AppIcon name="check-circle" />
                   <span>Confirm & Submit for Review</span>
                 </>
               )}

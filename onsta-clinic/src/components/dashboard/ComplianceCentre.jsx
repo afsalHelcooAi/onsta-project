@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useClinic } from '../../context/ClinicContext';
 import AIDocumentScanModal from '../common/AIDocumentScanModal';
-import FaIcon from '../common/FaIcon';
+import AppIcon from '../common/AppIcon';
 import { fetchComplianceDashboard } from '../../api/complianceApi';
 
 function calculateDoctorDays(dateVal) {
@@ -316,7 +316,7 @@ export default function ComplianceCentre() {
       <div className="bg-theme-card rounded-3xl border border-theme-border p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
           <div className="w-11 h-11 rounded-2xl bg-theme-primary-soft text-theme-primary flex items-center justify-center flex-shrink-0">
-            <FaIcon icon="fa-solid fa-shield-halved" className="text-lg" />
+            <AppIcon name="shield-check" className="text-lg" />
           </div>
           <div>
             <h1 className="text-2xl sm:text-3xl alata-regular text-theme-ink tracking-tight">
@@ -332,14 +332,15 @@ export default function ComplianceCentre() {
           <button
             onClick={loadComplianceState}
             disabled={isLoading}
-            className="w-9 h-9 rounded-full border border-theme-border bg-theme-surface hover:bg-theme-canvas text-theme-primary flex items-center justify-center transition-colors"
+            aria-label="Refresh Compliance State"
+            className="min-w-[44px] min-h-[44px] rounded-full border border-theme-border bg-theme-surface hover:bg-theme-canvas text-theme-primary flex items-center justify-center transition-colors"
             title="Refresh Compliance State"
           >
-            <FaIcon icon={`fa-solid fa-arrows-rotate ${isLoading ? 'fa-spin' : ''}`} />
+            <AppIcon name="refresh" spin={isLoading} />
           </button>
 
           <span className="px-4 py-2 rounded-full text-xs alata-regular bg-[#DCFCE7] text-[#166534] border border-[#BBF7D0] flex items-center gap-2 shadow-xs">
-            <FaIcon icon="fa-solid fa-shield-halved" className="text-[#16A34A]" />
+            <AppIcon name="shield-check" className="text-[#16A34A]" />
             <span>Health Score: {overallScore}% Compliant</span>
           </span>
         </div>
@@ -355,7 +356,7 @@ export default function ComplianceCentre() {
               : 'text-theme-subtle hover:text-theme-ink'
           }`}
         >
-          <FaIcon icon="fa-regular fa-clock" />
+          <AppIcon name="clock" />
           <span>Credentials & Expiry Watchdog</span>
           {warningCount > 0 && (
             <span className="w-2 h-2 rounded-full bg-theme-accent animate-pulse" />
@@ -370,7 +371,7 @@ export default function ComplianceCentre() {
               : 'text-theme-subtle hover:text-theme-ink'
           }`}
         >
-          <FaIcon icon="fa-solid fa-microchip" />
+          <AppIcon name="cpu" />
           <span>UAE Rule Set Matrix (12 Rules)</span>
           <span className="px-2 py-0.5 rounded-full text-[10px] bg-theme-primary-soft text-theme-primary alata-regular">
             {passedCount}/{totalRules}
@@ -385,7 +386,7 @@ export default function ComplianceCentre() {
               : 'text-theme-subtle hover:text-theme-ink'
           }`}
         >
-          <FaIcon icon="fa-regular fa-eye" />
+          <AppIcon name="eye" />
           <span>Public Listing Gate (onsta.ae)</span>
           <span className={`w-2 h-2 rounded-full ${isPublicListingActive ? 'bg-[#16A34A]' : 'bg-[#DC2626]'}`} />
         </button>
@@ -407,7 +408,7 @@ export default function ComplianceCentre() {
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
                   expiringDoc.daysRemaining <= 0 ? 'bg-[#FEE2E2] text-[#991B1B]' : 'bg-theme-accent/20 text-theme-accent'
                 }`}>
-                  <FaIcon icon="fa-solid fa-triangle-exclamation" className="text-base" />
+                  <AppIcon name="warning" className="text-base" />
                 </div>
                 <div>
                   <h4 className="alata-regular text-sm text-theme-ink">
@@ -425,7 +426,7 @@ export default function ComplianceCentre() {
                 onClick={() => handleStartRenewalScan(expiringDoc)}
                 className="px-5 py-2.5 rounded-full bg-theme-primary text-white text-xs alata-regular hover:bg-theme-primary-hover transition-colors flex items-center gap-2 flex-shrink-0 shadow-sm"
               >
-                <FaIcon icon="fa-solid fa-upload" />
+                <AppIcon name="upload" />
                 <span>Upload Renewed Licence</span>
               </button>
             </div>
@@ -434,7 +435,7 @@ export default function ComplianceCentre() {
           {/* Core Licences Grid */}
           <div>
             <h2 className="text-xs alata-regular uppercase tracking-wider text-theme-primary mb-3.5 flex items-center gap-2">
-              <FaIcon icon="fa-solid fa-building" />
+              <AppIcon name="building" />
               <span>Core Institutional Accreditation</span>
             </h2>
 
@@ -459,7 +460,7 @@ export default function ComplianceCentre() {
                               ? 'bg-[#FFEDD5] text-[#9A3412]'
                               : 'bg-theme-primary-soft text-theme-primary'
                           }`}>
-                            <FaIcon icon="fa-solid fa-file-contract" className="text-base" />
+                            <AppIcon name="file-contract" className="text-base" />
                           </div>
                           <div>
                             <h3 className="text-sm alata-regular text-theme-ink">{doc.title}</h3>
@@ -515,7 +516,7 @@ export default function ComplianceCentre() {
                         <div className="flex items-center justify-between text-theme-muted">
                           <span>Status:</span>
                           <span className="text-[#166534] alata-regular flex items-center gap-1.5">
-                            <FaIcon icon="fa-solid fa-circle-check" /> Verified by ONSTA AI
+                            <AppIcon name="check-circle" /> Verified by ONSTA AI
                           </span>
                         </div>
                       </div>
@@ -526,21 +527,21 @@ export default function ComplianceCentre() {
                       {doc.canRenew ? (
                         <div className="flex items-center justify-between w-full">
                           <span className="text-[11px] text-[#9A3412] alata-regular flex items-center gap-1.5">
-                            <FaIcon icon="fa-solid fa-circle-exclamation" />
+                            <AppIcon name="warning-circle" />
                             <span>Renewal Unlocked</span>
                           </span>
                           <button
                             onClick={() => handleStartRenewalScan(doc)}
                             className="px-4 py-1.5 rounded-full bg-theme-primary text-white text-xs alata-regular hover:bg-theme-primary-hover flex items-center gap-1.5 transition-colors shadow-sm"
                           >
-                            <FaIcon icon="fa-solid fa-upload" className="text-[11px]" />
+                            <AppIcon name="upload" className="text-[11px]" />
                             <span>Re-upload Renewed Doc</span>
                           </button>
                         </div>
                       ) : (
                         <div className="flex items-center justify-between w-full">
                           <span className="text-[11px] text-theme-subtle flex items-center gap-1.5">
-                            <FaIcon icon="fa-solid fa-lock" />
+                            <AppIcon name="lock" />
                             <span>Locked (Opens ≤ 60 days before expiry)</span>
                           </span>
                           <span className="text-[10px] alata-regular text-[#166534] uppercase tracking-wider bg-[#DCFCE7] px-2.5 py-0.5 rounded-full border border-[#BBF7D0]">
@@ -559,7 +560,7 @@ export default function ComplianceCentre() {
           <div className="pt-4">
             <div className="flex items-center justify-between mb-3.5">
               <h2 className="text-xs alata-regular uppercase tracking-wider text-theme-primary flex items-center gap-2">
-                <FaIcon icon="fa-solid fa-stethoscope" />
+                <AppIcon name="stethoscope" />
                 <span>Practitioner Credentials & Doctor Licences Watchdog</span>
               </h2>
               <span className="text-xs text-theme-muted alata-regular">
@@ -570,7 +571,7 @@ export default function ComplianceCentre() {
             {practitionersWatchdog.length === 0 ? (
               <div className="bg-theme-card rounded-3xl border border-dashed border-theme-border-strong p-8 text-center text-xs text-theme-muted space-y-2">
                 <div className="w-12 h-12 rounded-2xl bg-theme-canvas text-theme-primary flex items-center justify-center mx-auto">
-                  <FaIcon icon="fa-solid fa-user-doctor" className="text-xl" />
+                  <AppIcon name="doctor" className="text-xl" />
                 </div>
                 <p className="alata-regular text-sm text-theme-ink">No individual doctors registered yet.</p>
                 <p>Register doctors under the Doctors section to enable automatic licence expiry monitoring.</p>
@@ -598,11 +599,11 @@ export default function ComplianceCentre() {
                           <td className="py-3.5 px-4">
                             <div className="flex items-center gap-2.5">
                               {p.isExpired ? (
-                                <FaIcon icon="fa-solid fa-circle-xmark" className="text-[#DC2626] flex-shrink-0" />
+                                <AppIcon name="x-circle" className="text-[#DC2626] flex-shrink-0" />
                               ) : p.daysRemaining <= 30 ? (
-                                <FaIcon icon="fa-solid fa-triangle-exclamation" className="text-[#EA580C] flex-shrink-0" />
+                                <AppIcon name="warning" className="text-[#EA580C] flex-shrink-0" />
                               ) : (
-                                <FaIcon icon="fa-solid fa-circle-check" className="text-[#16A34A] flex-shrink-0" />
+                                <AppIcon name="check-circle" className="text-[#16A34A] flex-shrink-0" />
                               )}
                               <span className={`alata-regular text-sm ${p.isExpired ? 'text-[#991B1B]' : 'text-theme-ink'}`}>
                                 {p.fullName}
@@ -639,7 +640,7 @@ export default function ComplianceCentre() {
                             {p.status === 'PENDING_REVIEW' || p.renewalStatus === 'PENDING_REVIEW' ? (
                               <div>
                                 <span className="px-2.5 py-0.5 rounded-full text-[10px] alata-regular bg-theme-primary-soft text-theme-primary border border-theme-border-strong uppercase tracking-wide inline-flex items-center gap-1">
-                                  <FaIcon icon="fa-solid fa-spinner fa-spin" /> UNDER REVIEW
+                                  <AppIcon name="spinner" spin /> UNDER REVIEW
                                 </span>
                                 <span className="block text-[10px] font-medium text-theme-primary mt-0.5">
                                   Pending ONSTA Admin Approval
@@ -648,7 +649,7 @@ export default function ComplianceCentre() {
                             ) : p.status === 'REJECTED' || p.renewalStatus === 'REJECTED' ? (
                               <div>
                                 <span className="px-2.5 py-0.5 rounded-full text-[10px] alata-regular bg-[#FEE2E2] text-[#991B1B] border border-[#FECACA] uppercase tracking-wide inline-flex items-center gap-1">
-                                  <FaIcon icon="fa-solid fa-circle-xmark" /> MODIFICATION REQUIRED
+                                  <AppIcon name="x-circle" /> MODIFICATION REQUIRED
                                 </span>
                                 <span className="block text-[10px] font-medium text-[#991B1B] mt-0.5 max-w-[180px] truncate mx-auto" title={p.adminNotes}>
                                   Note: {p.adminNotes || 'Please re-upload scan'}
@@ -657,7 +658,7 @@ export default function ComplianceCentre() {
                             ) : p.isExpired ? (
                               <div>
                                 <span className="px-2.5 py-0.5 rounded-full text-[10px] alata-regular bg-[#FEE2E2] text-[#991B1B] border border-[#FECACA] uppercase tracking-wide inline-flex items-center gap-1">
-                                  <FaIcon icon="fa-solid fa-circle-xmark" /> EXPIRED
+                                  <AppIcon name="x-circle" /> EXPIRED
                                 </span>
                                 <span className="block text-[10px] font-medium text-[#DC2626] mt-0.5">
                                   Delisted on onsta.ae
@@ -666,7 +667,7 @@ export default function ComplianceCentre() {
                             ) : p.daysRemaining <= 30 ? (
                               <div>
                                 <span className="px-2.5 py-0.5 rounded-full text-[10px] alata-regular bg-[#FFEDD5] text-[#9A3412] border border-[#FED7AA] uppercase tracking-wide inline-flex items-center gap-1">
-                                  <FaIcon icon="fa-solid fa-triangle-exclamation" /> EXPIRING SOON
+                                  <AppIcon name="warning" /> EXPIRING SOON
                                 </span>
                                 <span className="block text-[10px] font-medium text-[#9A3412] mt-0.5">
                                   Renewal Due
@@ -675,7 +676,7 @@ export default function ComplianceCentre() {
                             ) : (
                               <div>
                                 <span className="px-2.5 py-0.5 rounded-full text-[10px] alata-regular bg-[#DCFCE7] text-[#166534] border border-[#BBF7D0] uppercase tracking-wide inline-flex items-center gap-1">
-                                  <FaIcon icon="fa-solid fa-circle-check" /> Active & Valid
+                                  <AppIcon name="check-circle" /> Active & Valid
                                 </span>
                                 <span className="block text-[10px] font-medium text-[#166534] mt-0.5">
                                   Live on onsta.ae
@@ -694,7 +695,7 @@ export default function ComplianceCentre() {
                                   : 'bg-theme-primary text-white hover:bg-theme-primary-hover'
                               }`}
                             >
-                              <FaIcon icon="fa-solid fa-upload" className="text-[11px]" />
+                              <AppIcon name="upload" className="text-[11px]" />
                               <span>
                                 {p.status === 'REJECTED' || p.renewalStatus === 'REJECTED'
                                   ? 'Re-upload Fix'
@@ -773,7 +774,7 @@ export default function ComplianceCentre() {
 
             <div className="flex items-center gap-2 overflow-x-auto pt-3 border-t border-theme-border">
               <span className="text-[11px] alata-regular text-theme-muted flex items-center gap-1.5">
-                <FaIcon icon="fa-solid fa-filter" /> Category:
+                <AppIcon name="filter" /> Category:
               </span>
               {categories.map((cat) => (
                 <button
@@ -842,11 +843,11 @@ export default function ComplianceCentre() {
                     }`}>
                       <div className="flex items-start gap-2">
                         {isPass ? (
-                          <FaIcon icon="fa-solid fa-circle-check" className="text-[#16A34A] flex-shrink-0 mt-0.5" />
+                          <AppIcon name="check-circle" className="text-[#16A34A] flex-shrink-0 mt-0.5" />
                         ) : isWarning ? (
-                          <FaIcon icon="fa-solid fa-triangle-exclamation" className="text-[#EA580C] flex-shrink-0 mt-0.5" />
+                          <AppIcon name="warning" className="text-[#EA580C] flex-shrink-0 mt-0.5" />
                         ) : (
-                          <FaIcon icon="fa-solid fa-circle-xmark" className="text-[#DC2626] flex-shrink-0 mt-0.5" />
+                          <AppIcon name="x-circle" className="text-[#DC2626] flex-shrink-0 mt-0.5" />
                         )}
                         <span>{rule.diagnostic}</span>
                       </div>
@@ -872,7 +873,7 @@ export default function ComplianceCentre() {
           <div className="p-6 rounded-3xl bg-theme-sidebar-bg text-white border border-theme-sidebar-border shadow-md flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="flex items-start gap-4">
               <div className="w-14 h-14 rounded-2xl bg-theme-primary text-white flex items-center justify-center flex-shrink-0">
-                <FaIcon icon="fa-regular fa-eye" className="text-2xl" />
+                <AppIcon name="eye" className="text-2xl" />
               </div>
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
@@ -902,7 +903,7 @@ export default function ComplianceCentre() {
                 className="px-5 py-2.5 rounded-full bg-theme-card text-theme-primary text-xs alata-regular hover:bg-theme-canvas transition-colors flex items-center justify-center gap-2 shadow-sm"
               >
                 <span>View on onsta.ae</span>
-                <FaIcon icon="fa-solid fa-arrow-up-right-from-square" className="text-[11px]" />
+                <AppIcon name="external-link" className="text-[11px]" />
               </a>
             </div>
           </div>
@@ -940,7 +941,7 @@ export default function ComplianceCentre() {
               ].map((item, idx) => (
                 <div key={idx} className="py-3.5 flex items-center justify-between gap-4">
                   <div className="flex items-center gap-3">
-                    <FaIcon icon="fa-solid fa-circle-check" className="text-[#16A34A] text-sm" />
+                    <AppIcon name="check-circle" className="text-[#16A34A] text-sm" />
                     <div>
                       <strong className="alata-regular text-sm text-theme-ink block">{item.title}</strong>
                       <span className="text-theme-muted text-[11px]">{item.desc}</span>

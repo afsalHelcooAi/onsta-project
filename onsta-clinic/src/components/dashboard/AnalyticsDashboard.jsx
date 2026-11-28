@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useClinic } from '../../context/ClinicContext';
-import { BarChart3, TrendingUp, Users, MousePointer, Tag, Calendar, Eye } from 'lucide-react';
+import AppIcon from '../common/AppIcon';
 
 export default function AnalyticsDashboard() {
   const { analytics } = useClinic();
@@ -60,7 +60,7 @@ export default function AnalyticsDashboard() {
               {k.value.toLocaleString()}
             </h3>
             <p className="text-[11px] text-emerald-700 font-semibold mt-1 flex items-center gap-1">
-              <TrendingUp className="w-3 h-3" />
+              <AppIcon name="trend-up" className="w-3 h-3" />
               <span>{k.change} period trend</span>
             </p>
           </div>

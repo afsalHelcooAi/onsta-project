@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import FaIcon from '../common/FaIcon';
+import AppIcon from '../common/AppIcon';
 import BrandLogo from '../common/BrandLogo';
 
 export default function AdminLogin({ onSignedIn }) {
@@ -50,7 +50,7 @@ export default function AdminLogin({ onSignedIn }) {
 
         {error && (
           <p role="alert" className="mt-5 rounded-2xl border border-[#FECACA] bg-[#FEE2E2] p-3.5 text-xs text-[#991B1B] flex items-center gap-2">
-            <FaIcon icon="fa-solid fa-circle-exclamation" className="text-[#DC2626]" />
+            <AppIcon name="warning-circle" className="text-[#DC2626]" />
             <span>{error}</span>
           </p>
         )}
@@ -59,7 +59,7 @@ export default function AdminLogin({ onSignedIn }) {
           <label className="block text-xs font-semibold text-theme-ink">
             Email
             <div className="relative mt-1.5">
-              <FaIcon icon="fa-solid fa-envelope" className="text-xs text-theme-subtle absolute left-3.5 top-3.5" />
+              <AppIcon name="mail" className="text-xs text-theme-subtle absolute left-3.5 top-3.5" />
               <input
                 required
                 type="email"
@@ -73,7 +73,7 @@ export default function AdminLogin({ onSignedIn }) {
           <label className="block text-xs font-semibold text-theme-ink">
             Password
             <div className="relative mt-1.5">
-              <FaIcon icon="fa-solid fa-lock" className="text-xs text-theme-subtle absolute left-3.5 top-3.5" />
+              <AppIcon name="lock" className="text-xs text-theme-subtle absolute left-3.5 top-3.5" />
               <input
                 required
                 type="password"

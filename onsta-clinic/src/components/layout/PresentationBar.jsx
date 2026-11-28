@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { PlayCircle, Sparkles, ChevronDown, CheckCircle2, AlertTriangle, RotateCcw, ShieldAlert, LogIn, UserCheck, MessageSquare } from 'lucide-react';
+import AppIcon from '../common/AppIcon';
 import { useClinic } from '../../context/ClinicContext';
 
 export default function PresentationBar() {
@@ -49,7 +49,7 @@ export default function PresentationBar() {
         {/* Left: Presentation Mode Indicator */}
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-950/80 border border-emerald-500/30 text-emerald-300 font-semibold text-[11px]">
-            <Sparkles className="w-3 h-3 text-emerald-400" />
+            <AppIcon name="play-circle" className="w-3 h-3 text-emerald-400" />
             <span>ONSTA Controller</span>
           </div>
           <span className="hidden lg:inline text-gray-400">
@@ -83,7 +83,7 @@ export default function PresentationBar() {
                   : "bg-white/10 text-gray-200 hover:bg-white/20 hover:text-white"
               }`}
             >
-              <UserCheck className="w-3 h-3" />
+              <AppIcon name="user-check" className="w-3 h-3" />
               <span>Doctors</span>
             </button>
 
@@ -96,7 +96,7 @@ export default function PresentationBar() {
                   : "bg-white/10 text-gray-200 hover:bg-white/20 hover:text-white"
               }`}
             >
-              <MessageSquare className="w-3 h-3" />
+              <AppIcon name="chat" className="w-3 h-3" />
               <span>Enquiries</span>
               {newEnquiriesCount > 0 && (
                 <span className="px-1.5 py-0.2 rounded-full bg-amber-400 text-gray-950 font-bold text-[9px]">
@@ -112,7 +112,7 @@ export default function PresentationBar() {
             className="px-2 py-1 rounded-lg bg-emerald-800/60 hover:bg-emerald-700 text-emerald-100 border border-emerald-600/40 font-medium flex items-center gap-1"
             title="Go to Login Page"
           >
-            <LogIn className="w-3 h-3" />
+            <AppIcon name="arrow-right" className="w-3 h-3" />
             <span>Login</span>
           </button>
 
@@ -127,10 +127,11 @@ export default function PresentationBar() {
           {/* Reset Demo */}
           <button
             onClick={resetToDemoDefaults}
+            aria-label="Reset All Demo Changes"
             title="Reset All Demo Changes"
-            className="p-1 rounded-lg bg-white/5 hover:bg-red-500/20 hover:text-red-300 text-gray-300 transition-colors"
+            className="min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg bg-white/5 hover:bg-red-500/20 hover:text-red-300 text-gray-300 transition-colors"
           >
-            <RotateCcw className="w-3.5 h-3.5" />
+            <AppIcon name="rotate-ccw" className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
