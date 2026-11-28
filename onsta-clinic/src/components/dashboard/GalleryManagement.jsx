@@ -35,7 +35,7 @@ export default function GalleryManagement() {
 
         <button
           onClick={() => setIsModalOpen(true)}
-          className="px-4 py-2 rounded-xl bg-[#0d281e] text-white hover:bg-[#153f2f] text-xs font-semibold flex items-center gap-1.5 transition-colors shadow-sm self-start"
+          className="px-4 py-2 rounded-full bg-theme-primary text-white hover:bg-theme-primary-hover text-xs alata-regular flex items-center gap-1.5 transition-colors shadow-sm self-start"
         >
           <Plus className="w-4 h-4" />
           <span>Upload Image</span>
@@ -47,7 +47,7 @@ export default function GalleryManagement() {
         {gallery.map((img) => (
           <div
             key={img.id}
-            className="bg-white rounded-2xl border border-[#e7e1d7] overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between"
+            className="bg-theme-card rounded-2xl border border-theme-border overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between"
           >
             <div className="relative h-48 bg-gray-100 group">
               <img
@@ -103,10 +103,10 @@ export default function GalleryManagement() {
 
       {/* Add Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn">
-          <div className="bg-white rounded-2xl shadow-xl max-w-md w-full overflow-hidden border border-[#e7e1d7] animate-scaleUp">
-            <div className="p-6 bg-[#0d281e] text-white flex items-center justify-between">
-              <h3 className="text-lg font-bold font-serif">Upload Clinic Photo</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-theme-overlay/50 backdrop-blur-sm animate-fadeIn">
+          <div className="bg-theme-card rounded-3xl shadow-xl max-w-md w-full overflow-hidden border border-theme-border animate-scaleUp">
+            <div className="p-6 bg-theme-sidebar-bg text-white flex items-center justify-between">
+              <h3 className="text-lg alata-regular">Upload Clinic Photo</h3>
               <button onClick={() => setIsModalOpen(false)} className="text-white/60 hover:text-white">
                 <X className="w-5 h-5" />
               </button>
@@ -114,7 +114,7 @@ export default function GalleryManagement() {
 
             <form onSubmit={handleAdd} className="p-6 space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">
+                <label className="block text-xs font-semibold text-theme-ink mb-1">
                   Image URL / Preset
                 </label>
                 <input
@@ -122,18 +122,18 @@ export default function GalleryManagement() {
                   required
                   value={newImage.url}
                   onChange={(e) => setNewImage({ ...newImage, url: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0d281e]"
+                  className="w-full px-3 py-2 rounded-xl border border-theme-border-slate bg-theme-surface text-xs text-theme-ink focus:outline-none focus:ring-2 focus:ring-theme-primary"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">
+                <label className="block text-xs font-semibold text-theme-ink mb-1">
                   Category
                 </label>
                 <select
                   value={newImage.category}
                   onChange={(e) => setNewImage({ ...newImage, category: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs text-gray-900 bg-white"
+                  className="w-full px-3 py-2 rounded-xl border border-theme-border-slate text-xs text-theme-ink bg-theme-surface"
                 >
                   <option value="Treatment Room">Treatment Room</option>
                   <option value="Interior">Interior</option>
@@ -144,7 +144,7 @@ export default function GalleryManagement() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-gray-700 mb-1">
+                <label className="block text-xs font-semibold text-theme-ink mb-1">
                   Image Caption
                 </label>
                 <input
@@ -153,24 +153,24 @@ export default function GalleryManagement() {
                   value={newImage.caption}
                   onChange={(e) => setNewImage({ ...newImage, caption: e.target.value })}
                   placeholder="e.g. Laser Consultation Room 2"
-                  className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0d281e]"
+                  className="w-full px-3 py-2 rounded-xl border border-theme-border-slate bg-theme-surface text-xs text-theme-ink focus:outline-none focus:ring-2 focus:ring-theme-primary"
                 />
-                <p className="text-[11px] text-gray-400 mt-1">
+                <p className="text-[11px] text-theme-muted mt-1">
                   Must follow advertising rules (no superlatives).
                 </p>
               </div>
 
-              <div className="pt-3 border-t border-gray-100 flex justify-end gap-3">
+              <div className="pt-3 border-t border-theme-border flex justify-end gap-3">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-gray-300 text-xs font-medium text-gray-700 hover:bg-gray-50"
+                  className="px-4 py-2 rounded-full border border-theme-border-slate text-xs font-medium text-theme-muted hover:bg-theme-surface"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-xl bg-[#0d281e] text-white text-xs font-semibold hover:bg-[#153f2f]"
+                  className="px-5 py-2 rounded-full bg-theme-primary text-white text-xs alata-regular hover:bg-theme-primary-hover"
                 >
                   Upload & Verify
                 </button>

@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useClinic } from '../../context/ClinicContext';
 import VerificationBadge from '../common/VerificationBadge';
 import FaIcon from '../common/FaIcon';
+import ModalPortal from '../common/ModalPortal';
 import { parseTariffSheet, fetchMasterTreatments } from '../../api/serviceApi';
 
 export default function ServicesPrices() {
@@ -231,16 +232,16 @@ export default function ServicesPrices() {
   return (
     <div className="space-y-6 animate-fadeIn pb-12">
       {/* Title & Actions */}
-      <div className="bg-white rounded-3xl border border-[#EAE0F2] p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-theme-card rounded-3xl border border-theme-border p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-2xl bg-[#F0E6F6] text-[#6B3B66] flex items-center justify-center flex-shrink-0">
+          <div className="w-11 h-11 rounded-2xl bg-theme-primary-soft text-theme-primary flex items-center justify-center flex-shrink-0">
             <FaIcon icon="fa-solid fa-stethoscope" className="text-lg" />
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl alata-regular text-[#1E1B2E] tracking-tight">
+            <h1 className="text-2xl sm:text-3xl alata-regular text-theme-ink tracking-tight">
               Services & Pricing Catalogue
             </h1>
-            <p className="text-xs text-[#64748B] mt-0.5">
+            <p className="text-xs text-theme-muted mt-0.5">
               Maintain your clinical treatment offerings. Add single services or import full tariffs from PDF sheets.
             </p>
           </div>
@@ -254,7 +255,7 @@ export default function ServicesPrices() {
               setPdfParsingStep('upload');
               setIsPdfImportOpen(true);
             }}
-            className="px-4 py-2.5 rounded-full bg-[#F6F0FA] text-[#6B3B66] border border-[#DECBE9] hover:bg-[#F0E6F6] text-xs alata-regular flex items-center gap-2 transition-colors shadow-xs"
+            className="px-4 py-2.5 rounded-full bg-theme-canvas text-theme-primary border border-theme-border-strong hover:bg-theme-primary-soft text-xs alata-regular flex items-center gap-2 transition-colors shadow-xs"
           >
             <FaIcon icon="fa-solid fa-file-pdf" />
             <span>Import PDF Tariff</span>
@@ -262,7 +263,7 @@ export default function ServicesPrices() {
 
           <button
             onClick={openAddModal}
-            className="px-5 py-2.5 rounded-full bg-[#6B3B66] text-white hover:bg-[#552B51] text-xs alata-regular flex items-center gap-2 transition-all shadow-sm hover:shadow-md"
+            className="px-5 py-2.5 rounded-full bg-theme-primary text-white hover:bg-theme-primary-hover text-xs alata-regular flex items-center gap-2 transition-all shadow-sm hover:shadow-md"
           >
             <FaIcon icon="fa-solid fa-plus" className="text-xs" />
             <span>Add Single Service</span>
@@ -270,26 +271,26 @@ export default function ServicesPrices() {
         </div>
       </div>
 
-      {/* Department Pills & Search Bar (Polyclinic.ae Inspiration) */}
-      <div className="bg-white p-4 rounded-2xl border border-[#EAE0F2] shadow-sm space-y-3">
+      {/* Department Pills & Search Bar */}
+      <div className="bg-theme-card p-4 rounded-2xl border border-theme-border shadow-sm space-y-3">
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
           <div className="relative flex-1">
-            <FaIcon icon="fa-solid fa-magnifying-glass" className="text-xs text-[#94A3B8] absolute left-4 top-1/2 -translate-y-1/2" />
+            <FaIcon icon="fa-solid fa-magnifying-glass" className="text-xs text-theme-subtle absolute left-4 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Search treatments by name, category, or clinical description..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-xs text-[#1E1B2E] focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#6B3B66]/30 focus:border-[#6B3B66]"
+              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-theme-border-slate bg-theme-surface text-xs text-theme-ink focus:outline-none focus:bg-theme-card focus:ring-2 focus:ring-theme-primary/30 focus:border-theme-primary"
             />
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="text-xs text-[#64748B] font-medium">Department:</span>
+            <span className="text-xs text-theme-muted font-medium">Department:</span>
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="px-3 py-2 rounded-xl border border-[#E2E8F0] text-xs text-[#1E1B2E] bg-[#F8FAFC] focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/30"
+              className="px-3 py-2 rounded-xl border border-theme-border-slate text-xs text-theme-ink bg-theme-surface focus:outline-none focus:ring-2 focus:ring-theme-primary/30"
             >
               {dynamicCategories.map(c => (
                 <option key={c} value={c}>{c}</option>
@@ -308,8 +309,8 @@ export default function ServicesPrices() {
                 onClick={() => setSelectedCategory(cat)}
                 className={`px-3 py-1 rounded-full text-[11px] alata-regular transition-all ${
                   selectedCategory === cat
-                    ? 'bg-[#6B3B66] text-white shadow-xs'
-                    : 'bg-[#F8FAFC] text-[#64748B] border border-[#E2E8F0] hover:border-[#DECBE9] hover:text-[#6B3B66]'
+                    ? 'bg-theme-primary text-white shadow-xs'
+                    : 'bg-theme-surface text-theme-muted border border-theme-border-slate hover:border-theme-border-strong hover:text-theme-primary'
                 }`}
               >
                 {cat}
@@ -320,10 +321,10 @@ export default function ServicesPrices() {
       </div>
 
       {/* Services Table */}
-      <div className="bg-white rounded-3xl border border-[#EAE0F2] overflow-hidden shadow-sm">
+      <div className="bg-theme-card rounded-3xl border border-theme-border overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
           <table className="w-full text-left text-xs">
-            <thead className="bg-[#F6F0FA] border-b border-[#EAE0F2] text-[#552B51] alata-regular uppercase tracking-wider text-[11px]">
+            <thead className="bg-theme-canvas border-b border-theme-border text-theme-primary-hover alata-regular uppercase tracking-wider text-[11px]">
               <tr>
                 <th className="py-3.5 px-5">Treatment / Service Name</th>
                 <th className="py-3.5 px-4">Category</th>
@@ -334,17 +335,17 @@ export default function ServicesPrices() {
                 <th className="py-3.5 px-4 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-[#F1EDF6]">
+            <tbody className="divide-y divide-theme-border">
               {filteredServices.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className="py-14 text-center text-[#64748B]">
-                    <div className="w-12 h-12 rounded-2xl bg-[#F6F0FA] text-[#6B3B66] flex items-center justify-center mx-auto mb-3">
+                  <td colSpan={7} className="py-14 text-center text-theme-muted">
+                    <div className="w-12 h-12 rounded-2xl bg-theme-canvas text-theme-primary flex items-center justify-center mx-auto mb-3">
                       <FaIcon icon="fa-solid fa-stethoscope" className="text-xl" />
                     </div>
-                    <p className="alata-regular text-sm text-[#1E1B2E]">
+                    <p className="alata-regular text-sm text-theme-ink">
                       {services.length === 0 ? 'No services in catalogue yet' : 'No services match your criteria'}
                     </p>
-                    <p className="text-xs text-[#64748B] mt-1 max-w-sm mx-auto">
+                    <p className="text-xs text-theme-muted mt-1 max-w-sm mx-auto">
                       {services.length === 0
                         ? 'Import your treatment price list from a PDF Tariff sheet or click "Add Single Service" above.'
                         : 'Try another search keyword or select a different department filter.'}
@@ -353,29 +354,29 @@ export default function ServicesPrices() {
                 </tr>
               ) : (
                 filteredServices.map((srv) => (
-                  <tr key={srv.id} className="hover:bg-[#F8FAFC] transition-colors">
+                  <tr key={srv.id} className="hover:bg-theme-surface transition-colors">
                     <td className="py-3.5 px-5">
-                      <div className="alata-regular text-[#1E1B2E] text-sm">{srv.name}</div>
+                      <div className="alata-regular text-theme-ink text-sm">{srv.name}</div>
                       {srv.description && (
-                        <div className="text-[11px] text-[#64748B] truncate max-w-sm mt-0.5">{srv.description}</div>
+                        <div className="text-[11px] text-theme-muted truncate max-w-sm mt-0.5">{srv.description}</div>
                       )}
                     </td>
                     <td className="py-3.5 px-4">
-                      <span className="px-2.5 py-1 rounded-full text-[10px] alata-regular bg-[#F0E6F6] text-[#6B3B66] border border-[#DECBE9]">
+                      <span className="px-2.5 py-1 rounded-full text-[10px] alata-regular bg-theme-primary-soft text-theme-primary border border-theme-border-strong">
                         {srv.category}
                       </span>
                     </td>
-                    <td className="py-3.5 px-4 text-[#475569] font-medium">
-                      <FaIcon icon="fa-regular fa-clock" className="mr-1.5 text-[#94A3B8]" />
+                    <td className="py-3.5 px-4 text-theme-muted font-medium">
+                      <FaIcon icon="fa-regular fa-clock" className="mr-1.5 text-theme-subtle" />
                       {srv.duration}
                     </td>
                     <td className="py-3.5 px-4">
                       <div className="flex items-baseline gap-1.5">
-                        <span className="alata-regular text-[#6B3B66] text-sm">
+                        <span className={`alata-regular text-sm ${srv.offerPrice ? 'text-theme-accent' : 'text-theme-primary'}`}>
                           {srv.offerPrice ? srv.offerPrice : srv.normalPrice} AED
                         </span>
                         {srv.offerPrice && (
-                          <span className="text-[10px] text-[#94A3B8] line-through">
+                          <span className="text-[10px] text-theme-subtle line-through">
                             {srv.normalPrice} AED
                           </span>
                         )}
@@ -392,7 +393,7 @@ export default function ServicesPrices() {
                         className={`px-3 py-1 rounded-full text-[10px] alata-regular transition-colors ${
                           srv.isActive
                             ? 'bg-[#DCFCE7] text-[#166534] hover:bg-[#BBF7D0]'
-                            : 'bg-[#F1F5F9] text-[#475569] hover:bg-[#E2E8F0]'
+                            : 'bg-theme-surface-muted text-theme-muted hover:bg-theme-border-slate'
                         }`}
                       >
                         {srv.isActive ? 'Active' : 'Inactive'}
@@ -402,7 +403,7 @@ export default function ServicesPrices() {
                       <div className="flex items-center justify-end gap-1.5">
                         <button
                           onClick={() => openEditModal(srv)}
-                          className="w-8 h-8 rounded-xl text-[#64748B] hover:text-[#6B3B66] hover:bg-[#F6F0FA] flex items-center justify-center transition-colors"
+                          className="w-8 h-8 rounded-xl text-theme-muted hover:text-theme-primary hover:bg-theme-canvas flex items-center justify-center transition-colors"
                           title="Edit service"
                         >
                           <FaIcon icon="fa-solid fa-pen-to-square" className="text-xs" />
@@ -413,7 +414,7 @@ export default function ServicesPrices() {
                               deleteService(srv.id);
                             }
                           }}
-                          className="w-8 h-8 rounded-xl text-[#94A3B8] hover:text-[#991B1B] hover:bg-[#FEE2E2] flex items-center justify-center transition-colors"
+                          className="w-8 h-8 rounded-xl text-theme-subtle hover:text-[#991B1B] hover:bg-[#FEE2E2] flex items-center justify-center transition-colors"
                           title="Delete service"
                         >
                           <FaIcon icon="fa-solid fa-trash-can" className="text-xs" />
@@ -430,18 +431,19 @@ export default function ServicesPrices() {
 
       {/* PDF BATCH IMPORT MODAL & STEP 2 REVIEW WINDOW */}
       {isPdfImportOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A1320]/60 backdrop-blur-sm animate-fadeIn">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-4xl w-full overflow-hidden border border-[#EAE0F2] max-h-[90vh] flex flex-col">
-            <div className="p-5 bg-[#1A1320] text-white flex items-center justify-between flex-shrink-0">
+        <ModalPortal>
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto bg-theme-overlay/60 backdrop-blur-sm animate-fadeIn">
+            <div className="my-auto bg-theme-card rounded-3xl shadow-2xl max-w-4xl w-full overflow-hidden border border-theme-border max-h-[90vh] flex flex-col">
+            <div className="p-5 bg-theme-sidebar-bg text-white flex items-center justify-between flex-shrink-0">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-[#6B3B66] text-white flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-theme-primary text-white flex items-center justify-center">
                   <FaIcon icon="fa-solid fa-file-pdf" className="text-sm" />
                 </div>
                 <div>
                   <h3 className="alata-regular text-base">
                     Import Services & Prices from PDF / Image Tariff
                   </h3>
-                  <p className="text-[#C7B0D8] text-xs">
+                  <p className="text-theme-sidebar-kicker text-xs">
                     Multimodal Vision AI extracts treatments, AED rates, and maps them to DHA regulatory scope.
                   </p>
                 </div>
@@ -458,7 +460,7 @@ export default function ServicesPrices() {
               <div className="p-8 text-center space-y-6 overflow-y-auto">
                 <div
                   onClick={() => fileInputRef.current?.click()}
-                  className="border-2 border-dashed border-[#DECBE9] rounded-3xl p-8 hover:border-[#6B3B66] transition-colors bg-[#F8FAFC] cursor-pointer"
+                  className="border-2 border-dashed border-theme-border-strong rounded-3xl p-8 hover:border-theme-primary transition-colors bg-theme-surface cursor-pointer"
                 >
                   <input
                     ref={fileInputRef}
@@ -467,13 +469,13 @@ export default function ServicesPrices() {
                     className="hidden"
                     onChange={handleFileSelect}
                   />
-                  <div className="w-16 h-16 bg-[#F0E6F6] text-[#6B3B66] rounded-2xl flex items-center justify-center mx-auto mb-4 border border-[#DECBE9]">
+                  <div className="w-16 h-16 bg-theme-primary-soft text-theme-primary rounded-2xl flex items-center justify-center mx-auto mb-4 border border-theme-border-strong">
                     <FaIcon icon="fa-solid fa-cloud-arrow-up" className="text-2xl" />
                   </div>
-                  <h4 className="alata-regular text-[#1E1B2E] text-base">
+                  <h4 className="alata-regular text-theme-ink text-base">
                     {selectedFile ? selectedFile.name : 'Drop your Clinic Price List or Treatment Menu'}
                   </h4>
-                  <p className="text-xs text-[#64748B] mt-1 max-w-md mx-auto">
+                  <p className="text-xs text-theme-muted mt-1 max-w-md mx-auto">
                     {selectedFile
                       ? `Selected ${(selectedFile.size / 1024).toFixed(1)} KB. Ready for AI extraction.`
                       : 'Supports multi-page PDFs, scanned price menus, or tariff sheets (PDF, PNG, JPG).'}
@@ -486,13 +488,13 @@ export default function ServicesPrices() {
                           e.stopPropagation();
                           executeTariffParse(false);
                         }}
-                        className="px-6 py-2.5 bg-[#6B3B66] hover:bg-[#552B51] text-white rounded-full text-xs alata-regular shadow-sm inline-flex items-center gap-2"
+                        className="px-6 py-2.5 bg-theme-primary hover:bg-theme-primary-hover text-white rounded-full text-xs alata-regular shadow-sm inline-flex items-center gap-2"
                       >
                         <FaIcon icon="fa-solid fa-wand-magic-sparkles" />
                         <span>Run AI Extraction on Uploaded File</span>
                       </button>
                     ) : (
-                      <span className="px-4 py-2 bg-white border border-[#DECBE9] rounded-full text-xs alata-regular text-[#6B3B66] hover:bg-[#F6F0FA]">
+                      <span className="px-4 py-2 bg-theme-card border border-theme-border-strong rounded-full text-xs alata-regular text-theme-primary hover:bg-theme-canvas">
                         Choose File from Computer
                       </span>
                     )}
@@ -507,25 +509,25 @@ export default function ServicesPrices() {
                 )}
 
                 <div className="relative flex py-2 items-center">
-                  <div className="flex-grow border-t border-[#EAE0F2]"></div>
-                  <span className="flex-shrink mx-4 text-[#94A3B8] text-xs font-medium uppercase tracking-wider">
+                  <div className="flex-grow border-t border-theme-border"></div>
+                  <span className="flex-shrink mx-4 text-theme-subtle text-xs font-medium uppercase tracking-wider">
                     Or Test Instantly
                   </span>
-                  <div className="flex-grow border-t border-[#EAE0F2]"></div>
+                  <div className="flex-grow border-t border-theme-border"></div>
                 </div>
 
-                <div className="p-4 bg-[#F6F0FA] border border-[#EAE0F2] rounded-2xl flex items-center justify-between gap-4">
+                <div className="p-4 bg-theme-canvas border border-theme-border rounded-2xl flex items-center justify-between gap-4">
                   <div className="text-left">
-                    <p className="text-xs alata-regular text-[#1E1B2E]">
+                    <p className="text-xs alata-regular text-theme-ink">
                       Sample UAE Aesthetic & Laser Clinic Tariff Sheet
                     </p>
-                    <p className="text-[11px] text-[#64748B] mt-0.5">
+                    <p className="text-[11px] text-theme-muted mt-0.5">
                       Extracts 6 real treatments (Hydrafacial, Candela GentleMax Laser, PRP, SkinPen, ZO Health, Carbon Peel).
                     </p>
                   </div>
                   <button
                     onClick={() => executeTariffParse(true)}
-                    className="px-4 py-2 bg-[#6B3B66] hover:bg-[#552B51] text-white rounded-full text-xs alata-regular shadow-sm inline-flex items-center gap-1.5 flex-shrink-0"
+                    className="px-4 py-2 bg-theme-primary hover:bg-theme-primary-hover text-white rounded-full text-xs alata-regular shadow-sm inline-flex items-center gap-1.5 flex-shrink-0"
                   >
                     <FaIcon icon="fa-solid fa-wand-magic-sparkles" />
                     <span>Parse Sample Menu</span>
@@ -536,16 +538,16 @@ export default function ServicesPrices() {
 
             {pdfParsingStep === 'parsing' && (
               <div className="p-16 text-center space-y-4">
-                <div className="w-16 h-16 bg-[#F0E6F6] text-[#6B3B66] rounded-2xl flex items-center justify-center mx-auto border border-[#DECBE9]">
+                <div className="w-16 h-16 bg-theme-primary-soft text-theme-primary rounded-2xl flex items-center justify-center mx-auto border border-theme-border-strong">
                   <FaIcon icon="fa-solid fa-spinner fa-spin" className="text-2xl" />
                 </div>
-                <h4 className="alata-regular text-[#1E1B2E] text-lg">
+                <h4 className="alata-regular text-theme-ink text-lg">
                   AI Reading & Structuring Services from Tariff...
                 </h4>
-                <p className="text-xs text-[#64748B] max-w-sm mx-auto">
+                <p className="text-xs text-theme-muted max-w-sm mx-auto">
                   Detecting treatments, duration times, categories, and matching against permitted DHA facility scopes.
                 </p>
-                <div className="flex items-center justify-center gap-2 text-[11px] text-[#6B3B66] font-medium">
+                <div className="flex items-center justify-center gap-2 text-[11px] text-theme-primary font-medium">
                   <FaIcon icon="fa-solid fa-microchip" />
                   <span>Multimodal Vision AI + UAE Regulatory Scope Engine</span>
                 </div>
@@ -570,8 +572,8 @@ export default function ServicesPrices() {
                 </div>
 
                 <div className="p-4 overflow-y-auto flex-1">
-                  <table className="w-full text-left text-xs border border-[#EAE0F2] rounded-xl overflow-hidden">
-                    <thead className="bg-[#F6F0FA] border-b border-[#EAE0F2] text-[#552B51] alata-regular uppercase text-[10px]">
+                  <table className="w-full text-left text-xs border border-theme-border rounded-xl overflow-hidden">
+                    <thead className="bg-theme-canvas border-b border-theme-border text-theme-primary-hover alata-regular uppercase text-[10px]">
                       <tr>
                         <th className="py-2.5 px-3">Service Name</th>
                         <th className="py-2.5 px-3">Category</th>
@@ -582,15 +584,15 @@ export default function ServicesPrices() {
                         <th className="py-2.5 px-3 text-center">Action</th>
                       </tr>
                     </thead>
-                    <tbody className="divide-y divide-[#F1EDF6]">
+                    <tbody className="divide-y divide-theme-border">
                       {parsedServices.map((item, idx) => (
-                        <tr key={idx} className={`hover:bg-[#F8FAFC] ${item.isDuplicate ? 'bg-[#FFF9F2]' : ''}`}>
+                        <tr key={idx} className={`hover:bg-theme-surface ${item.isDuplicate ? 'bg-[#FFF9F2]' : ''}`}>
                           <td className="py-2 px-3">
                             <input
                               type="text"
                               value={item.name}
                               onChange={(e) => handleUpdateParsedItem(idx, 'name', e.target.value)}
-                              className="w-full px-2 py-1 border border-[#E2E8F0] rounded-lg text-xs text-[#1E1B2E] focus:outline-none focus:border-[#6B3B66]"
+                              className="w-full px-2 py-1 border border-theme-border-slate rounded-lg text-xs text-theme-ink focus:outline-none focus:border-theme-primary"
                             />
                             {item.isDuplicate && (
                               <div className="text-[10px] text-[#9A3412] font-semibold mt-0.5 flex items-center gap-1">
@@ -603,7 +605,7 @@ export default function ServicesPrices() {
                             <select
                               value={item.category}
                               onChange={(e) => handleUpdateParsedItem(idx, 'category', e.target.value)}
-                              className="w-full px-2 py-1 border border-[#E2E8F0] rounded-lg text-xs text-[#1E1B2E] focus:outline-none focus:border-[#6B3B66]"
+                              className="w-full px-2 py-1 border border-theme-border-slate rounded-lg text-xs text-theme-ink focus:outline-none focus:border-theme-primary"
                             >
                               <option value="Dermatology">Dermatology</option>
                               <option value="Laser Clinic">Laser Clinic</option>
@@ -617,7 +619,7 @@ export default function ServicesPrices() {
                               type="text"
                               value={item.duration}
                               onChange={(e) => handleUpdateParsedItem(idx, 'duration', e.target.value)}
-                              className="w-20 px-2 py-1 border border-[#E2E8F0] rounded-lg text-xs text-[#1E1B2E] focus:outline-none focus:border-[#6B3B66]"
+                              className="w-20 px-2 py-1 border border-theme-border-slate rounded-lg text-xs text-theme-ink focus:outline-none focus:border-theme-primary"
                             />
                           </td>
                           <td className="py-2 px-3">
@@ -625,7 +627,7 @@ export default function ServicesPrices() {
                               type="number"
                               value={item.normalPrice}
                               onChange={(e) => handleUpdateParsedItem(idx, 'normalPrice', e.target.value)}
-                              className="w-20 px-2 py-1 border border-[#E2E8F0] rounded-lg text-xs alata-regular text-[#6B3B66] focus:outline-none focus:border-[#6B3B66]"
+                              className="w-20 px-2 py-1 border border-theme-border-slate rounded-lg text-xs alata-regular text-theme-primary focus:outline-none focus:border-theme-primary"
                             />
                           </td>
                           <td className="py-2 px-3">
@@ -634,7 +636,7 @@ export default function ServicesPrices() {
                               placeholder="Optional"
                               value={item.offerPrice ?? ''}
                               onChange={(e) => handleUpdateParsedItem(idx, 'offerPrice', e.target.value ? parseFloat(e.target.value) : null)}
-                              className="w-20 px-2 py-1 border border-[#E2E8F0] rounded-lg text-xs alata-regular text-[#475569] focus:outline-none focus:border-[#6B3B66]"
+                              className="w-20 px-2 py-1 border border-theme-border-slate rounded-lg text-xs alata-regular text-theme-muted focus:outline-none focus:border-theme-primary"
                             />
                           </td>
                           <td className="py-2 px-3">
@@ -645,7 +647,7 @@ export default function ServicesPrices() {
                           <td className="py-2 px-3 text-center">
                             <button
                               onClick={() => handleDeleteParsedItem(idx)}
-                              className="text-[#94A3B8] hover:text-[#991B1B] p-1 rounded"
+                              className="text-theme-subtle hover:text-[#991B1B] p-1 rounded"
                               title="Remove item"
                             >
                               <FaIcon icon="fa-solid fa-trash-can" />
@@ -659,7 +661,7 @@ export default function ServicesPrices() {
                   <div className="mt-3">
                     <button
                       onClick={handleAddCustomParsedItem}
-                      className="text-xs text-[#6B3B66] hover:text-[#552B51] alata-regular inline-flex items-center gap-1.5"
+                      className="text-xs text-theme-primary hover:text-theme-primary-hover alata-regular inline-flex items-center gap-1.5"
                     >
                       <FaIcon icon="fa-solid fa-plus" className="text-[10px]" />
                       <span>Add another treatment row</span>
@@ -667,10 +669,10 @@ export default function ServicesPrices() {
                   </div>
                 </div>
 
-                <div className="p-4 bg-[#F8FAFC] border-t border-[#EAE0F2] flex items-center justify-between flex-shrink-0">
+                <div className="p-4 bg-theme-surface border-t border-theme-border flex items-center justify-between flex-shrink-0">
                   <button
                     onClick={() => setPdfParsingStep('upload')}
-                    className="text-xs text-[#64748B] hover:underline"
+                    className="text-xs text-theme-muted hover:underline"
                   >
                     ← Re-upload Tariff
                   </button>
@@ -678,13 +680,13 @@ export default function ServicesPrices() {
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => setIsPdfImportOpen(false)}
-                      className="px-4 py-2 border border-[#E2E8F0] rounded-full text-xs text-[#475569] hover:bg-white"
+                      className="px-4 py-2 border border-theme-border-slate rounded-full text-xs text-theme-muted hover:bg-theme-card"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={handleSaveAllParsedServices}
-                      className="px-6 py-2 bg-[#6B3B66] hover:bg-[#552B51] text-white rounded-full text-xs alata-regular shadow-sm flex items-center gap-2"
+                      className="px-6 py-2 bg-theme-primary hover:bg-theme-primary-hover text-white rounded-full text-xs alata-regular shadow-sm flex items-center gap-2"
                     >
                       <FaIcon icon="fa-solid fa-circle-check" />
                       <span>Confirm & Save All ({parsedServices.length} Services)</span>
@@ -695,42 +697,44 @@ export default function ServicesPrices() {
             )}
           </div>
         </div>
+        </ModalPortal>
       )}
 
       {/* Add / Edit Single Service Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A1320]/60 backdrop-blur-sm animate-fadeIn">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border border-[#EAE0F2]">
-            <div className="p-5 bg-[#1A1320] text-white flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-[#6B3B66] flex items-center justify-center">
-                  <FaIcon icon="fa-solid fa-stethoscope" className="text-sm" />
+        <ModalPortal>
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto bg-theme-overlay/60 backdrop-blur-sm animate-fadeIn">
+            <div className="my-auto bg-theme-card rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border border-theme-border max-h-[92vh] flex flex-col">
+              <div className="p-5 bg-theme-sidebar-bg text-white flex items-center justify-between flex-shrink-0">
+                <div className="flex items-center gap-2.5">
+                  <div className="w-8 h-8 rounded-xl bg-theme-primary flex items-center justify-center">
+                    <FaIcon icon="fa-solid fa-stethoscope" className="text-sm" />
+                  </div>
+                  <h3 className="alata-regular text-base">
+                    {editingService ? 'Edit Treatment Offering' : 'Add Treatment Service'}
+                  </h3>
                 </div>
-                <h3 className="alata-regular text-base">
-                  {editingService ? 'Edit Treatment Offering' : 'Add Treatment Service'}
-                </h3>
+                <button
+                  onClick={() => setIsModalOpen(false)}
+                  className="text-white/70 hover:text-white w-8 h-8 rounded-xl flex items-center justify-center hover:bg-white/10"
+                >
+                  <FaIcon icon="fa-solid fa-xmark" />
+                </button>
               </div>
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="text-white/70 hover:text-white w-8 h-8 rounded-xl flex items-center justify-center hover:bg-white/10"
-              >
-                <FaIcon icon="fa-solid fa-xmark" />
-              </button>
-            </div>
 
-            <form onSubmit={handleFormSubmit} className="p-6 space-y-4">
-              <div className="bg-[#F6F0FA] p-4 rounded-2xl border border-[#EAE0F2]">
-                <div className="flex items-center gap-1.5 text-xs alata-regular text-[#6B3B66] mb-1">
+              <form onSubmit={handleFormSubmit} className="p-6 space-y-4 overflow-y-auto flex-1">
+              <div className="bg-theme-canvas p-4 rounded-2xl border border-theme-border">
+                <div className="flex items-center gap-1.5 text-xs alata-regular text-theme-primary mb-1">
                   <FaIcon icon="fa-solid fa-wand-magic-sparkles" />
                   <span>Map to Onsta Master Treatment (AI Face Detection)</span>
                 </div>
-                <p className="text-[11px] text-[#64748B] mb-2">
+                <p className="text-[11px] text-theme-muted mb-2">
                   Selecting a standard treatment links your clinic's service to patient face scan recommendations automatically.
                 </p>
                 <select
                   value={formData.masterTreatmentId}
                   onChange={(e) => handleMasterTreatmentSelect(e.target.value)}
-                  className="w-full px-3 py-2 bg-white rounded-xl border border-[#DECBE9] text-xs text-[#1E1B2E] font-medium focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/30"
+                  className="w-full px-3 py-2 bg-theme-card rounded-xl border border-theme-border-strong text-xs text-theme-ink font-medium focus:outline-none focus:ring-2 focus:ring-theme-primary/30"
                 >
                   <option value="">-- Custom / Other Clinic Service --</option>
                   {masterTreatments.map((mt) => (
@@ -742,7 +746,7 @@ export default function ServicesPrices() {
                 {formData.masterTreatmentId && (
                   <div className="mt-2 flex flex-wrap gap-1">
                     {masterTreatments.find(t => t.id === formData.masterTreatmentId)?.target_concerns?.map((c) => (
-                      <span key={c.id} className="text-[10px] bg-white border border-[#DECBE9] text-[#6B3B66] px-2.5 py-0.5 rounded-full alata-regular">
+                      <span key={c.id} className="text-[10px] bg-theme-card border border-theme-border-strong text-theme-primary px-2.5 py-0.5 rounded-full alata-regular">
                         ✓ Treats: {c.name}
                       </span>
                     ))}
@@ -751,7 +755,7 @@ export default function ServicesPrices() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-[#1E1B2E] mb-1">
+                <label className="block text-xs font-semibold text-theme-ink mb-1">
                   Service / Treatment Name *
                 </label>
                 <input
@@ -759,20 +763,20 @@ export default function ServicesPrices() {
                   required
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] text-xs text-[#1E1B2E] focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/30"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-theme-border-slate text-xs text-theme-ink focus:outline-none focus:ring-2 focus:ring-theme-primary/30"
                   placeholder="e.g. Hydrafacial MD Deep Extraction"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-[#1E1B2E] mb-1">
+                  <label className="block text-xs font-semibold text-theme-ink mb-1">
                     Category *
                   </label>
                   <select
                     value={formData.category}
                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] text-xs text-[#1E1B2E] focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/30"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-theme-border-slate text-xs text-theme-ink focus:outline-none focus:ring-2 focus:ring-theme-primary/30"
                   >
                     {masterCategories.length > 0 ? (
                       masterCategories.map(cat => (
@@ -792,7 +796,7 @@ export default function ServicesPrices() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-[#1E1B2E] mb-1">
+                  <label className="block text-xs font-semibold text-theme-ink mb-1">
                     Duration *
                   </label>
                   <input
@@ -800,7 +804,7 @@ export default function ServicesPrices() {
                     required
                     value={formData.duration}
                     onChange={(e) => setFormData({ ...formData, duration: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] text-xs text-[#1E1B2E] focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/30"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-theme-border-slate text-xs text-theme-ink focus:outline-none focus:ring-2 focus:ring-theme-primary/30"
                     placeholder="e.g. 45 mins"
                   />
                 </div>
@@ -808,7 +812,7 @@ export default function ServicesPrices() {
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-[#1E1B2E] mb-1">
+                  <label className="block text-xs font-semibold text-theme-ink mb-1">
                     Standard Tariff (AED) *
                   </label>
                   <input
@@ -817,69 +821,70 @@ export default function ServicesPrices() {
                     min="1"
                     value={formData.normalPrice}
                     onChange={(e) => setFormData({ ...formData, normalPrice: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] text-xs alata-regular text-[#1E1B2E] focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/30"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-theme-border-slate text-xs alata-regular text-theme-ink focus:outline-none focus:ring-2 focus:ring-theme-primary/30"
                     placeholder="e.g. 450"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-[#1E1B2E] mb-1">
-                    Offer Price (AED) <span className="text-[#94A3B8] font-normal">(Optional)</span>
+                  <label className="block text-xs font-semibold text-theme-ink mb-1">
+                    Offer Price (AED) <span className="text-theme-subtle font-normal">(Optional)</span>
                   </label>
                   <input
                     type="number"
                     value={formData.offerPrice}
                     onChange={(e) => setFormData({ ...formData, offerPrice: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] text-xs alata-regular text-[#6B3B66] focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/30"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-theme-border-slate text-xs alata-regular text-theme-primary focus:outline-none focus:ring-2 focus:ring-theme-primary/30"
                     placeholder="e.g. 299"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-[#1E1B2E] mb-1">
+                <label className="block text-xs font-semibold text-theme-ink mb-1">
                   Regulatory Scope (MOHAP / DHA Facility Compliance)
                 </label>
                 <input
                   type="text"
                   value={formData.scopeRequired}
                   onChange={(e) => setFormData({ ...formData, scopeRequired: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] text-xs text-[#1E1B2E] bg-[#F8FAFC] focus:outline-none"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-theme-border-slate text-xs text-theme-ink bg-theme-surface focus:outline-none"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-[#1E1B2E] mb-1">
+                <label className="block text-xs font-semibold text-theme-ink mb-1">
                   Clinical Description
                 </label>
                 <textarea
                   rows={3}
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] text-xs text-[#1E1B2E] focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/30"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-theme-border-slate text-xs text-theme-ink focus:outline-none focus:ring-2 focus:ring-theme-primary/30"
                   placeholder="Describe treatment procedure, clinical benefits, and technology used."
                 />
               </div>
 
-              <div className="pt-4 border-t border-[#F1EDF6] flex items-center justify-end gap-2">
+              <div className="pt-4 border-t border-theme-border flex items-center justify-end gap-2">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 border border-[#E2E8F0] rounded-full text-xs text-[#475569] hover:bg-[#F8FAFC]"
+                  className="px-4 py-2 border border-theme-border-slate rounded-full text-xs text-theme-muted hover:bg-theme-surface"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 bg-[#6B3B66] hover:bg-[#552B51] text-white rounded-full text-xs alata-regular shadow-sm flex items-center gap-2"
+                  className="px-6 py-2.5 bg-theme-primary hover:bg-theme-primary-hover text-white rounded-full text-xs alata-regular shadow-sm flex items-center gap-2"
                 >
                   <FaIcon icon="fa-solid fa-circle-check" />
                   <span>{editingService ? 'Update Service' : 'Save Service'}</span>
                 </button>
               </div>
             </form>
+            </div>
           </div>
-        </div>
+        </ModalPortal>
       )}
     </div>
   );

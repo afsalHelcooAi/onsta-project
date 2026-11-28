@@ -6,6 +6,7 @@ import {
   Sparkles, User, ChevronRight, CheckCircle2, Building2
 } from 'lucide-react';
 import DoctorAvatar from './DoctorAvatar';
+import BrandLogo from './BrandLogo';
 
 export default function CustomerPreviewModal({ isOpen, onClose }) {
   const { clinicData, services = [], offers = [], gallery = [], doctors = [] } = useClinic();
@@ -50,17 +51,19 @@ export default function CustomerPreviewModal({ isOpen, onClose }) {
   const clinicCover = clinicData.coverImage || 'https://images.unsplash.com/photo-1629909615184-74f495363b67?w=1200&auto=format&fit=crop&q=80';
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/60 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-[#F6F0FA] rounded-3xl shadow-2xl max-w-6xl w-full h-[94vh] flex flex-col overflow-hidden border border-[#EAE0F2] animate-scaleUp">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-theme-overlay/60 backdrop-blur-sm animate-fadeIn">
+      <div className="bg-theme-canvas rounded-3xl shadow-2xl max-w-6xl w-full h-[94vh] flex flex-col overflow-hidden border border-theme-border animate-scaleUp">
         
         {/* Top Control Bar */}
-        <div className="px-6 py-3 bg-[#1A1320] text-white flex items-center justify-between border-b border-[#2E2238] flex-shrink-0">
+        <div className="px-6 py-3 bg-theme-sidebar-bg text-white flex items-center justify-between border-b border-theme-sidebar-border flex-shrink-0">
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2 bg-[#6B3B66] px-3 py-1 rounded-full">
-              <span className="alata-regular text-xs tracking-wider text-white">ONSTA</span>
-              <span className="text-[11px] text-[#F0E6F6]">Live Customer Portal Preview</span>
+            <div className="flex items-center gap-2.5">
+              <BrandLogo className="w-8 h-8 rounded-lg ring-1 ring-white/15" />
+              <span className="px-3 py-1 rounded-full bg-theme-primary text-[11px] alata-regular text-white border border-white/10">
+                Live Customer Portal Preview
+              </span>
             </div>
-            <span className="hidden md:inline-flex items-center gap-1.5 text-xs text-[#DECBE9]">
+            <span className="hidden md:inline-flex items-center gap-1.5 text-xs text-theme-border-strong">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
               Verified Public Layout (onsta.ae)
             </span>
@@ -68,12 +71,12 @@ export default function CustomerPreviewModal({ isOpen, onClose }) {
 
           <div className="flex items-center gap-3">
             {/* Device Switcher */}
-            <div className="hidden sm:flex items-center bg-[#2A1F35] p-0.5 rounded-full border border-[#3E2F4D]">
+            <div className="hidden sm:flex items-center bg-theme-sidebar-hover p-0.5 rounded-full border border-theme-sidebar-control-border">
               <button
                 type="button"
                 onClick={() => setDeviceMode('desktop')}
                 className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs alata-regular transition-colors ${
-                  deviceMode === 'desktop' ? 'bg-white text-[#6B3B66] shadow-sm' : 'text-[#BDB1C9] hover:text-white'
+                  deviceMode === 'desktop' ? 'bg-theme-card text-theme-primary shadow-sm' : 'text-theme-sidebar-text hover:text-white'
                 }`}
               >
                 <Monitor className="w-3.5 h-3.5" />
@@ -83,7 +86,7 @@ export default function CustomerPreviewModal({ isOpen, onClose }) {
                 type="button"
                 onClick={() => setDeviceMode('mobile')}
                 className={`flex items-center gap-1.5 px-3 py-1 rounded-full text-xs alata-regular transition-colors ${
-                  deviceMode === 'mobile' ? 'bg-white text-[#6B3B66] shadow-sm' : 'text-[#BDB1C9] hover:text-white'
+                  deviceMode === 'mobile' ? 'bg-theme-card text-theme-primary shadow-sm' : 'text-theme-sidebar-text hover:text-white'
                 }`}
               >
                 <Smartphone className="w-3.5 h-3.5" />
@@ -103,7 +106,7 @@ export default function CustomerPreviewModal({ isOpen, onClose }) {
         </div>
 
         {/* Viewport Canvas */}
-        <div className="flex-1 overflow-y-auto bg-[#F8FAFC] p-3 sm:p-6 lg:p-8 flex justify-center">
+        <div className="flex-1 overflow-y-auto bg-theme-surface p-3 sm:p-6 lg:p-8 flex justify-center">
           <div
             className={`w-full transition-all duration-300 ${
               deviceMode === 'mobile'
@@ -154,8 +157,8 @@ export default function CustomerPreviewModal({ isOpen, onClose }) {
 
                   {/* Badge & Title at Bottom Left of Hero */}
                   <div className="absolute bottom-6 left-6 right-6">
-                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/95 backdrop-blur text-xs font-semibold text-gray-800 shadow-sm mb-2.5">
-                      <Sparkles className="w-3.5 h-3.5 text-amber-500 fill-amber-400" />
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-theme-accent-soft border border-theme-accent-border backdrop-blur text-xs font-semibold text-theme-accent-text shadow-sm mb-2.5">
+                      <Sparkles className="w-3.5 h-3.5 text-theme-accent fill-theme-accent" />
                       <span>Featured</span>
                     </div>
 
@@ -178,7 +181,7 @@ export default function CustomerPreviewModal({ isOpen, onClose }) {
                   </div>
 
                   <div className="flex items-center gap-1 text-gray-900 font-semibold">
-                    <Star className="w-4 h-4 text-amber-500 fill-amber-400" />
+                    <Star className="w-4 h-4 text-theme-accent fill-theme-accent" />
                     <span>{clinicRating}</span>
                     <span className="text-gray-400 font-normal">({clinicReviewsCount})</span>
                   </div>
@@ -253,7 +256,7 @@ export default function CustomerPreviewModal({ isOpen, onClose }) {
 
                           <div className="flex items-center gap-3 sm:gap-4 flex-shrink-0">
                             <div className="text-right">
-                              <span className="font-bold text-gray-900 text-sm sm:text-base whitespace-nowrap block">
+                              <span className={`font-bold text-sm sm:text-base whitespace-nowrap block ${srv.offerPrice ? 'text-theme-accent' : 'text-theme-primary'}`}>
                                 {srv.offerPrice ? srv.offerPrice : srv.normalPrice} AED
                               </span>
                               {srv.offerPrice && (
@@ -285,7 +288,7 @@ export default function CustomerPreviewModal({ isOpen, onClose }) {
                       <div>
                         <div className="flex items-center gap-1">
                           {[1, 2, 3, 4, 5].map((i) => (
-                            <Star key={i} className="w-4 h-4 text-amber-400 fill-amber-400" />
+                            <Star key={i} className="w-4 h-4 text-theme-accent fill-theme-accent" />
                           ))}
                         </div>
                         <p className="text-xs text-gray-500 mt-0.5">Based on {clinicReviewsCount} verified visits</p>
@@ -414,7 +417,7 @@ export default function CustomerPreviewModal({ isOpen, onClose }) {
                 {displayOffers.length > 0 && (
                   <div className="bg-white rounded-3xl p-5 sm:p-6 shadow-xs border border-gray-100">
                     <div className="flex items-center gap-2 mb-4">
-                      <Tag className="w-4 h-4 text-rose-500" />
+                      <Tag className="w-4 h-4 text-theme-accent" />
                       <h2 className="font-serif font-bold text-gray-900 text-base">
                         Offers
                       </h2>
@@ -424,9 +427,9 @@ export default function CustomerPreviewModal({ isOpen, onClose }) {
                       {displayOffers.map((offer) => (
                         <div
                           key={offer.id}
-                          className="bg-[#FFF9F6] border border-[#FFE7DE] rounded-2xl p-4 transition-all"
+                          className="bg-theme-accent-soft border border-theme-accent-border rounded-2xl p-4 transition-all"
                         >
-                          <div className="inline-block px-2 py-0.5 rounded-full bg-rose-50 border border-rose-200/60 text-[10px] font-bold text-rose-600 mb-1.5">
+                          <div className="inline-block px-2.5 py-0.5 rounded-full bg-theme-primary text-[10px] font-bold text-theme-accent mb-1.5">
                             {offer.discountPercent || 45}% off
                           </div>
 
@@ -436,7 +439,7 @@ export default function CustomerPreviewModal({ isOpen, onClose }) {
 
                           {offer.offerPrice && (
                             <div className="mt-2 flex items-baseline gap-2">
-                              <span className="text-sm font-bold text-[#0d281e]">AED {offer.offerPrice}</span>
+                              <span className="text-sm font-bold text-theme-accent">AED {offer.offerPrice}</span>
                               {offer.normalPrice && (
                                 <span className="text-xs text-gray-400 line-through">AED {offer.normalPrice}</span>
                               )}

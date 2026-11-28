@@ -25,8 +25,8 @@ export default function VerificationBadge({ status, text, size = 'sm' }) {
 
   if (norm === 'warning' || norm === 'expiring_soon' || norm === 'changes requested' || norm === 'changes_requested' || norm === 'review' || norm === 'review_required') {
     return (
-      <span className={`inline-flex items-center gap-1.5 alata-regular rounded-full bg-[#FFEDD5] text-[#9A3412] border border-[#FED7AA] ${paddingClass}`}>
-        <FaIcon icon="fa-solid fa-triangle-exclamation" className="text-[11px]" />
+      <span className={`inline-flex items-center gap-1.5 alata-regular rounded-full bg-theme-accent-soft text-theme-accent-text border border-theme-accent-border ${paddingClass}`}>
+        <FaIcon icon="fa-solid fa-triangle-exclamation" className="text-[11px] text-theme-accent" />
         <span>{text || (norm === 'expiring_soon' ? 'Expiring soon' : norm.includes('changes') ? 'Changes requested' : 'Review required')}</span>
       </span>
     );
@@ -51,7 +51,7 @@ export default function VerificationBadge({ status, text, size = 'sm' }) {
   }
 
   return (
-    <span className={`inline-flex items-center gap-1.5 alata-regular rounded-full bg-[#F0E6F6] text-[#552B51] border border-[#DECBE9] ${paddingClass}`}>
+    <span className={`inline-flex items-center gap-1.5 alata-regular rounded-full bg-theme-primary-soft text-theme-primary-hover border border-theme-border-strong ${paddingClass}`}>
       <FaIcon icon="fa-regular fa-clock" className="text-[11px]" />
       <span>{text || (norm === 'pending_review' ? 'Pending review' : 'Draft')}</span>
     </span>

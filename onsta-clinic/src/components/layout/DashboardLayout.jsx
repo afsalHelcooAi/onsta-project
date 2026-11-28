@@ -17,8 +17,8 @@ export default function DashboardLayout() {
   } = useClinic();
 
   return (
-    <div className="flex min-h-screen bg-[#F6F0FA] text-[#1E1B2E]">
-      {/* Luxury Deep Aubergine Sidebar */}
+    <div className="flex min-h-screen bg-theme-canvas text-theme-ink">
+      {/* Luxury Sidebar */}
       <Sidebar onOpenPreview={() => setShowCustomerPreview(true)} />
 
       {/* Main Content Area */}
@@ -44,12 +44,12 @@ export default function DashboardLayout() {
         <div className="fixed bottom-6 right-6 z-50 animate-fadeIn">
           <div className={`p-4 rounded-2xl shadow-xl border flex items-start gap-3 max-w-md ${
             toast.type === 'success'
-              ? 'bg-[#1A1320] text-white border-[#6B3B66]'
+              ? 'bg-theme-sidebar-bg text-white border-theme-primary'
               : toast.type === 'error'
               ? 'bg-[#3F1622] text-white border-rose-500/40'
               : toast.type === 'warning'
               ? 'bg-[#332215] text-white border-amber-500/40'
-              : 'bg-[#1E1B2E] text-white border-slate-700'
+              : 'bg-theme-ink text-white border-slate-700'
           }`}>
             <div className="mt-0.5 text-base">
               {toast.type === 'success' && <FaIcon icon="fa-solid fa-circle-check" className="text-emerald-400" />}

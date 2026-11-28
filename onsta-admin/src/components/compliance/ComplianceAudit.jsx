@@ -19,20 +19,20 @@ function daysUntil(value) {
 
 function ExpiryBadge({ date }) {
   const days = daysUntil(date);
-  if (days === null) return <span className="text-[#64748B] text-xs">No expiry</span>;
+  if (days === null) return <span className="text-theme-muted text-xs">No expiry</span>;
   if (days < 0) return (
     <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-50 border border-rose-200 px-2.5 py-0.5 text-[10px] alata-regular uppercase tracking-wide text-rose-700">
       <FaIcon icon="fa-solid fa-circle-xmark" className="text-[11px]" /> Expired {Math.abs(days)}d ago
     </span>
   );
   if (days <= 30) return (
-    <span className="inline-flex items-center gap-1.5 rounded-full bg-amber-50 border border-amber-200 px-2.5 py-0.5 text-[10px] alata-regular uppercase tracking-wide text-amber-700">
-      <FaIcon icon="fa-solid fa-triangle-exclamation" className="text-[11px]" /> Expires in {days}d
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-theme-accent-soft border border-theme-accent-border px-2.5 py-0.5 text-[10px] alata-regular uppercase tracking-wide text-theme-accent-text">
+      <FaIcon icon="fa-solid fa-triangle-exclamation" className="text-[11px] text-theme-accent" /> Expires in {days}d
     </span>
   );
   if (days <= 90) return (
-    <span className="inline-flex items-center gap-1.5 rounded-full bg-yellow-50 border border-yellow-200 px-2.5 py-0.5 text-[10px] alata-regular uppercase tracking-wide text-yellow-700">
-      <FaIcon icon="fa-regular fa-clock" className="text-[11px]" /> {days}d left
+    <span className="inline-flex items-center gap-1.5 rounded-full bg-theme-accent-soft border border-theme-accent-border px-2.5 py-0.5 text-[10px] alata-regular uppercase tracking-wide text-theme-accent-text">
+      <FaIcon icon="fa-regular fa-clock" className="text-[11px] text-theme-accent" /> {days}d left
     </span>
   );
   return (
@@ -62,16 +62,16 @@ function ClinicComplianceStatus({ clinic }) {
   }
   if (hasUrgent) {
     return {
-      icon: <FaIcon icon="fa-solid fa-triangle-exclamation" className="text-amber-600 text-xs" />,
+      icon: <FaIcon icon="fa-solid fa-triangle-exclamation" className="text-theme-accent text-xs" />,
       label: 'EXPIRING SOON',
-      tone: 'text-amber-700 bg-amber-50 border-amber-200',
+      tone: 'text-theme-accent-text bg-theme-accent-soft border-theme-accent-border',
     };
   }
   if (hasWarning) {
     return {
-      icon: <FaIcon icon="fa-regular fa-clock" className="text-yellow-600 text-xs" />,
+      icon: <FaIcon icon="fa-regular fa-clock" className="text-theme-accent text-xs" />,
       label: 'REVIEW DUE',
-      tone: 'text-yellow-700 bg-yellow-50 border-yellow-200',
+      tone: 'text-theme-accent-text bg-theme-accent-soft border-theme-accent-border',
     };
   }
   return {
@@ -88,11 +88,11 @@ function ComplianceDetailPanel({ clinic, onRefresh }) {
 
   if (!clinic) {
     return (
-      <div className="flex min-h-64 flex-col items-center justify-center text-center text-[#64748B] py-16">
-        <div className="w-16 h-16 rounded-2xl bg-[#F0E6F6] text-[#6B3B66] flex items-center justify-center mb-3 border border-[#DECBE9]">
+      <div className="flex min-h-64 flex-col items-center justify-center text-center text-theme-muted py-16">
+        <div className="w-16 h-16 rounded-2xl bg-theme-primary-soft text-theme-primary flex items-center justify-center mb-3 border border-theme-border-strong">
           <FaIcon icon="fa-solid fa-file-shield" className="text-2xl" />
         </div>
-        <p className="text-sm alata-regular text-[#1E1B2E]">Select a clinic to view its compliance details.</p>
+        <p className="text-sm alata-regular text-theme-ink">Select a clinic to view its compliance details.</p>
       </div>
     );
   }
@@ -131,16 +131,16 @@ function ComplianceDetailPanel({ clinic, onRefresh }) {
     <div className="space-y-5">
       {/* Modification Request Modal */}
       {rejectModalReq && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A1320]/50 backdrop-blur-sm animate-fadeIn">
-          <div className="bg-white rounded-3xl p-6 max-w-md w-full shadow-2xl border border-[#EAE0F2] space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-theme-overlay/50 backdrop-blur-sm animate-fadeIn">
+          <div className="bg-theme-card rounded-3xl p-6 max-w-md w-full shadow-2xl border border-theme-border space-y-4">
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="alata-regular text-[#1E1B2E] text-base">Request Modification / Re-upload</h3>
-                <p className="text-xs text-[#64748B] mt-0.5">{rejectModalReq.target_name} ({rejectModalReq.document_code})</p>
+                <h3 className="alata-regular text-theme-ink text-base">Request Modification / Re-upload</h3>
+                <p className="text-xs text-theme-muted mt-0.5">{rejectModalReq.target_name} ({rejectModalReq.document_code})</p>
               </div>
               <button
                 onClick={() => setRejectModalReq(null)}
-                className="text-[#64748B] hover:text-[#1E1B2E] p-1.5 rounded-full hover:bg-[#F6F0FA] transition"
+                className="text-theme-muted hover:text-theme-ink p-1.5 rounded-full hover:bg-theme-canvas transition"
                 aria-label="Close modal"
               >
                 <FaIcon icon="fa-solid fa-xmark" className="text-sm" />
@@ -148,7 +148,7 @@ function ComplianceDetailPanel({ clinic, onRefresh }) {
             </div>
             <form onSubmit={handleRejectSubmit} className="space-y-3">
               <div>
-                <label className="block text-xs font-semibold text-[#1E1B2E] mb-1.5">
+                <label className="block text-xs font-semibold text-theme-ink mb-1.5">
                   Reason / Modification Note for Clinic
                 </label>
                 <textarea
@@ -157,17 +157,17 @@ function ComplianceDetailPanel({ clinic, onRefresh }) {
                   value={rejectReason}
                   onChange={(e) => setRejectReason(e.target.value)}
                   placeholder="e.g. Document image is blurry or truncated. Please re-upload a clear colour PDF of the renewed licence."
-                  className="w-full text-xs p-3 bg-[#F8FAFC] border border-[#EAE0F2] rounded-xl focus:border-[#6B3B66] focus:ring-2 focus:ring-[#6B3B66]/20 outline-none text-[#1E1B2E]"
+                  className="w-full text-xs p-3 bg-theme-surface border border-theme-border rounded-xl focus:border-theme-primary focus:ring-2 focus:ring-theme-primary/20 outline-none text-theme-ink"
                 />
               </div>
-              <p className="text-[11px] text-[#64748B]">
+              <p className="text-[11px] text-theme-muted">
                 This message will be shown directly in the clinic&apos;s Compliance Centre with a button to re-upload.
               </p>
-              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-[#EAE0F2]">
+              <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-theme-border">
                 <button
                   type="button"
                   onClick={() => setRejectModalReq(null)}
-                  className="px-4 py-2 rounded-full border border-[#EAE0F2] text-xs font-medium text-[#64748B] hover:bg-[#F6F0FA] hover:text-[#1E1B2E] transition"
+                  className="px-4 py-2 rounded-full border border-theme-border text-xs font-medium text-theme-muted hover:bg-theme-canvas hover:text-theme-ink transition"
                 >
                   Cancel
                 </button>
@@ -185,11 +185,11 @@ function ComplianceDetailPanel({ clinic, onRefresh }) {
       )}
 
       {/* Header */}
-      <div className="flex flex-wrap items-start justify-between gap-3 border-b border-[#EAE0F2] pb-4">
+      <div className="flex flex-wrap items-start justify-between gap-3 border-b border-theme-border pb-4">
         <div className="min-w-0">
-          <h2 className="alata-regular text-2xl text-[#1E1B2E]">{clinic.trading_name}</h2>
-          <p className="mt-1 text-xs text-[#64748B]">
-            {clinic.legal_name} · <span className="alata-regular text-[#6B3B66]">{clinic.tenant_code}</span>
+          <h2 className="alata-regular text-2xl text-theme-ink">{clinic.trading_name}</h2>
+          <p className="mt-1 text-xs text-theme-muted">
+            {clinic.legal_name} · <span className="alata-regular text-theme-primary">{clinic.tenant_code}</span>
           </p>
         </div>
         <div className={`inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-xs alata-regular ${tone}`}>
@@ -199,21 +199,21 @@ function ComplianceDetailPanel({ clinic, onRefresh }) {
 
       {/* Pending Regulatory Renewal Requests (Admin Action Required) */}
       {clinic.renewal_requests && clinic.renewal_requests.length > 0 && (
-        <section className="rounded-3xl border border-[#DECBE9] bg-[#F6F0FA]/70 p-5 space-y-3 shadow-sm">
+        <section className="rounded-3xl border border-theme-border-strong bg-theme-canvas/70 p-5 space-y-3 shadow-sm">
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-full bg-[#6B3B66] text-white flex items-center justify-center shrink-0">
+              <div className="w-8 h-8 rounded-full bg-theme-primary text-white flex items-center justify-center shrink-0">
                 <FaIcon icon="fa-solid fa-circle-exclamation" className="text-sm" />
               </div>
-              <h3 className="alata-regular text-[#1E1B2E] text-sm">
+              <h3 className="alata-regular text-theme-ink text-sm">
                 Regulatory Renewal Requests ({clinic.renewal_requests.filter(r => r.status === 'PENDING_REVIEW').length} Pending)
               </h3>
             </div>
-            <span className="text-[10px] alata-regular uppercase tracking-wider bg-[#F0E6F6] text-[#6B3B66] border border-[#DECBE9] px-3 py-1 rounded-full">
+            <span className="text-[10px] alata-regular uppercase tracking-wider bg-theme-primary-soft text-theme-primary border border-theme-border-strong px-3 py-1 rounded-full">
               Action Required
             </span>
           </div>
-          <p className="text-xs text-[#64748B]">
+          <p className="text-xs text-theme-muted">
             The clinic submitted updated licence credentials extracted via AI. Review and approve below to apply updates and restore public marketplace listing on onsta.ae.
           </p>
 
@@ -221,49 +221,49 @@ function ComplianceDetailPanel({ clinic, onRefresh }) {
             {clinic.renewal_requests.map((req) => (
               <div
                 key={req.id}
-                className="bg-white rounded-2xl border border-[#EAE0F2] p-4 shadow-sm space-y-3"
+                className="bg-theme-card rounded-2xl border border-theme-border p-4 shadow-sm space-y-3"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <strong className="text-[#1E1B2E] text-sm alata-regular">{req.target_name}</strong>
-                      <span className="text-[10px] alata-regular px-2.5 py-0.5 rounded-full bg-[#F0E6F6] text-[#6B3B66] border border-[#DECBE9]">
+                      <strong className="text-theme-ink text-sm alata-regular">{req.target_name}</strong>
+                      <span className="text-[10px] alata-regular px-2.5 py-0.5 rounded-full bg-theme-primary-soft text-theme-primary border border-theme-border-strong">
                         {req.document_code}
                       </span>
                     </div>
-                    <span className="text-xs text-[#64748B] block mt-1">
-                      Licence No: <strong className="text-[#1E1B2E]">{req.document_number}</strong> · Authority: <strong className="text-[#1E1B2E]">{req.authority}</strong>
+                    <span className="text-xs text-theme-muted block mt-1">
+                      Licence No: <strong className="text-theme-ink">{req.document_number}</strong> · Authority: <strong className="text-theme-ink">{req.authority}</strong>
                     </span>
                   </div>
                   <span className={`px-2.5 py-0.5 rounded-full text-[10px] alata-regular border ${
                     req.status === 'PENDING_REVIEW'
-                      ? 'bg-[#F0E6F6] text-[#6B3B66] border-[#DECBE9]'
+                      ? 'bg-theme-primary-soft text-theme-primary border-theme-border-strong'
                       : 'bg-rose-50 text-rose-700 border-rose-200'
                   }`}>
                     {req.status === 'PENDING_REVIEW' ? 'Pending Review' : 'Modification Requested'}
                   </span>
                 </div>
 
-                <div className="grid grid-cols-2 gap-3 text-xs bg-[#F8FAFC] p-3 rounded-xl border border-[#EAE0F2]">
+                <div className="grid grid-cols-2 gap-3 text-xs bg-theme-surface p-3 rounded-xl border border-theme-border">
                   <div>
-                    <span className="text-[#64748B] block text-[10px] uppercase tracking-wider">Current Expiry</span>
-                    <span className="alata-regular text-[#1E1B2E] text-sm">{req.old_expiry_date || 'Expired'}</span>
+                    <span className="text-theme-muted block text-[10px] uppercase tracking-wider">Current Expiry</span>
+                    <span className="alata-regular text-theme-ink text-sm">{req.old_expiry_date || 'Expired'}</span>
                   </div>
                   <div>
-                    <span className="text-[#64748B] block text-[10px] uppercase tracking-wider">New Requested Expiry</span>
+                    <span className="text-theme-muted block text-[10px] uppercase tracking-wider">New Requested Expiry</span>
                     <span className="alata-regular text-emerald-700 text-sm">{req.new_expiry_date}</span>
                   </div>
                 </div>
 
                 {req.file_name && (
-                  <div className="text-[11px] text-[#64748B] flex items-center gap-1.5">
-                    <FaIcon icon="fa-solid fa-file-lines" className="text-[#6B3B66]" />
-                    <span>Attached Document: <strong className="text-[#1E1B2E] font-mono">{req.file_name}</strong></span>
+                  <div className="text-[11px] text-theme-muted flex items-center gap-1.5">
+                    <FaIcon icon="fa-solid fa-file-lines" className="text-theme-primary" />
+                    <span>Attached Document: <strong className="text-theme-ink font-mono">{req.file_name}</strong></span>
                   </div>
                 )}
 
                 {req.status === 'PENDING_REVIEW' && (
-                  <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-[#EAE0F2]">
+                  <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-theme-border">
                     <button
                       onClick={() => {
                         setRejectModalReq(req);
@@ -278,7 +278,7 @@ function ComplianceDetailPanel({ clinic, onRefresh }) {
                     <button
                       onClick={() => handleApprove(req.id)}
                       disabled={actionLoading === req.id}
-                      className="px-4 py-1.5 rounded-full bg-[#6B3B66] hover:bg-[#552B51] text-white text-xs alata-regular transition-colors flex items-center gap-1.5 shadow-sm"
+                      className="px-4 py-1.5 rounded-full bg-theme-primary hover:bg-theme-primary-hover text-white text-xs alata-regular transition-colors flex items-center gap-1.5 shadow-sm"
                     >
                       {actionLoading === req.id ? (
                         <FaIcon icon="fa-solid fa-spinner fa-spin" className="text-xs" />
@@ -302,94 +302,94 @@ function ComplianceDetailPanel({ clinic, onRefresh }) {
       )}
 
       {/* Trade License */}
-      <section className="rounded-3xl border border-[#EAE0F2] bg-white p-5">
+      <section className="rounded-3xl border border-theme-border bg-theme-card p-5">
         <div className="flex items-center justify-between gap-3 mb-3.5">
-          <h3 className="alata-regular text-base text-[#1E1B2E]">Trade License</h3>
+          <h3 className="alata-regular text-base text-theme-ink">Trade License</h3>
           <ExpiryBadge date={clinic.trade_license_expiry_date} />
         </div>
         <dl className="grid gap-x-5 gap-y-3 sm:grid-cols-2 text-sm">
           <div>
-            <dt className="text-[11px] font-medium uppercase tracking-wide text-[#64748B]">License Number</dt>
-            <dd className="mt-1 font-medium text-[#1E1B2E]">{clinic.trade_license_number || 'Not provided'}</dd>
+            <dt className="text-[11px] font-medium uppercase tracking-wide text-theme-muted">License Number</dt>
+            <dd className="mt-1 font-medium text-theme-ink">{clinic.trade_license_number || 'Not provided'}</dd>
           </div>
           <div>
-            <dt className="text-[11px] font-medium uppercase tracking-wide text-[#64748B]">Issuing Authority</dt>
-            <dd className="mt-1 font-medium text-[#1E1B2E]">{clinic.trade_license_authority || 'Not provided'}</dd>
+            <dt className="text-[11px] font-medium uppercase tracking-wide text-theme-muted">Issuing Authority</dt>
+            <dd className="mt-1 font-medium text-theme-ink">{clinic.trade_license_authority || 'Not provided'}</dd>
           </div>
           <div>
-            <dt className="text-[11px] font-medium uppercase tracking-wide text-[#64748B]">Issue Date</dt>
-            <dd className="mt-1 font-medium text-[#1E1B2E]">{formatDate(clinic.trade_license_issue_date)}</dd>
+            <dt className="text-[11px] font-medium uppercase tracking-wide text-theme-muted">Issue Date</dt>
+            <dd className="mt-1 font-medium text-theme-ink">{formatDate(clinic.trade_license_issue_date)}</dd>
           </div>
           <div>
-            <dt className="text-[11px] font-medium uppercase tracking-wide text-[#64748B]">Expiry Date</dt>
-            <dd className="mt-1 font-medium text-[#1E1B2E]">{formatDate(clinic.trade_license_expiry_date)}</dd>
+            <dt className="text-[11px] font-medium uppercase tracking-wide text-theme-muted">Expiry Date</dt>
+            <dd className="mt-1 font-medium text-theme-ink">{formatDate(clinic.trade_license_expiry_date)}</dd>
           </div>
         </dl>
       </section>
 
       {/* Facility License */}
-      <section className="rounded-3xl border border-[#EAE0F2] bg-white p-5">
+      <section className="rounded-3xl border border-theme-border bg-theme-card p-5">
         <div className="flex items-center justify-between gap-3 mb-3.5">
-          <h3 className="alata-regular text-base text-[#1E1B2E]">Facility License</h3>
+          <h3 className="alata-regular text-base text-theme-ink">Facility License</h3>
           <ExpiryBadge date={clinic.facility_license_expiry_date} />
         </div>
         <dl className="grid gap-x-5 gap-y-3 sm:grid-cols-2 text-sm">
           <div>
-            <dt className="text-[11px] font-medium uppercase tracking-wide text-[#64748B]">License Number</dt>
-            <dd className="mt-1 font-medium text-[#1E1B2E]">{clinic.facility_license_number || 'Not provided'}</dd>
+            <dt className="text-[11px] font-medium uppercase tracking-wide text-theme-muted">License Number</dt>
+            <dd className="mt-1 font-medium text-theme-ink">{clinic.facility_license_number || 'Not provided'}</dd>
           </div>
           <div>
-            <dt className="text-[11px] font-medium uppercase tracking-wide text-[#64748B]">Issuing Authority</dt>
-            <dd className="mt-1 font-medium text-[#1E1B2E]">{clinic.facility_license_authority || 'Not provided'}</dd>
+            <dt className="text-[11px] font-medium uppercase tracking-wide text-theme-muted">Issuing Authority</dt>
+            <dd className="mt-1 font-medium text-theme-ink">{clinic.facility_license_authority || 'Not provided'}</dd>
           </div>
           <div>
-            <dt className="text-[11px] font-medium uppercase tracking-wide text-[#64748B]">Issue Date</dt>
-            <dd className="mt-1 font-medium text-[#1E1B2E]">{formatDate(clinic.facility_license_issue_date)}</dd>
+            <dt className="text-[11px] font-medium uppercase tracking-wide text-theme-muted">Issue Date</dt>
+            <dd className="mt-1 font-medium text-theme-ink">{formatDate(clinic.facility_license_issue_date)}</dd>
           </div>
           <div>
-            <dt className="text-[11px] font-medium uppercase tracking-wide text-[#64748B]">Expiry Date</dt>
-            <dd className="mt-1 font-medium text-[#1E1B2E]">{formatDate(clinic.facility_license_expiry_date)}</dd>
+            <dt className="text-[11px] font-medium uppercase tracking-wide text-theme-muted">Expiry Date</dt>
+            <dd className="mt-1 font-medium text-theme-ink">{formatDate(clinic.facility_license_expiry_date)}</dd>
           </div>
         </dl>
       </section>
 
       {/* Company Registration */}
-      <section className="rounded-3xl border border-[#EAE0F2] bg-white p-5">
-        <h3 className="alata-regular text-base text-[#1E1B2E] mb-3.5">Company Registration</h3>
+      <section className="rounded-3xl border border-theme-border bg-theme-card p-5">
+        <h3 className="alata-regular text-base text-theme-ink mb-3.5">Company Registration</h3>
         <dl className="grid gap-x-5 gap-y-3 sm:grid-cols-2 text-sm">
           <div>
-            <dt className="text-[11px] font-medium uppercase tracking-wide text-[#64748B]">Registration Number</dt>
-            <dd className="mt-1 font-medium text-[#1E1B2E]">{clinic.company_registration_number || 'Not provided'}</dd>
+            <dt className="text-[11px] font-medium uppercase tracking-wide text-theme-muted">Registration Number</dt>
+            <dd className="mt-1 font-medium text-theme-ink">{clinic.company_registration_number || 'Not provided'}</dd>
           </div>
           <div>
-            <dt className="text-[11px] font-medium uppercase tracking-wide text-[#64748B]">Facility Type</dt>
-            <dd className="mt-1 font-medium text-[#1E1B2E]">{clinic.facility_type || 'Not provided'}</dd>
+            <dt className="text-[11px] font-medium uppercase tracking-wide text-theme-muted">Facility Type</dt>
+            <dd className="mt-1 font-medium text-theme-ink">{clinic.facility_type || 'Not provided'}</dd>
           </div>
           <div>
-            <dt className="text-[11px] font-medium uppercase tracking-wide text-[#64748B]">Emirate</dt>
-            <dd className="mt-1 font-medium text-[#1E1B2E]">{clinic.emirate || '—'}</dd>
+            <dt className="text-[11px] font-medium uppercase tracking-wide text-theme-muted">Emirate</dt>
+            <dd className="mt-1 font-medium text-theme-ink">{clinic.emirate || '—'}</dd>
           </div>
           <div>
-            <dt className="text-[11px] font-medium uppercase tracking-wide text-[#64748B]">Verification Status</dt>
-            <dd className="mt-1 font-medium text-[#1E1B2E]">{clinic.verification_status || '—'}</dd>
+            <dt className="text-[11px] font-medium uppercase tracking-wide text-theme-muted">Verification Status</dt>
+            <dd className="mt-1 font-medium text-theme-ink">{clinic.verification_status || '—'}</dd>
           </div>
         </dl>
       </section>
 
       {/* Practitioner Licenses Watchdog */}
-      <section className="rounded-3xl border border-[#EAE0F2] bg-white p-5">
+      <section className="rounded-3xl border border-theme-border bg-theme-card p-5">
         <div className="flex items-center justify-between gap-3 mb-3.5">
           <div>
-            <h3 className="alata-regular text-base text-[#1E1B2E]">Practitioner Licences Watchdog</h3>
-            <p className="text-xs text-[#64748B]">Live credential status from practitioner_licenses table</p>
+            <h3 className="alata-regular text-base text-theme-ink">Practitioner Licences Watchdog</h3>
+            <p className="text-xs text-theme-muted">Live credential status from practitioner_licenses table</p>
           </div>
-          <span className="text-xs alata-regular px-3 py-1 rounded-full bg-[#F0E6F6] text-[#6B3B66] border border-[#DECBE9]">
+          <span className="text-xs alata-regular px-3 py-1 rounded-full bg-theme-primary-soft text-theme-primary border border-theme-border-strong">
             {clinic.practitioners ? clinic.practitioners.length : 0} Doctor(s)
           </span>
         </div>
 
         {(!clinic.practitioners || clinic.practitioners.length === 0) ? (
-          <div className="p-5 text-center text-xs text-[#64748B] bg-[#F8FAFC] border border-dashed border-[#EAE0F2] rounded-2xl">
+          <div className="p-5 text-center text-xs text-theme-muted bg-theme-surface border border-dashed border-theme-border rounded-2xl">
             No practitioners currently registered to this facility.
           </div>
         ) : (
@@ -407,19 +407,19 @@ function ComplianceDetailPanel({ clinic, onRefresh }) {
                       ? 'bg-rose-50/50 border-rose-200'
                       : isCritical
                       ? 'bg-amber-50/50 border-amber-200'
-                      : 'bg-[#F8FAFC] border-[#EAE0F2]'
+                      : 'bg-theme-surface border-theme-border'
                   }`}
                 >
                   <div>
                     <div className="flex items-center gap-2 flex-wrap">
-                      <strong className={isExpired ? 'text-rose-900 alata-regular text-sm' : 'text-[#1E1B2E] alata-regular text-sm'}>
+                      <strong className={isExpired ? 'text-rose-900 alata-regular text-sm' : 'text-theme-ink alata-regular text-sm'}>
                         {doc.full_name}
                       </strong>
-                      <span className="text-[10px] text-[#64748B] font-mono">
+                      <span className="text-[10px] text-theme-muted font-mono">
                         ({doc.authority || 'DHA'} · {doc.license_number})
                       </span>
                     </div>
-                    <span className="text-[#64748B] text-[11px] block mt-0.5">
+                    <span className="text-theme-muted text-[11px] block mt-0.5">
                       {doc.specialty} · {doc.professional_title || 'Specialist'}
                     </span>
                   </div>
@@ -496,17 +496,17 @@ export default function ComplianceAudit() {
   ];
 
   return (
-    <main className="flex h-screen min-w-0 flex-1 flex-col overflow-hidden bg-[#F6F0FA]">
-      <header className="flex flex-wrap items-center justify-between gap-4 border-b border-[#EAE0F2] bg-white px-6 py-5 shadow-sm sm:px-8">
+    <main className="flex h-screen min-w-0 flex-1 flex-col overflow-hidden bg-theme-canvas">
+      <header className="flex flex-wrap items-center justify-between gap-4 border-b border-theme-border bg-theme-card px-6 py-5 shadow-sm sm:px-8">
         <div>
-          <h1 className="alata-regular text-xl text-[#1E1B2E]">Compliance & Permits</h1>
-          <p className="mt-1 text-xs text-[#64748B]">Monitor trade, facility, and practitioner license expiry across all registered clinics.</p>
+          <h1 className="alata-regular text-xl text-theme-ink">Compliance & Permits</h1>
+          <p className="mt-1 text-xs text-theme-muted">Monitor trade, facility, and practitioner license expiry across all registered clinics.</p>
         </div>
         <button
           type="button"
           onClick={() => setRefreshKey((k) => k + 1)}
           disabled={loading}
-          className="inline-flex items-center gap-2 rounded-full border border-[#DECBE9] bg-[#F6F0FA] px-4 py-2 text-xs alata-regular text-[#6B3B66] hover:bg-[#F0E6F6] disabled:opacity-60 transition"
+          className="inline-flex items-center gap-2 rounded-full border border-theme-border-strong bg-theme-canvas px-4 py-2 text-xs alata-regular text-theme-primary hover:bg-theme-primary-soft disabled:opacity-60 transition"
         >
           <FaIcon icon="fa-solid fa-arrows-rotate" className={loading ? 'fa-spin' : ''} /> Refresh
         </button>
@@ -518,32 +518,32 @@ export default function ComplianceAudit() {
 
       <div className="grid min-h-0 flex-1 grid-cols-1 overflow-hidden xl:grid-cols-[minmax(0,1.05fr)_minmax(430px,0.95fr)]">
         {/* Left: Clinic List */}
-        <section className="flex min-h-0 flex-col border-r border-[#EAE0F2] bg-[#F8FAFC]">
+        <section className="flex min-h-0 flex-col border-r border-theme-border bg-theme-surface">
           {/* Filters */}
-          <div className="space-y-3 border-b border-[#EAE0F2] bg-white/70 p-4">
+          <div className="space-y-3 border-b border-theme-border bg-theme-card/70 p-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-sm alata-regular text-[#1E1B2E]">
-                <FaIcon icon="fa-solid fa-hospital" className="text-[#6B3B66]" /> Registered clinics
+              <div className="flex items-center gap-2 text-sm alata-regular text-theme-ink">
+                <FaIcon icon="fa-solid fa-hospital" className="text-theme-primary" /> Registered clinics
               </div>
-              <span className="text-xs alata-regular text-[#64748B]">{total} total</span>
+              <span className="text-xs alata-regular text-theme-muted">{total} total</span>
             </div>
 
             {/* Search + Emirate */}
             <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_160px]">
               <label className="relative">
-                <FaIcon icon="fa-solid fa-magnifying-glass" className="absolute left-3.5 top-3 text-xs text-[#64748B]" />
+                <FaIcon icon="fa-solid fa-magnifying-glass" className="absolute left-3.5 top-3 text-xs text-theme-muted" />
                 <input
                   value={search}
                   onChange={(e) => { setSearch(e.target.value); setOffset(0); }}
                   placeholder="Search clinic or tenant code"
-                  className="w-full rounded-xl border border-[#EAE0F2] bg-white py-2 pl-9 pr-3 text-sm text-[#1E1B2E] outline-none focus:border-[#6B3B66]"
+                  className="w-full rounded-xl border border-theme-border bg-theme-card py-2 pl-9 pr-3 text-sm text-theme-ink outline-none focus:border-theme-primary"
                 />
               </label>
               <select
                 value={emirate}
                 onChange={updateFilter(setEmirate)}
                 aria-label="Filter by emirate"
-                className="rounded-xl border border-[#EAE0F2] bg-white px-3 py-2 text-sm text-[#1E1B2E] outline-none focus:border-[#6B3B66]"
+                className="rounded-xl border border-theme-border bg-theme-card px-3 py-2 text-sm text-theme-ink outline-none focus:border-theme-primary"
               >
                 <option value="">All emirates</option>
                 {EMIRATES.map((name) => <option key={name} value={name}>{name}</option>)}
@@ -559,8 +559,8 @@ export default function ComplianceAudit() {
                   onClick={() => { setComplianceFilter(value); setOffset(0); }}
                   className={`flex-1 rounded-full py-1.5 text-[11px] alata-regular transition ${
                     complianceFilter === value
-                      ? 'bg-[#6B3B66] text-white shadow-sm'
-                      : 'bg-white border border-[#EAE0F2] text-[#64748B] hover:bg-[#F6F0FA] hover:text-[#6B3B66]'
+                      ? 'bg-theme-primary text-white shadow-sm'
+                      : 'bg-theme-card border border-theme-border text-theme-muted hover:bg-theme-canvas hover:text-theme-primary'
                   }`}
                 >
                   {label}
@@ -570,11 +570,11 @@ export default function ComplianceAudit() {
           </div>
 
           {/* List */}
-          <div className="min-h-0 flex-1 overflow-auto divide-y divide-[#EAE0F2]">
+          <div className="min-h-0 flex-1 overflow-auto divide-y divide-theme-border">
             {loading && clinics.length === 0 ? (
-              <p className="p-8 text-center text-sm text-[#64748B]">Loading compliance data…</p>
+              <p className="p-8 text-center text-sm text-theme-muted">Loading compliance data…</p>
             ) : clinics.length === 0 ? (
-              <p className="p-8 text-center text-sm text-[#64748B]">
+              <p className="p-8 text-center text-sm text-theme-muted">
                 {error ? 'Clinic list is unavailable.' : 'No clinics match your search and filters.'}
               </p>
             ) : (
@@ -586,32 +586,32 @@ export default function ComplianceAudit() {
                     key={clinic.clinic_id}
                     type="button"
                     onClick={() => setSelectedClinic(clinic)}
-                    className={`w-full px-4 py-4 text-left transition hover:bg-[#F6F0FA]/60 ${
-                      isSelected ? 'border-l-4 border-[#6B3B66] bg-[#F6F0FA]/90' : 'bg-white/60'
+                    className={`w-full px-4 py-4 text-left transition hover:bg-theme-canvas/60 ${
+                      isSelected ? 'border-l-4 border-theme-primary bg-theme-canvas/90' : 'bg-theme-card/60'
                     }`}
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
-                        <h2 className="truncate text-sm alata-regular text-[#1E1B2E]">{clinic.trading_name}</h2>
-                        <p className="mt-1 truncate text-xs text-[#64748B]">{clinic.legal_name}</p>
+                        <h2 className="truncate text-sm alata-regular text-theme-ink">{clinic.trading_name}</h2>
+                        <p className="mt-1 truncate text-xs text-theme-muted">{clinic.legal_name}</p>
                       </div>
                       <div className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-0.5 text-[10px] alata-regular ${tone}`}>
                         {icon} {label}
                       </div>
                     </div>
-                    <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-[#64748B]">
+                    <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-theme-muted">
                       <span className="inline-flex items-center gap-1">
-                        <FaIcon icon="fa-solid fa-location-dot" className="text-[#6B3B66]/70" />
+                        <FaIcon icon="fa-solid fa-location-dot" className="text-theme-primary/70" />
                         {clinic.emirate || '—'}
                       </span>
                       <span>{clinic.facility_type}</span>
-                      <span className="alata-regular text-[#6B3B66]">{clinic.tenant_code}</span>
+                      <span className="alata-regular text-theme-primary">{clinic.tenant_code}</span>
                     </div>
-                    <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[10px] text-[#64748B]">
+                    <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[10px] text-theme-muted">
                       <span>Trade: {formatDate(clinic.trade_license_expiry_date)}</span>
                       <span>Facility: {formatDate(clinic.facility_license_expiry_date)}</span>
                       {clinic.pending_renewals_count > 0 ? (
-                        <span className="text-[#6B3B66] alata-regular bg-[#F0E6F6] px-2 py-0.5 rounded-full border border-[#DECBE9]">
+                        <span className="text-theme-primary alata-regular bg-theme-primary-soft px-2 py-0.5 rounded-full border border-theme-border-strong">
                           Renewals: {clinic.pending_renewals_count} Pending
                         </span>
                       ) : null}
@@ -630,14 +630,14 @@ export default function ComplianceAudit() {
           </div>
 
           {/* Pagination */}
-          <footer className="flex items-center justify-between border-t border-[#EAE0F2] bg-white px-4 py-3 text-xs text-[#64748B]">
+          <footer className="flex items-center justify-between border-t border-theme-border bg-theme-card px-4 py-3 text-xs text-theme-muted">
             <span className="alata-regular">Page {page} of {pageCount}</span>
             <div className="flex gap-2">
               <button
                 type="button"
                 disabled={offset === 0 || loading}
                 onClick={() => setOffset(Math.max(0, offset - PAGE_SIZE))}
-                className="rounded-full border border-[#EAE0F2] w-8 h-8 flex items-center justify-center hover:bg-[#F6F0FA] hover:text-[#6B3B66] disabled:opacity-40 transition"
+                className="rounded-full border border-theme-border w-8 h-8 flex items-center justify-center hover:bg-theme-canvas hover:text-theme-primary disabled:opacity-40 transition"
                 aria-label="Previous page"
               >
                 <FaIcon icon="fa-solid fa-chevron-left" className="text-xs" />
@@ -646,7 +646,7 @@ export default function ComplianceAudit() {
                 type="button"
                 disabled={offset + PAGE_SIZE >= total || loading}
                 onClick={() => setOffset(offset + PAGE_SIZE)}
-                className="rounded-full border border-[#EAE0F2] w-8 h-8 flex items-center justify-center hover:bg-[#F6F0FA] hover:text-[#6B3B66] disabled:opacity-40 transition"
+                className="rounded-full border border-theme-border w-8 h-8 flex items-center justify-center hover:bg-theme-canvas hover:text-theme-primary disabled:opacity-40 transition"
                 aria-label="Next page"
               >
                 <FaIcon icon="fa-solid fa-chevron-right" className="text-xs" />
@@ -656,8 +656,8 @@ export default function ComplianceAudit() {
         </section>
 
         {/* Right: Detail Panel */}
-        <section className="min-h-0 overflow-y-auto bg-[#F8FAFC] p-5 sm:p-6">
-          <div className="bg-white rounded-3xl border border-[#EAE0F2] p-5 sm:p-6 shadow-sm">
+        <section className="min-h-0 overflow-y-auto bg-theme-surface p-5 sm:p-6">
+          <div className="bg-theme-card rounded-3xl border border-theme-border p-5 sm:p-6 shadow-sm">
             <ComplianceDetailPanel
               clinic={selectedClinic}
               onRefresh={() => setRefreshKey((k) => k + 1)}

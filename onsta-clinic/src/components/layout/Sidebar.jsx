@@ -2,6 +2,7 @@ import React from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useClinic } from '../../context/ClinicContext';
 import FaIcon from '../common/FaIcon';
+import BrandLogo from '../common/BrandLogo';
 
 export default function Sidebar() {
   const { clinicData, logout, enquiries } = useClinic();
@@ -31,21 +32,24 @@ export default function Sidebar() {
   ];
 
   return (
-    <aside className="w-64 bg-[#1A1320] text-white flex flex-col justify-between h-screen sticky top-0 flex-shrink-0 select-none border-r border-[#2E2238]">
+    <aside className="w-64 bg-theme-sidebar-bg text-white flex flex-col justify-between h-screen sticky top-0 flex-shrink-0 select-none border-r border-theme-sidebar-border">
       {/* Brand & Clinic Identity */}
       <div>
         <div className="p-6 pb-4">
-          <div className="flex items-center gap-2.5">
-            <span className="bg-[#6B3B66] text-white alata-regular px-2.5 py-1 rounded-lg text-xs tracking-widest border border-white/15 uppercase shadow-sm">
-              ONSTA
-            </span>
-            <span className="alata-regular text-sm tracking-wide text-[#EFE8F6]">
-              Clinic Partner
-            </span>
+          <div className="flex items-center gap-3">
+            <BrandLogo className="w-10 h-10 rounded-xl shadow-sm ring-1 ring-white/15" />
+            <div>
+              <span className="alata-regular text-sm tracking-wide text-theme-sidebar-heading block leading-tight">
+                Clinic Partner
+              </span>
+              <span className="text-[10px] font-medium uppercase tracking-wider text-theme-sidebar-kicker">
+                onsta.ai
+              </span>
+            </div>
           </div>
 
-          <div className="mt-5 p-3.5 rounded-2xl bg-[#241B2E] border border-[#352842]">
-            <p className="text-[10px] uppercase tracking-wider text-[#C7B0D8] font-semibold">
+          <div className="mt-5 p-3.5 rounded-2xl bg-theme-sidebar-surface border border-theme-sidebar-border">
+            <p className="text-[10px] uppercase tracking-wider text-theme-sidebar-kicker font-semibold">
               Active Medical Facility
             </p>
             <h2 className="text-sm alata-regular text-white truncate mt-0.5">
@@ -73,15 +77,15 @@ export default function Sidebar() {
                 to={item.path}
                 className={`flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm transition-all duration-150 ${
                   isActive
-                    ? 'bg-[#FFFFFF] text-[#1E1B2E] alata-regular shadow-md'
-                    : 'text-[#BDB1C9] hover:text-white hover:bg-[#2A1F35] font-medium'
+                    ? 'bg-theme-card text-theme-ink alata-regular shadow-md'
+                    : 'text-theme-sidebar-text hover:text-white hover:bg-theme-sidebar-hover font-medium'
                 }`}
               >
                 <div className="flex items-center gap-3">
                   <FaIcon
                     icon={item.icon}
                     className={`w-4 text-center text-sm ${
-                      isActive ? 'text-[#6B3B66]' : 'text-[#9F8FB0]'
+                      isActive ? 'text-theme-primary' : 'text-theme-sidebar-muted'
                     }`}
                   />
                   <span className={isActive ? 'alata-regular' : ''}>{item.name}</span>
@@ -89,8 +93,8 @@ export default function Sidebar() {
                 {item.badge && (
                   <span className={`px-2 py-0.5 rounded-full text-[11px] alata-regular ${
                     isActive
-                      ? 'bg-[#6B3B66] text-white'
-                      : 'bg-[#F0E6F6] text-[#6B3B66]'
+                      ? 'bg-theme-primary text-white'
+                      : 'bg-theme-primary-soft text-theme-primary'
                   }`}>
                     {item.badge}
                   </span>
@@ -102,14 +106,14 @@ export default function Sidebar() {
       </div>
 
       {/* Bottom Actions: Clean Prominent Log Out Button */}
-      <div className="p-4 border-t border-[#2E2238]">
+      <div className="p-4 border-t border-theme-sidebar-border">
         <button
           onClick={handleSignOut}
-          className="flex items-center justify-center gap-2.5 w-full px-4 py-2.5 rounded-xl text-xs alata-regular tracking-wide text-[#F4D9E6] bg-[#2D1F34] hover:bg-[#6B3B66] hover:text-white border border-[#422E4B] transition-all shadow-sm group"
+          className="flex items-center justify-center gap-2.5 w-full px-4 py-2.5 rounded-xl text-xs alata-regular tracking-wide text-theme-sidebar-logout-text bg-theme-sidebar-logout-bg hover:bg-theme-primary hover:text-white border border-theme-sidebar-logout-border transition-all shadow-sm group"
         >
           <FaIcon
             icon="fa-solid fa-arrow-right-from-bracket"
-            className="text-sm text-[#E09CB8] group-hover:text-white transition-colors"
+            className="text-sm text-theme-sidebar-logout-icon group-hover:text-white transition-colors"
           />
           <span>Log Out</span>
         </button>

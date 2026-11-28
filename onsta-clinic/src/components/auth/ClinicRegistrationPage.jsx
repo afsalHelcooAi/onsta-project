@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import FaIcon from '../common/FaIcon';
+import BrandLogo from '../common/BrandLogo';
 import {
   analyzeClinicDocuments,
   registerClinic,
@@ -289,11 +290,11 @@ export default function ClinicRegistrationPage() {
   const field = (label, key, type = 'text', required = true) => {
     const hasError = Boolean(fieldErrors[key]);
     return (
-      <label key={key} className="block text-xs font-semibold uppercase tracking-wider text-[#64748B]">
+      <label key={key} className="block text-xs font-semibold uppercase tracking-wider text-theme-muted">
         <div className="flex items-center justify-between gap-2">
           <span>
             {label}
-            {!required && <span className="font-normal lowercase text-[#64748B]/80"> (optional)</span>}
+            {!required && <span className="font-normal lowercase text-theme-muted/80"> (optional)</span>}
           </span>
           {hasError && <span className="text-[11px] normal-case text-rose-600 font-semibold">{fieldErrors[key]}</span>}
         </div>
@@ -305,10 +306,10 @@ export default function ClinicRegistrationPage() {
           value={form[key] || ''}
           onChange={update(key)}
           placeholder={key === 'main_phone' ? '+971 50 123 4567 (optional)' : ''}
-          className={`mt-1.5 w-full rounded-xl border px-3.5 py-2.5 text-sm font-normal text-[#1E1B2E] outline-none transition ${
+          className={`mt-1.5 w-full rounded-xl border px-3.5 py-2.5 text-sm font-normal text-theme-ink outline-none transition ${
             hasError
               ? 'border-rose-400 bg-rose-50/50 focus:border-rose-600 focus:ring-2 focus:ring-rose-100'
-              : 'border-[#EAE0F2] bg-[#F8FAFC] focus:border-[#6B3B66] focus:bg-white focus:ring-2 focus:ring-[#6B3B66]/15'
+              : 'border-theme-border bg-theme-surface focus:border-theme-primary focus:bg-theme-card focus:ring-2 focus:ring-theme-primary/15'
           }`}
         />
       </label>
@@ -316,26 +317,24 @@ export default function ClinicRegistrationPage() {
   };
 
   return (
-    <main className="min-h-screen bg-[#F6F0FA] px-4 py-10 text-[#1E1B2E]">
+    <main className="min-h-screen bg-theme-canvas px-4 py-10 text-theme-ink">
       <div className="mx-auto max-w-4xl">
         <Link
           to={isEditMode ? '/application' : '/login'}
-          className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#DECBE9] bg-white px-4 py-2 text-xs alata-regular text-[#6B3B66] shadow-sm transition hover:bg-[#F0E6F6]"
+          className="mb-6 inline-flex items-center gap-2 rounded-full border border-theme-border-strong bg-theme-card px-4 py-2 text-xs alata-regular text-theme-primary shadow-sm transition hover:bg-theme-primary-soft"
         >
           <FaIcon icon="fa-solid fa-arrow-left" />
           {isEditMode ? 'Back to application status' : 'Back to clinic sign in'}
         </Link>
 
-        <div className="rounded-3xl border border-[#EAE0F2] bg-white p-6 shadow-xl sm:p-10">
+        <div className="rounded-3xl border border-theme-border bg-theme-card p-6 shadow-xl sm:p-10">
           <div className="mb-8 flex items-start gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#F0E6F6] text-[#6B3B66] border border-[#DECBE9]">
-              <FaIcon icon="fa-solid fa-hospital" className="text-xl" />
-            </div>
+            <BrandLogo className="h-12 w-12 shrink-0 rounded-2xl shadow-sm" />
             <div>
-              <h1 className="alata-regular text-2xl sm:text-3xl text-[#1E1B2E]">
+              <h1 className="alata-regular text-2xl sm:text-3xl text-theme-ink">
                 {isEditMode ? 'Modify & Update Clinic Registration' : 'Register your clinic'}
               </h1>
-              <p className="mt-1 text-sm text-[#64748B]">
+              <p className="mt-1 text-sm text-theme-muted">
                 {isEditMode
                   ? 'Update your clinic details and re-upload any requested licenses to resubmit for review.'
                   : 'Upload the three required documents one at a time. We’ll read the clinic details for you to review.'}
@@ -345,12 +344,12 @@ export default function ClinicRegistrationPage() {
 
           {/* Super Admin Suggestion / Rejection Reason Banner in Edit Mode */}
           {reviewNotes && (
-            <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-950">
+            <div className="mb-6 rounded-2xl border border-theme-accent-border bg-theme-accent-soft p-4 text-sm text-theme-accent-text">
               <div className="flex items-center gap-2 alata-regular">
-                <FaIcon icon="fa-solid fa-circle-exclamation" className="text-amber-700" />
+                <FaIcon icon="fa-solid fa-circle-exclamation" className="text-theme-accent" />
                 <span>Super Admin Modification Notes:</span>
               </div>
-              <p className="mt-1.5 text-xs text-amber-900 leading-relaxed font-medium">{reviewNotes}</p>
+              <p className="mt-1.5 text-xs text-theme-accent-text/90 leading-relaxed font-medium">{reviewNotes}</p>
             </div>
           )}
 
@@ -377,10 +376,10 @@ export default function ClinicRegistrationPage() {
                 onClick={() => setStep(index)}
                 className={`rounded-2xl px-3.5 py-2.5 text-left text-xs sm:text-sm alata-regular transition border ${
                   index === step
-                    ? 'bg-[#6B3B66] text-white border-[#6B3B66] shadow-sm'
+                    ? 'bg-theme-primary text-white border-theme-primary shadow-sm'
                     : index < step || isEditMode
-                    ? 'bg-[#F0E6F6] text-[#6B3B66] border-[#DECBE9]'
-                    : 'bg-[#F8FAFC] text-[#64748B] border-[#EAE0F2] hover:bg-[#F6F0FA]'
+                    ? 'bg-theme-primary-soft text-theme-primary border-theme-border-strong'
+                    : 'bg-theme-surface text-theme-muted border-theme-border hover:bg-theme-canvas'
                 }`}
               >
                 <span className="inline-flex items-center gap-1.5">
@@ -394,8 +393,8 @@ export default function ClinicRegistrationPage() {
               onClick={() => setStep(3)}
               className={`rounded-2xl px-3.5 py-2.5 text-left text-xs sm:text-sm alata-regular transition border ${
                 step === 3
-                  ? 'bg-[#6B3B66] text-white border-[#6B3B66] shadow-sm'
-                  : 'bg-[#F8FAFC] text-[#64748B] border-[#EAE0F2] hover:bg-[#F6F0FA]'
+                  ? 'bg-theme-primary text-white border-theme-primary shadow-sm'
+                  : 'bg-theme-surface text-theme-muted border-theme-border hover:bg-theme-canvas'
               }`}
             >
               <span>4. Clinic Details</span>
@@ -405,20 +404,20 @@ export default function ClinicRegistrationPage() {
           {step < DOCUMENTS.length ? (
             <section className="space-y-5">
               <div>
-                <p className="text-xs alata-regular uppercase tracking-wider text-[#6B3B66]">
+                <p className="text-xs alata-regular uppercase tracking-wider text-theme-primary">
                   Document {step + 1} of {DOCUMENTS.length}
                 </p>
-                <h2 className="mt-1 alata-regular text-xl text-[#1E1B2E]">Upload your {currentDocument.title}</h2>
-                <p className="mt-2 text-sm text-[#64748B]">{currentDocument.source}</p>
+                <h2 className="mt-1 alata-regular text-xl text-theme-ink">Upload your {currentDocument.title}</h2>
+                <p className="mt-2 text-sm text-theme-muted">{currentDocument.source}</p>
               </div>
 
-              <div className="rounded-2xl border border-[#EAE0F2] bg-[#F8FAFC] p-4">
-                <h3 className="alata-regular text-sm text-[#1E1B2E]">Details we’ll try to read</h3>
-                <p className="mt-1 text-sm text-[#64748B]">{currentDocument.details}</p>
+              <div className="rounded-2xl border border-theme-border bg-theme-surface p-4">
+                <h3 className="alata-regular text-sm text-theme-ink">Details we’ll try to read</h3>
+                <p className="mt-1 text-sm text-theme-muted">{currentDocument.details}</p>
               </div>
 
-              <label className="flex cursor-pointer items-center gap-3.5 rounded-2xl border border-dashed border-[#DECBE9] bg-[#F8FAFC]/60 p-5 text-sm text-[#1E1B2E] hover:border-[#6B3B66] hover:bg-[#F6F0FA]/50 transition">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#F0E6F6] text-[#6B3B66]">
+              <label className="flex cursor-pointer items-center gap-3.5 rounded-2xl border border-dashed border-theme-border-strong bg-theme-surface/60 p-5 text-sm text-theme-ink hover:border-theme-primary hover:bg-theme-canvas/50 transition">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-theme-primary-soft text-theme-primary">
                   <FaIcon icon="fa-solid fa-cloud-arrow-up" className="text-base" />
                 </div>
                 <span>{files[currentDocument.code]?.name || `Choose ${currentDocument.title} (PDF, JPEG, or PNG; up to 15 MB)`}</span>
@@ -429,15 +428,15 @@ export default function ClinicRegistrationPage() {
                 type="button"
                 disabled={busy || !files[currentDocument.code]}
                 onClick={analyzeCurrentDocument}
-                className="flex items-center justify-center gap-2 rounded-full border border-[#DECBE9] bg-[#F6F0FA] px-5 py-2.5 text-sm alata-regular text-[#6B3B66] hover:bg-[#F0E6F6] transition disabled:opacity-50"
+                className="flex items-center justify-center gap-2 rounded-full border border-theme-border-strong bg-theme-canvas px-5 py-2.5 text-sm alata-regular text-theme-primary hover:bg-theme-primary-soft transition disabled:opacity-50"
               >
                 <FaIcon icon={busy ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-wand-magic-sparkles'} />
                 <span>Analyze this document &amp; Check Duplicates</span>
               </button>
 
               {currentAnalysis && (
-                <div role="status" className="space-y-3 rounded-2xl border border-[#DECBE9] bg-[#F6F0FA]/70 p-5">
-                  <div className="flex items-center gap-2 text-sm alata-regular text-[#6B3B66]">
+                <div role="status" className="space-y-3 rounded-2xl border border-theme-border-strong bg-theme-canvas/70 p-5">
+                  <div className="flex items-center gap-2 text-sm alata-regular text-theme-primary">
                     <FaIcon icon="fa-solid fa-circle-check" />
                     <span>
                       {currentAnalysis.document_type === currentDocument.code
@@ -447,31 +446,31 @@ export default function ClinicRegistrationPage() {
                         : 'OCR could not identify the document type'}
                     </span>
                   </div>
-                  <p className="text-xs text-[#64748B]">
+                  <p className="text-xs text-theme-muted">
                     {currentAnalysis.ocr_status === 'TEXT_FOUND'
                       ? 'Text was detected. Any extracted clinic details will be reviewed in the next step.'
                       : 'No readable text was detected; check the scan is clear and readable.'}
                   </p>
                   {Object.keys(currentAnalysis.extracted_fields || {}).length > 0 && (
-                    <div className="rounded-xl border border-[#EAE0F2] bg-white p-4">
-                      <p className="mb-2.5 text-xs alata-regular text-[#1E1B2E]">Details read from this document</p>
+                    <div className="rounded-xl border border-theme-border bg-theme-card p-4">
+                      <p className="mb-2.5 text-xs alata-regular text-theme-ink">Details read from this document</p>
                       <dl className="grid gap-2.5 text-xs sm:grid-cols-2">
                         {Object.entries(currentAnalysis.extracted_fields).map(([key, value]) => (
                           <div key={key}>
-                            <dt className="text-[#64748B]">{FIELD_LABELS[key] || key.replaceAll('_', ' ')}</dt>
-                            <dd className="font-medium text-[#1E1B2E]">{value}</dd>
+                            <dt className="text-theme-muted">{FIELD_LABELS[key] || key.replaceAll('_', ' ')}</dt>
+                            <dd className="font-medium text-theme-ink">{value}</dd>
                           </div>
                         ))}
                       </dl>
                     </div>
                   )}
                   {currentAnalysis.document_type !== currentDocument.code && (
-                    <label className="flex items-start gap-2 text-xs text-[#1E1B2E]">
+                    <label className="flex items-start gap-2 text-xs text-theme-ink">
                       <input
                         type="checkbox"
                         checked={Boolean(confirmedTypes[currentDocument.code])}
                         onChange={(event) => setConfirmedTypes((current) => ({ ...current, [currentDocument.code]: event.target.checked }))}
-                        className="mt-0.5 rounded text-[#6B3B66] focus:ring-[#6B3B66]"
+                        className="mt-0.5 rounded text-theme-primary focus:ring-theme-primary"
                       />
                       <span>I confirm this file is the {currentDocument.title} listed for this step.</span>
                     </label>
@@ -480,7 +479,7 @@ export default function ClinicRegistrationPage() {
                     <button
                       type="button"
                       onClick={goNext}
-                      className="inline-flex items-center gap-2 rounded-full bg-[#6B3B66] px-6 py-2.5 text-sm alata-regular text-white shadow-sm hover:bg-[#552B51] transition"
+                      className="inline-flex items-center gap-2 rounded-full bg-theme-primary px-6 py-2.5 text-sm alata-regular text-white shadow-sm hover:bg-theme-primary-hover transition"
                     >
                       <span>{step < DOCUMENTS.length - 1 ? 'Continue to next document' : 'Continue to clinic details'}</span>
                       <FaIcon icon="fa-solid fa-arrow-right" className="text-xs" />
@@ -496,7 +495,7 @@ export default function ClinicRegistrationPage() {
                     setError('');
                     setStep((value) => value - 1);
                   }}
-                  className="inline-flex items-center gap-1.5 text-sm alata-regular text-[#6B3B66] hover:text-[#552B51]"
+                  className="inline-flex items-center gap-1.5 text-sm alata-regular text-theme-primary hover:text-theme-primary-hover"
                 >
                   <FaIcon icon="fa-solid fa-arrow-left" className="text-xs" />
                   Back to previous document
@@ -507,11 +506,11 @@ export default function ClinicRegistrationPage() {
             <form onSubmit={handleSubmit} className="space-y-7">
               {!isEditMode && (
                 <section>
-                  <h2 className="mb-3 alata-regular text-base text-[#1E1B2E]">Document uploads complete</h2>
+                  <h2 className="mb-3 alata-regular text-base text-theme-ink">Document uploads complete</h2>
                   <ul className="space-y-2">
                     {DOCUMENTS.map((doc) => (
-                      <li key={doc.code} className="flex items-center gap-2.5 rounded-2xl border border-[#DECBE9] bg-[#F6F0FA]/70 px-4 py-2.5 text-sm text-[#1E1B2E]">
-                        <FaIcon icon="fa-solid fa-circle-check" className="text-[#6B3B66]" />
+                      <li key={doc.code} className="flex items-center gap-2.5 rounded-2xl border border-theme-border-strong bg-theme-canvas/70 px-4 py-2.5 text-sm text-theme-ink">
+                        <FaIcon icon="fa-solid fa-circle-check" className="text-theme-primary" />
                         <span>
                           <strong className="alata-regular">{doc.title}:</strong> {files[doc.code]?.name || 'Pre-attached'}
                         </span>
@@ -523,12 +522,12 @@ export default function ClinicRegistrationPage() {
 
               <section>
                 <div className="flex items-center justify-between mb-1">
-                  <h2 className="alata-regular text-lg text-[#1E1B2E]">Review extracted clinic details</h2>
-                  <span className="text-xs alata-regular text-[#6B3B66] bg-[#F0E6F6] border border-[#DECBE9] px-3 py-0.5 rounded-full">
+                  <h2 className="alata-regular text-lg text-theme-ink">Review extracted clinic details</h2>
+                  <span className="text-xs alata-regular text-theme-primary bg-theme-primary-soft border border-theme-border-strong px-3 py-0.5 rounded-full">
                     Validated with Zod
                   </span>
                 </div>
-                <p className="mb-4 text-xs text-[#64748B]">Correct any values before submitting. Area is optional.</p>
+                <p className="mb-4 text-xs text-theme-muted">Correct any values before submitting. Area is optional.</p>
                 <div className="grid gap-4 sm:grid-cols-2">
                   {CLINIC_FIELDS.map(([label, key, type, required]) => field(label, key, type || 'text', required))}
                 </div>
@@ -536,8 +535,8 @@ export default function ClinicRegistrationPage() {
 
               {!isEditMode && (
                 <section>
-                  <h2 className="mb-1 alata-regular text-lg text-[#1E1B2E]">Account Credentials</h2>
-                  <p className="mb-4 text-xs text-[#64748B]">
+                  <h2 className="mb-1 alata-regular text-lg text-theme-ink">Account Credentials</h2>
+                  <p className="mb-4 text-xs text-theme-muted">
                     Account holder name defaults to the license owner/signatory if detected.
                   </p>
                   <div className="grid gap-4 sm:grid-cols-2">
@@ -548,8 +547,8 @@ export default function ClinicRegistrationPage() {
                 </section>
               )}
 
-              <div className="flex items-start gap-2.5 rounded-2xl border border-[#EAE0F2] bg-[#F8FAFC] p-4 text-xs text-[#64748B]">
-                <FaIcon icon="fa-solid fa-shield-halved" className="mt-0.5 shrink-0 text-[#6B3B66] text-sm" />
+              <div className="flex items-start gap-2.5 rounded-2xl border border-theme-border bg-theme-surface p-4 text-xs text-theme-muted">
+                <FaIcon icon="fa-solid fa-shield-halved" className="mt-0.5 shrink-0 text-theme-primary text-sm" />
                 <span>
                   {isEditMode
                     ? 'Submitting these changes will update your pending application and notify the Super Admin for review.'
@@ -557,21 +556,21 @@ export default function ClinicRegistrationPage() {
                 </span>
               </div>
 
-              <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-[#EAE0F2]">
+              <div className="flex flex-wrap items-center justify-between gap-3 pt-2 border-t border-theme-border">
                 <button
                   type="button"
                   onClick={() => {
                     setError('');
                     setStep(DOCUMENTS.length - 1);
                   }}
-                  className="inline-flex items-center gap-1.5 text-sm alata-regular text-[#6B3B66] hover:text-[#552B51]"
+                  className="inline-flex items-center gap-1.5 text-sm alata-regular text-theme-primary hover:text-theme-primary-hover"
                 >
                   <FaIcon icon="fa-solid fa-arrow-left" className="text-xs" />
                   Back to documents
                 </button>
                 <button
                   disabled={busy || Boolean(success)}
-                  className="flex items-center justify-center gap-2 rounded-full bg-[#6B3B66] px-6 py-3 text-sm alata-regular text-white shadow-sm hover:bg-[#552B51] transition disabled:opacity-60"
+                  className="flex items-center justify-center gap-2 rounded-full bg-theme-primary px-6 py-3 text-sm alata-regular text-white shadow-sm hover:bg-theme-primary-hover transition disabled:opacity-60"
                 >
                   {busy ? (
                     <>
