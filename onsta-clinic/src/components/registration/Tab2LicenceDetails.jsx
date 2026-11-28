@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FileText, Cpu, CheckCircle2, AlertTriangle, XCircle, Upload, Eye, Check } from 'lucide-react';
+import AppIcon from '../common/AppIcon';
 import AIDocumentScanModal from '../common/AIDocumentScanModal';
 
 export default function Tab2LicenceDetails({ onNext, onBack, onSaveDraft }) {
@@ -78,7 +78,7 @@ export default function Tab2LicenceDetails({ onNext, onBack, onSaveDraft }) {
           <div className="p-4 rounded-xl border border-dashed border-gray-300 bg-gray-50 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="p-2.5 rounded-lg bg-emerald-100 text-[#0d281e]">
-                <FileText className="w-5 h-5" />
+                <AppIcon name="file-text" className="w-5 h-5" />
               </div>
               <div>
                 <p className="text-xs font-semibold text-gray-900">{tradeLicence.fileName}</p>
@@ -92,7 +92,7 @@ export default function Tab2LicenceDetails({ onNext, onBack, onSaveDraft }) {
                 onClick={() => triggerScan("Trade Licence")}
                 className="px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold hover:bg-emerald-100 flex items-center gap-1.5 transition-colors"
               >
-                <Cpu className="w-3.5 h-3.5" />
+                <AppIcon name="cpu" className="w-3.5 h-3.5" />
                 Read by AI
               </button>
             </div>
@@ -182,14 +182,14 @@ export default function Tab2LicenceDetails({ onNext, onBack, onSaveDraft }) {
               B. Licence Holder / Partner Details
             </h4>
             <span className="text-xs text-emerald-700 font-semibold bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200 flex items-center gap-1">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Auto-Retrieved from Trade Licence
+              <AppIcon name="check-circle" className="w-3.5 h-3.5 text-emerald-600" /> Auto-Retrieved from Trade Licence
             </span>
           </div>
 
           <div className="p-4 rounded-xl border border-emerald-200 bg-emerald-50/50 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="p-2.5 rounded-lg bg-emerald-100 text-[#0d281e]">
-                <Check className="w-5 h-5 text-emerald-800" />
+                <AppIcon name="check" className="w-5 h-5 text-emerald-800" />
               </div>
               <div>
                 <p className="text-xs font-semibold text-gray-900">
@@ -216,7 +216,7 @@ export default function Tab2LicenceDetails({ onNext, onBack, onSaveDraft }) {
           <div className="p-4 rounded-xl border border-dashed border-gray-300 bg-gray-50 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="p-2.5 rounded-lg bg-emerald-100 text-[#0d281e]">
-                <FileText className="w-5 h-5" />
+                <AppIcon name="file-text" className="w-5 h-5" />
               </div>
               <div>
                 <p className="text-xs font-semibold text-gray-900">{facilityLicence.fileName}</p>
@@ -229,7 +229,7 @@ export default function Tab2LicenceDetails({ onNext, onBack, onSaveDraft }) {
               onClick={() => triggerScan("Healthcare Facility Licence")}
               className="px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold hover:bg-emerald-100 flex items-center gap-1.5"
             >
-              <Cpu className="w-3.5 h-3.5" />
+              <AppIcon name="cpu" className="w-3.5 h-3.5" />
               Verify Licence
             </button>
           </div>
@@ -271,7 +271,7 @@ export default function Tab2LicenceDetails({ onNext, onBack, onSaveDraft }) {
           <div className="p-4 rounded-xl border border-dashed border-gray-300 bg-gray-50 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <div className="p-2.5 rounded-lg bg-emerald-100 text-[#0d281e]">
-                <FileText className="w-5 h-5" />
+                <AppIcon name="file-text" className="w-5 h-5" />
               </div>
               <div>
                 <p className="text-xs font-semibold text-gray-900">{mohapLicence.fileName}</p>
@@ -284,7 +284,7 @@ export default function Tab2LicenceDetails({ onNext, onBack, onSaveDraft }) {
               onClick={() => triggerScan("MOHAP Advertisement Licence")}
               className="px-3 py-1.5 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold hover:bg-emerald-100 flex items-center gap-1.5"
             >
-              <Cpu className="w-3.5 h-3.5" />
+              <AppIcon name="cpu" className="w-3.5 h-3.5" />
               Verify MOHAP
             </button>
           </div>

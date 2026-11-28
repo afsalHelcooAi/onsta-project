@@ -1,7 +1,7 @@
 import React from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import { useClinic } from '../../context/ClinicContext';
-import FaIcon from '../common/FaIcon';
+import AppIcon from '../common/AppIcon';
 import BrandLogo from '../common/BrandLogo';
 
 export default function Sidebar() {
@@ -17,18 +17,18 @@ export default function Sidebar() {
   const newEnquiriesCount = enquiries ? enquiries.filter(e => e.status === 'new').length : 0;
 
   const navItems = [
-    { name: 'Overview', path: '/dashboard/overview', icon: 'fa-solid fa-table-columns' },
-    { name: 'Clinic profile', path: '/dashboard/profile', icon: 'fa-solid fa-hospital' },
-    { name: 'Doctors', path: '/dashboard/doctors', icon: 'fa-solid fa-user-doctor' },
-    { name: 'Services & prices', path: '/dashboard/services', icon: 'fa-solid fa-stethoscope' },
-    { name: 'Offers', path: '/dashboard/offers', icon: 'fa-solid fa-tags' },
+    { name: 'Overview', path: '/dashboard/overview', icon: 'overview' },
+    { name: 'Clinic profile', path: '/dashboard/profile', icon: 'hospital' },
+    { name: 'Doctors', path: '/dashboard/doctors', icon: 'doctor' },
+    { name: 'Services & prices', path: '/dashboard/services', icon: 'stethoscope' },
+    { name: 'Offers', path: '/dashboard/offers', icon: 'tag' },
     {
       name: 'Enquiries',
       path: '/dashboard/enquiries',
-      icon: 'fa-solid fa-calendar-check',
+      icon: 'calendar-check',
       badge: newEnquiriesCount > 0 ? newEnquiriesCount.toString() : null
     },
-    { name: 'Compliance', path: '/dashboard/compliance', icon: 'fa-solid fa-shield-halved' }
+    { name: 'Compliance', path: '/dashboard/compliance', icon: 'shield-check' }
   ];
 
   return (
@@ -82,9 +82,10 @@ export default function Sidebar() {
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <FaIcon
-                    icon={item.icon}
-                    className={`w-4 text-center text-sm ${
+                  <AppIcon
+                    name={item.icon}
+                    weight={isActive ? 'duotone' : 'regular'}
+                    className={`w-4 text-center text-base ${
                       isActive ? 'text-theme-primary' : 'text-theme-sidebar-muted'
                     }`}
                   />
@@ -111,9 +112,9 @@ export default function Sidebar() {
           onClick={handleSignOut}
           className="flex items-center justify-center gap-2.5 w-full px-4 py-2.5 rounded-xl text-xs alata-regular tracking-wide text-theme-sidebar-logout-text bg-theme-sidebar-logout-bg hover:bg-theme-primary hover:text-white border border-theme-sidebar-logout-border transition-all shadow-sm group"
         >
-          <FaIcon
-            icon="fa-solid fa-arrow-right-from-bracket"
-            className="text-sm text-theme-sidebar-logout-icon group-hover:text-white transition-colors"
+          <AppIcon
+            name="sign-out"
+            className="text-base text-theme-sidebar-logout-icon group-hover:text-white transition-colors"
           />
           <span>Log Out</span>
         </button>

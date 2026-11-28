@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import FaIcon from '../common/FaIcon';
+import AppIcon from '../common/AppIcon';
 import BrandLogo from '../common/BrandLogo';
 import { useClinic } from '../../context/ClinicContext';
 import { submitClinicApplication, uploadClinicDocument } from '../../api/accountApi';
@@ -55,7 +55,7 @@ export default function ApplicationStatusPage() {
             onClick={logout}
             className="flex items-center gap-2 rounded-full border border-theme-border bg-theme-surface px-4 py-2 text-xs alata-regular text-theme-muted hover:bg-theme-canvas hover:text-theme-primary transition"
           >
-            <FaIcon icon="fa-solid fa-arrow-right-from-bracket" /> Sign out
+            <AppIcon name="sign-out" /> Sign out
           </button>
         </div>
 
@@ -85,8 +85,8 @@ export default function ApplicationStatusPage() {
             isRejected ? 'border-rose-200 bg-rose-50 text-rose-950' : 'border-amber-200 bg-amber-50 text-amber-950'
           }`}>
             <div className="flex items-center gap-2 alata-regular">
-              <FaIcon
-                icon={isRejected ? 'fa-solid fa-circle-xmark' : 'fa-solid fa-circle-exclamation'}
+              <AppIcon
+                name={isRejected ? 'x-circle' : 'warning-circle'}
                 className={isRejected ? 'text-rose-700' : 'text-amber-700'}
               />
               <span>{isRejected ? 'Reason for Rejection / Modification Suggestion:' : 'Reviewer Feedback:'}</span>
@@ -115,7 +115,7 @@ export default function ApplicationStatusPage() {
             : 'border-theme-border-strong bg-theme-canvas text-theme-primary'
         }`}>
           <div className="flex items-center gap-3">
-            <FaIcon icon="fa-regular fa-clock" className="text-lg" />
+            <AppIcon name="clock" className="text-lg" />
             <div>
               <div className="text-xs font-medium opacity-80">Current Application Status</div>
               <div className="mt-0.5 text-sm alata-regular uppercase">{status.replaceAll('_', ' ')}</div>
@@ -127,7 +127,7 @@ export default function ApplicationStatusPage() {
               onClick={handleEditApplication}
               className="flex items-center gap-1.5 rounded-full bg-theme-card px-4 py-2 text-xs alata-regular text-theme-primary shadow-sm border border-theme-border-strong hover:bg-theme-primary-soft transition"
             >
-              <FaIcon icon="fa-solid fa-pen-to-square" />
+              <AppIcon name="edit" />
               Edit Registration
             </button>
           )}
@@ -152,7 +152,7 @@ export default function ApplicationStatusPage() {
                   className="rounded-2xl border border-dashed border-theme-border-strong bg-theme-surface p-3 text-xs hover:border-theme-primary hover:bg-theme-canvas/50 transition cursor-pointer"
                 >
                   <span className="mb-2 flex items-center gap-1.5 alata-regular text-theme-ink">
-                    <FaIcon icon="fa-solid fa-cloud-arrow-up" className="text-theme-primary" />
+                    <AppIcon name="cloud-upload" className="text-theme-primary" />
                     <span>{label}</span>
                   </span>
                   <input
@@ -171,7 +171,7 @@ export default function ApplicationStatusPage() {
             >
               {busy ? (
                 <>
-                  <FaIcon icon="fa-solid fa-spinner fa-spin" /> <span>Submitting…</span>
+                  <AppIcon name="spinner" spin /> <span>Submitting…</span>
                 </>
               ) : (
                 'Upload changes and submit'

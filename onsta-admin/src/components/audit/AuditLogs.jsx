@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import FaIcon from '../common/FaIcon';
+import AppIcon from '../common/AppIcon';
 import { fetchAuditLogs } from '../../api/adminApi';
 
 const PAGE_SIZE = 25;
@@ -38,31 +38,31 @@ function ActionBadge({ action }) {
     case 'CLINIC_APPROVED':
       return (
         <span className="inline-flex items-center gap-1.5 rounded-full border border-emerald-200 bg-emerald-50 px-2.5 py-0.5 text-[11px] alata-regular text-emerald-700">
-          <FaIcon icon="fa-solid fa-shield-halved" className="text-[10px]" /> Clinic Approved
+          <AppIcon name="shield-check" className="text-[11px]" /> Clinic Approved
         </span>
       );
     case 'CLINIC_REJECTED':
       return (
         <span className="inline-flex items-center gap-1.5 rounded-full border border-rose-200 bg-rose-50 px-2.5 py-0.5 text-[11px] alata-regular text-rose-700">
-          <FaIcon icon="fa-solid fa-circle-xmark" className="text-[10px]" /> Clinic Rejected
+          <AppIcon name="x-circle" className="text-[11px]" /> Clinic Rejected
         </span>
       );
     case 'INFO_REQUESTED':
       return (
         <span className="inline-flex items-center gap-1.5 rounded-full border border-amber-200 bg-amber-50 px-2.5 py-0.5 text-[11px] alata-regular text-amber-700">
-          <FaIcon icon="fa-solid fa-circle-exclamation" className="text-[10px]" /> Info Requested
+          <AppIcon name="warning-circle" className="text-[11px]" /> Info Requested
         </span>
       );
     case 'USER_STATUS_CHANGED':
       return (
         <span className="inline-flex items-center gap-1.5 rounded-full border border-theme-border-strong bg-theme-primary-soft px-2.5 py-0.5 text-[11px] alata-regular text-theme-primary">
-          <FaIcon icon="fa-solid fa-user-gear" className="text-[10px]" /> Status Changed
+          <AppIcon name="user-gear" className="text-[11px]" /> Status Changed
         </span>
       );
     default:
       return (
         <span className="inline-flex items-center gap-1.5 rounded-full border border-theme-border bg-theme-surface px-2.5 py-0.5 text-[11px] alata-regular text-theme-ink">
-          <FaIcon icon="fa-regular fa-clock" className="text-[10px]" /> {action.replace(/_/g, ' ')}
+          <AppIcon name="clock" className="text-[11px]" /> {action.replace(/_/g, ' ')}
         </span>
       );
   }
@@ -167,7 +167,7 @@ export default function AuditLogs() {
           disabled={loading}
           className="inline-flex items-center gap-2 rounded-full border border-theme-border-strong bg-theme-canvas px-4 py-2 text-xs alata-regular text-theme-primary hover:bg-theme-primary-soft disabled:opacity-60 transition"
         >
-          <FaIcon icon="fa-solid fa-arrows-rotate" className={loading ? 'fa-spin' : ''} /> Refresh
+          <AppIcon name="refresh" spin={loading} /> Refresh
         </button>
       </header>
 
@@ -182,7 +182,7 @@ export default function AuditLogs() {
         <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3">
           <div className="flex flex-1 flex-wrap items-center gap-2 sm:max-w-xl">
             <label className="relative min-w-[200px] flex-1">
-              <FaIcon icon="fa-solid fa-magnifying-glass" className="absolute left-3.5 top-3 text-xs text-theme-muted" />
+              <AppIcon name="search" className="absolute left-3.5 top-3 text-xs text-theme-muted" />
               <input
                 value={search}
                 onChange={(e) => { setSearch(e.target.value); setOffset(0); }}
@@ -221,7 +221,7 @@ export default function AuditLogs() {
           ) : logs.length === 0 ? (
             <div className="flex flex-col items-center justify-center rounded-3xl border border-dashed border-theme-border-strong bg-theme-card p-12 text-center">
               <div className="w-14 h-14 rounded-2xl bg-theme-primary-soft text-theme-primary flex items-center justify-center mb-3 border border-theme-border-strong">
-                <FaIcon icon="fa-solid fa-scroll" className="text-xl" />
+                <AppIcon name="scroll" className="text-xl" />
               </div>
               <h3 className="text-base alata-regular text-theme-ink">No audit events found</h3>
               <p className="mt-1 text-xs text-theme-muted">
@@ -242,7 +242,7 @@ export default function AuditLogs() {
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div className="flex items-start gap-3">
                         <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-theme-primary-soft border border-theme-border-strong text-theme-primary">
-                          <FaIcon icon="fa-solid fa-user" className="text-sm" />
+                          <AppIcon name="user" className="text-sm" />
                         </div>
                         <div>
                           <div className="flex flex-wrap items-center gap-2">
@@ -271,9 +271,9 @@ export default function AuditLogs() {
                           type="button"
                           onClick={() => setExpandedId(isExpanded ? null : log.id)}
                           aria-label={isExpanded ? 'Collapse JSON payload' : 'Expand JSON payload'}
-                          className="rounded-full border border-theme-border w-7 h-7 flex items-center justify-center text-theme-muted hover:bg-theme-canvas hover:text-theme-primary transition"
+                          className="rounded-full border border-theme-border min-w-[44px] min-h-[44px] flex items-center justify-center text-theme-muted hover:bg-theme-canvas hover:text-theme-primary transition"
                         >
-                          <FaIcon icon={isExpanded ? 'fa-solid fa-chevron-up' : 'fa-solid fa-chevron-down'} className="text-xs" />
+                          <AppIcon name={isExpanded ? 'caret-up' : 'caret-down'} className="text-sm" />
                         </button>
                       </div>
                     </div>
@@ -306,19 +306,19 @@ export default function AuditLogs() {
               type="button"
               disabled={offset === 0 || loading}
               onClick={() => setOffset(Math.max(0, offset - PAGE_SIZE))}
-              className="rounded-full border border-theme-border w-8 h-8 flex items-center justify-center hover:bg-theme-canvas hover:text-theme-primary disabled:opacity-40 transition"
+              className="rounded-full border border-theme-border min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-theme-canvas hover:text-theme-primary disabled:opacity-40 transition"
               aria-label="Previous page"
             >
-              <FaIcon icon="fa-solid fa-chevron-left" className="text-xs" />
+              <AppIcon name="caret-left" className="text-sm" />
             </button>
             <button
               type="button"
               disabled={offset + PAGE_SIZE >= total || loading}
               onClick={() => setOffset(offset + PAGE_SIZE)}
-              className="rounded-full border border-theme-border w-8 h-8 flex items-center justify-center hover:bg-theme-canvas hover:text-theme-primary disabled:opacity-40 transition"
+              className="rounded-full border border-theme-border min-w-[44px] min-h-[44px] flex items-center justify-center hover:bg-theme-canvas hover:text-theme-primary disabled:opacity-40 transition"
               aria-label="Next page"
             >
-              <FaIcon icon="fa-solid fa-chevron-right" className="text-xs" />
+              <AppIcon name="caret-right" className="text-sm" />
             </button>
           </div>
         </div>

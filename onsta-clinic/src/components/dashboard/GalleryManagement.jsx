@@ -1,7 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { useClinic } from '../../context/ClinicContext';
-import { Image as ImageIcon, Plus, Trash2, Eye, EyeOff, Star, X, Upload } from 'lucide-react';
-import { uploadClinicMedia, deleteClinicMedia, patchClinicMedia } from '../../api/clinicProfileApi';
+import AppIcon from '../common/AppIcon';
 
 export default function GalleryManagement() {
   const { gallery, setGallery, setClinicData, addGalleryImage, deleteGalleryImage, toggleGalleryImageActive, showToast } = useClinic();
@@ -134,7 +133,7 @@ export default function GalleryManagement() {
           onClick={() => setIsModalOpen(true)}
           className="px-4 py-2 rounded-full bg-theme-primary text-white hover:bg-theme-primary-hover text-xs alata-regular flex items-center gap-1.5 transition-colors shadow-sm self-start"
         >
-          <Plus className="w-4 h-4" />
+          <AppIcon name="plus" className="w-4 h-4" />
           <span>Upload Image</span>
         </button>
       </div>
@@ -170,12 +169,13 @@ export default function GalleryManagement() {
                 </button>
                 <button
                   onClick={() => handleToggleActive(img)}
-                  className={`p-1.5 rounded-full backdrop-blur transition-colors ${
+                  aria-label={img.isActive ? 'Hide image from patients' : 'Show image to patients'}
+                  className={`min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full backdrop-blur transition-colors ${
                     img.isActive ? 'bg-white text-emerald-800' : 'bg-black/60 text-white/70'
                   }`}
                   title={img.isActive ? 'Visible to patients' : 'Hidden from patients'}
                 >
-                  {img.isActive ? <Eye className="w-3.5 h-3.5" /> : <EyeOff className="w-3.5 h-3.5" />}
+                  <AppIcon name={img.isActive ? 'eye' : 'eye-off'} className="w-4 h-4" />
                 </button>
               </div>
             </div>
@@ -197,10 +197,11 @@ export default function GalleryManagement() {
 
                 <button
                   onClick={() => handleDelete(img.id)}
-                  className="text-gray-400 hover:text-red-600 transition-colors p-1"
+                  aria-label="Delete image"
+                  className="text-gray-400 hover:text-red-600 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl hover:bg-red-50"
                   title="Delete image"
                 >
-                  <Trash2 className="w-3.5 h-3.5" />
+                  <AppIcon name="trash" className="w-4 h-4" />
                 </button>
               </div>
             </div>
@@ -214,8 +215,13 @@ export default function GalleryManagement() {
           <div className="bg-theme-card rounded-3xl shadow-xl max-w-md w-full overflow-hidden border border-theme-border animate-scaleUp">
             <div className="p-6 bg-theme-sidebar-bg text-white flex items-center justify-between">
               <h3 className="text-lg alata-regular">Upload Clinic Photo</h3>
-              <button onClick={() => setIsModalOpen(false)} className="text-white/60 hover:text-white">
-                <X className="w-5 h-5" />
+              <button
+                type="button"
+                onClick={() => setIsModalOpen(false)}
+                aria-label="Close upload modal"
+                className="text-white/60 hover:text-white min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl hover:bg-white/10"
+              >
+                <AppIcon name="close" className="w-5 h-5" />
               </button>
             </div>
 

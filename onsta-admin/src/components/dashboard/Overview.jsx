@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import FaIcon from '../common/FaIcon';
+import AppIcon from '../common/AppIcon';
 import { fetchAdminOverview } from '../../api/adminApi';
 
 const USER_STATUSES = ['ACTIVE', 'SUSPENDED', 'DISABLED'];
@@ -88,7 +88,7 @@ function StatCard({ label, icon, value, sub, loading, urgent, onClick }) {
             ? 'bg-[#FEE2E2] text-[#991B1B]'
             : 'bg-theme-primary-soft text-theme-primary group-hover:bg-theme-primary group-hover:text-white'
         }`}>
-          <FaIcon icon={icon} className="text-sm" />
+          <AppIcon name={icon} className="text-sm" />
         </div>
       </div>
       {loading ? (
@@ -105,7 +105,7 @@ function StatCard({ label, icon, value, sub, loading, urgent, onClick }) {
       {onClick && !loading && (
         <div className="mt-3 pt-2.5 border-t border-theme-border flex items-center justify-between text-[11px] alata-regular text-theme-primary">
           <span>Open section</span>
-          <FaIcon icon="fa-solid fa-chevron-right" className="text-[10px]" />
+          <AppIcon name="caret-right" className="text-[10px]" />
         </div>
       )}
     </div>
@@ -115,7 +115,7 @@ function StatCard({ label, icon, value, sub, loading, urgent, onClick }) {
 function EmptyApplications() {
   return (
     <div className="mt-4 flex flex-col items-center justify-center rounded-2xl border border-dashed border-theme-border-strong bg-theme-surface py-8 text-center">
-      <FaIcon icon="fa-solid fa-wave-square" className="mb-2 text-2xl text-theme-border-strong" />
+      <AppIcon name="waveform" className="mb-2 text-2xl text-theme-border-strong" />
       <p className="text-sm alata-regular text-theme-ink">No applications submitted yet</p>
       <p className="mt-1 text-xs text-theme-muted">Clinic applications will appear here once submitted.</p>
     </div>
@@ -197,7 +197,7 @@ export default function Overview({ onNavigate }) {
         <div className="bg-theme-card rounded-3xl border border-theme-border p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3.5">
             <div className="w-11 h-11 rounded-2xl bg-theme-primary-soft text-theme-primary flex items-center justify-center flex-shrink-0">
-              <FaIcon icon="fa-solid fa-table-columns" className="text-lg" />
+              <AppIcon name="overview" className="text-lg" />
             </div>
             <div>
               <h1 className="alata-regular text-2xl sm:text-3xl text-theme-ink">Platform Overview</h1>
@@ -217,7 +217,7 @@ export default function Overview({ onNavigate }) {
               disabled={loading}
               className="inline-flex items-center gap-2 rounded-full border border-theme-border-strong bg-theme-canvas px-4 py-2 text-xs alata-regular text-theme-primary hover:bg-theme-primary-soft shadow-xs disabled:opacity-60 transition-all"
             >
-              <FaIcon icon={`fa-solid fa-arrows-rotate ${loading ? 'fa-spin' : ''}`} /> Refresh
+              <AppIcon name="refresh" spin={loading} /> Refresh
             </button>
           </div>
         </div>
@@ -234,7 +234,7 @@ export default function Overview({ onNavigate }) {
               onClick={() => onNavigate && onNavigate('master-catalog')}
               className="px-3.5 py-1.5 rounded-full bg-theme-canvas hover:bg-theme-primary-soft border border-theme-border-strong text-theme-primary text-xs alata-regular flex items-center gap-1.5 transition-colors"
             >
-              <FaIcon icon="fa-solid fa-wand-magic-sparkles" />
+              <AppIcon name="ai" />
               <span>Master Treatments &amp; AI</span>
             </button>
 
@@ -243,7 +243,7 @@ export default function Overview({ onNavigate }) {
               onClick={() => onNavigate && onNavigate('review-queue')}
               className="px-3.5 py-1.5 rounded-full bg-theme-surface hover:bg-theme-surface-muted border border-theme-border-slate text-theme-ink text-xs alata-regular flex items-center gap-1.5 transition-colors"
             >
-              <FaIcon icon="fa-solid fa-shield-halved" className="text-theme-primary" />
+              <AppIcon name="shield-check" className="text-theme-primary" />
               <span>Verification Queue ({pendingApplications})</span>
             </button>
 
@@ -252,7 +252,7 @@ export default function Overview({ onNavigate }) {
               onClick={() => onNavigate && onNavigate('compliance-audit')}
               className="px-3.5 py-1.5 rounded-full bg-theme-accent-soft hover:bg-theme-accent/20 border border-theme-accent-border text-theme-accent-text text-xs alata-regular flex items-center gap-1.5 transition-colors"
             >
-              <FaIcon icon="fa-solid fa-file-contract" className="text-theme-accent" />
+              <AppIcon name="file-contract" className="text-theme-accent" />
               <span>Compliance &amp; Permits</span>
             </button>
 
@@ -261,7 +261,7 @@ export default function Overview({ onNavigate }) {
               onClick={() => onNavigate && onNavigate('audit-logs')}
               className="px-3.5 py-1.5 rounded-full bg-theme-surface hover:bg-theme-surface-muted border border-theme-border-slate text-theme-muted text-xs alata-regular flex items-center gap-1.5 transition-colors"
             >
-              <FaIcon icon="fa-solid fa-scroll" />
+              <AppIcon name="scroll" />
               <span>Audit Logs</span>
             </button>
           </div>
@@ -269,7 +269,7 @@ export default function Overview({ onNavigate }) {
 
         {error && (
           <div role="alert" className="flex items-center gap-2 rounded-2xl border border-[#FECACA] bg-[#FEE2E2] px-4 py-3 text-xs text-[#991B1B]">
-            <FaIcon icon="fa-solid fa-circle-exclamation" className="shrink-0" /> {error}
+            <AppIcon name="warning-circle" className="shrink-0" /> {error}
           </div>
         )}
 
@@ -282,7 +282,7 @@ export default function Overview({ onNavigate }) {
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <h2 id="expiring-licenses-title" className="flex items-center gap-2 alata-regular text-base text-theme-ink">
-                  <FaIcon icon="fa-solid fa-triangle-exclamation" className="text-theme-accent" />
+                  <AppIcon name="warning" className="text-theme-accent" />
                   Licences expiring within 30 days
                 </h2>
                 <p className="mt-1 text-xs text-theme-muted">
@@ -291,7 +291,7 @@ export default function Overview({ onNavigate }) {
               </div>
               {onNavigate && (
                 <button type="button" onClick={() => onNavigate('compliance-audit')} className="inline-flex items-center gap-1.5 text-xs alata-regular text-theme-primary hover:underline">
-                  Open Compliance &amp; Permits <FaIcon icon="fa-solid fa-arrow-right" className="text-[11px]" />
+                  Open Compliance &amp; Permits <AppIcon name="arrow-right" className="text-[11px]" />
                 </button>
               )}
             </div>
@@ -316,7 +316,7 @@ export default function Overview({ onNavigate }) {
         <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
           <StatCard
             label="Pending Review"
-            icon="fa-solid fa-shield-halved"
+            icon="shield-check"
             value={pendingApplications}
             sub="Clinic verification queue"
             loading={loading && !overview}
@@ -325,7 +325,7 @@ export default function Overview({ onNavigate }) {
           />
           <StatCard
             label="Registered Clinics"
-            icon="fa-solid fa-hospital"
+            icon="hospital"
             value={overview?.registered_clinics ?? 0}
             sub={`${clinicsAwaitingActivation} awaiting activation`}
             loading={loading && !overview}
@@ -333,7 +333,7 @@ export default function Overview({ onNavigate }) {
           />
           <StatCard
             label="Platform Users"
-            icon="fa-solid fa-users"
+            icon="users"
             value={users.ACTIVE ?? 0}
             sub={`${users.SUSPENDED ?? 0} suspended · ${users.DISABLED ?? 0} disabled`}
             loading={loading && !overview}
@@ -341,7 +341,7 @@ export default function Overview({ onNavigate }) {
           />
           <StatCard
             label="Open Info Requests"
-            icon="fa-solid fa-circle-exclamation"
+            icon="warning-circle"
             value={openInfoRequests}
             sub="Awaiting clinic modifications"
             loading={loading && !overview}
@@ -357,7 +357,7 @@ export default function Overview({ onNavigate }) {
             <div className="flex items-center justify-between">
               <div>
                 <span className="text-[11px] alata-regular text-theme-primary uppercase tracking-wider flex items-center gap-1.5">
-                  <FaIcon icon="fa-solid fa-wand-magic-sparkles" />
+                  <AppIcon name="ai" />
                   AI Face Scan &amp; Clinical Catalog
                 </span>
                 <h2 className="text-lg alata-regular text-theme-ink mt-0.5">Master Treatments Coverage</h2>
@@ -368,7 +368,7 @@ export default function Overview({ onNavigate }) {
                   onClick={() => onNavigate('master-catalog')}
                   className="text-xs alata-regular text-theme-primary hover:text-theme-primary-hover flex items-center gap-1"
                 >
-                  Manage <FaIcon icon="fa-solid fa-chevron-right" className="text-[10px]" />
+                  Manage <AppIcon name="caret-right" className="text-[10px]" />
                 </button>
               )}
             </div>
@@ -414,7 +414,7 @@ export default function Overview({ onNavigate }) {
             <div className="flex items-center justify-between">
               <div>
                 <span className="text-[11px] alata-regular text-theme-accent uppercase tracking-wider flex items-center gap-1.5">
-                  <FaIcon icon="fa-solid fa-tags" />
+                  <AppIcon name="tag" />
                   Marketplace Campaigns
                 </span>
                 <h2 className="text-lg alata-regular text-theme-ink mt-0.5">Live Consumer Offers</h2>
@@ -428,7 +428,7 @@ export default function Overview({ onNavigate }) {
               <div className="bg-theme-surface p-4 rounded-2xl border border-theme-border-slate">
                 <div className="flex items-center justify-between text-theme-muted text-xs">
                   <span>Active Live Offers</span>
-                  <FaIcon icon="fa-solid fa-tags" className="text-theme-accent" />
+                  <AppIcon name="tag" className="text-theme-accent" />
                 </div>
                 <div className="mt-2 text-3xl alata-regular text-theme-ink">{catalog.active_offers}</div>
                 <p className="mt-1 text-[11px] text-theme-muted">
@@ -439,7 +439,7 @@ export default function Overview({ onNavigate }) {
               <div className="bg-theme-accent-soft p-4 rounded-2xl border border-theme-accent-border">
                 <div className="flex items-center justify-between text-theme-accent-text text-xs">
                   <span>Average Discount</span>
-                  <FaIcon icon="fa-solid fa-percent" className="text-theme-accent" />
+                  <AppIcon name="percent" className="text-theme-accent" />
                 </div>
                 <div className="mt-2 text-3xl alata-regular text-theme-accent">{catalog.avg_discount_percent}%</div>
                 <p className="mt-1 text-[11px] text-theme-muted">
@@ -449,7 +449,7 @@ export default function Overview({ onNavigate }) {
             </div>
 
             <div className="p-3.5 bg-[#DCFCE7]/60 border border-[#BBF7D0] rounded-2xl text-xs text-[#166534] flex items-center gap-2.5">
-              <FaIcon icon="fa-solid fa-shield-halved" className="shrink-0" />
+              <AppIcon name="shield-check" className="shrink-0" />
               <span>All active offers satisfy DHA ST-21 advertising wording rules &amp; positive price validation.</span>
             </div>
           </div>
@@ -569,10 +569,10 @@ export default function Overview({ onNavigate }) {
                 className="mt-5 flex cursor-pointer items-center justify-between rounded-2xl border border-theme-border-strong bg-theme-canvas p-4 shadow-xs transition hover:bg-theme-primary-soft"
               >
                 <div className="flex items-center gap-2.5">
-                  <FaIcon icon="fa-solid fa-file-contract" className="text-theme-primary" />
+                  <AppIcon name="file-contract" className="text-theme-primary" />
                   <span className="text-xs alata-regular text-theme-ink">Open Compliance &amp; Permits Audit</span>
                 </div>
-                <FaIcon icon="fa-solid fa-arrow-right" className="text-xs text-theme-primary" />
+                <AppIcon name="arrow-right" className="text-xs text-theme-primary" />
               </div>
             )}
           </div>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CheckCircle2, ShieldCheck, FileCheck, ArrowRight, Clock, AlertTriangle, Loader2, Sparkles, Building2 } from 'lucide-react';
+import AppIcon from '../common/AppIcon';
 import { useClinic } from '../../context/ClinicContext';
 import { registrationApi } from '../../api/registrationApi';
 
@@ -44,7 +44,7 @@ export default function Tab5ReviewSubmit({ onBack, onSaveDraft }) {
     return (
       <div className="bg-white rounded-2xl border border-[#ceead6] p-8 sm:p-12 shadow-lg text-center max-w-2xl mx-auto space-y-6 animate-fadeIn">
         <div className="w-20 h-20 bg-emerald-100 text-[#137333] rounded-3xl flex items-center justify-center mx-auto shadow-inner">
-          <Sparkles className="w-10 h-10 animate-bounce" />
+          <AppIcon name="shield-check" className="w-10 h-10 animate-bounce" />
         </div>
 
         <div>
@@ -61,7 +61,7 @@ export default function Tab5ReviewSubmit({ onBack, onSaveDraft }) {
 
         <div className="p-4 bg-emerald-50 rounded-xl border border-emerald-200 text-xs text-emerald-900 text-left space-y-1.5">
           <div className="flex items-center gap-2 font-semibold">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            <AppIcon name="check-circle" className="w-4 h-4 text-emerald-600" />
             <span>Clinic Profile Activated on ONSTA Marketplace</span>
           </div>
           <p className="text-emerald-700 leading-relaxed">
@@ -74,9 +74,9 @@ export default function Tab5ReviewSubmit({ onBack, onSaveDraft }) {
             onClick={() => navigate('/dashboard/overview')}
             className="px-8 py-3.5 rounded-xl bg-[#0d281e] text-white font-semibold text-sm hover:bg-[#153f2f] transition-all shadow-md flex items-center gap-2"
           >
-            <Building2 className="w-4 h-4" />
+            <AppIcon name="building" className="w-4 h-4" />
             <span>Enter Clinic Partner Dashboard</span>
-            <ArrowRight className="w-4 h-4 ml-1" />
+            <AppIcon name="arrow-right" className="w-4 h-4 ml-1" />
           </button>
         </div>
       </div>
@@ -87,7 +87,7 @@ export default function Tab5ReviewSubmit({ onBack, onSaveDraft }) {
     return (
       <div className="bg-white rounded-2xl border border-[#e7e1d7] p-8 sm:p-12 shadow-lg text-center max-w-xl mx-auto space-y-6 animate-fadeIn">
         <div className="w-16 h-16 bg-emerald-50 text-[#0d281e] rounded-2xl flex items-center justify-center mx-auto border border-emerald-200">
-          <Loader2 className="w-8 h-8 animate-spin" />
+          <AppIcon name="spinner" spin className="w-8 h-8" />
         </div>
 
         <div>
@@ -111,13 +111,13 @@ export default function Tab5ReviewSubmit({ onBack, onSaveDraft }) {
           }`}>
             1. Submitted
           </span>
-          <ArrowRight className="w-3.5 h-3.5 text-gray-400" />
+          <AppIcon name="arrow-right" className="w-3.5 h-3.5 text-gray-400" />
           <span className={`px-2.5 py-1 rounded-full ${
             submissionPhase === 'in_review' ? 'bg-amber-100 text-amber-800 animate-pulse' : 'bg-gray-100 text-gray-500'
           }`}>
             2. In Review
           </span>
-          <ArrowRight className="w-3.5 h-3.5 text-gray-400" />
+          <AppIcon name="arrow-right" className="w-3.5 h-3.5 text-gray-400" />
           <span className="px-2.5 py-1 rounded-full bg-gray-100 text-gray-400">
             3. Approved
           </span>
@@ -141,7 +141,7 @@ export default function Tab5ReviewSubmit({ onBack, onSaveDraft }) {
         <div className="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-xs space-y-3">
           <div className="flex items-center justify-between">
             <span className="font-bold text-emerald-950 flex items-center gap-1.5 uppercase tracking-wide">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <AppIcon name="check-circle" className="w-4 h-4 text-emerald-600" />
               AI Auto-Fill Completed (25+ Fields Extracted from 3 Documents)
             </span>
             <span className="text-[10px] font-bold bg-white text-emerald-800 px-2 py-0.5 rounded border border-emerald-300">

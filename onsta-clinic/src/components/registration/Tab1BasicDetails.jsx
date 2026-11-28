@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AlertCircle, CheckCircle2, XCircle, Info, Sparkles } from 'lucide-react';
+import AppIcon from '../common/AppIcon';
 
 export default function Tab1BasicDetails({ data, onChange, onNext, onSaveDraft }) {
   // Local state initialized with data
@@ -370,7 +370,7 @@ export default function Tab1BasicDetails({ data, onChange, onNext, onSaveDraft }
           {/* Why so strict box */}
           <div className="mt-6 pt-5 border-t border-gray-100">
             <h5 className="text-xs font-bold text-gray-800 flex items-center gap-1.5">
-              <Info className="w-3.5 h-3.5 text-gray-500" />
+              <AppIcon name="info" className="w-3.5 h-3.5 text-gray-500" />
               Why so strict?
             </h5>
             <p className="text-[11px] text-gray-600 mt-2 leading-relaxed">

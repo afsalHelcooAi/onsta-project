@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
-import FaIcon from '../common/FaIcon';
+import AppIcon from '../common/AppIcon';
 import BrandLogo from '../common/BrandLogo';
 import {
   analyzeClinicDocuments,
@@ -322,7 +322,7 @@ export default function ClinicRegistrationPage() {
           to={isEditMode ? '/application' : '/login'}
           className="mb-6 inline-flex items-center gap-2 rounded-full border border-theme-border-strong bg-theme-card px-4 py-2 text-xs alata-regular text-theme-primary shadow-sm transition hover:bg-theme-primary-soft"
         >
-          <FaIcon icon="fa-solid fa-arrow-left" />
+          <AppIcon name="arrow-left" />
           {isEditMode ? 'Back to application status' : 'Back to clinic sign in'}
         </Link>
 
@@ -345,7 +345,7 @@ export default function ClinicRegistrationPage() {
           {reviewNotes && (
             <div className="mb-6 rounded-2xl border border-theme-accent-border bg-theme-accent-soft p-4 text-sm text-theme-accent-text">
               <div className="flex items-center gap-2 alata-regular">
-                <FaIcon icon="fa-solid fa-circle-exclamation" className="text-theme-accent" />
+                <AppIcon name="warning-circle" className="text-theme-accent" />
                 <span>Super Admin Modification Notes:</span>
               </div>
               <p className="mt-1.5 text-xs text-theme-accent-text/90 leading-relaxed font-medium">{reviewNotes}</p>
@@ -354,14 +354,14 @@ export default function ClinicRegistrationPage() {
 
           {error && (
             <div role="alert" className="mb-5 rounded-2xl border border-rose-200 bg-rose-50 p-3.5 text-sm text-rose-900 flex items-start gap-2.5">
-              <FaIcon icon="fa-solid fa-circle-exclamation" className="text-rose-600 shrink-0 mt-0.5" />
+              <AppIcon name="warning-circle" className="text-rose-600 shrink-0 mt-0.5" />
               <span>{error}</span>
             </div>
           )}
 
           {success && (
             <div role="status" className="mb-5 rounded-2xl border border-emerald-200 bg-emerald-50 p-3.5 text-sm text-emerald-900 flex items-start gap-2.5">
-              <FaIcon icon="fa-solid fa-circle-check" className="text-emerald-700 shrink-0 mt-0.5" />
+              <AppIcon name="check-circle" className="text-emerald-700 shrink-0 mt-0.5" />
               <span>{success}</span>
             </div>
           )}
@@ -382,7 +382,7 @@ export default function ClinicRegistrationPage() {
                 }`}
               >
                 <span className="inline-flex items-center gap-1.5">
-                  {index < step ? <FaIcon icon="fa-solid fa-check" className="text-[11px]" /> : <span>{index + 1}.</span>}
+                  {index < step ? <AppIcon name="check" className="text-[11px]" /> : <span>{index + 1}.</span>}
                   <span>{doc.title}</span>
                 </span>
               </button>
@@ -417,22 +417,14 @@ export default function ClinicRegistrationPage() {
 
               <label className="flex cursor-pointer items-center gap-3.5 rounded-2xl border border-dashed border-theme-border-strong bg-theme-surface/60 p-5 text-sm text-theme-ink hover:border-theme-primary hover:bg-theme-canvas/50 transition">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-theme-primary-soft text-theme-primary">
-                  <FaIcon icon={busy ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-cloud-arrow-up'} className="text-base" />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <span className="block truncate">
-                    {files[currentDocument.code]?.name || `Choose ${currentDocument.title} (PDF, JPEG, or PNG; up to 15 MB)`}
-                  </span>
-                  {files[currentDocument.code] && !busy && (
-                    <span className="text-[11px] text-[#64748B]">Click to upload a different file</span>
-                  )}
+                  <AppIcon name="cloud-upload" className="text-base" />
                 </div>
                 <input type="file" accept="application/pdf,image/jpeg,image/png" onChange={chooseFile} disabled={busy} className="sr-only" />
               </label>
 
               {busy && (
                 <div role="status" className="flex items-center gap-2.5 rounded-2xl border border-[#DECBE9] bg-[#F6F0FA] px-4 py-3 text-sm alata-regular text-[#6B3B66]">
-                  <FaIcon icon="fa-solid fa-spinner fa-spin" />
+                  <AppIcon name="spinner" spin size="sm" />
                   <span>Analyzing {currentDocument.title} with AI OCR &amp; checking duplicates...</span>
                 </div>
               )}
@@ -443,7 +435,7 @@ export default function ClinicRegistrationPage() {
                   onClick={() => analyzeDocumentFile(files[currentDocument.code], currentDocument)}
                   className="flex items-center justify-center gap-2 rounded-full border border-theme-border-strong bg-theme-canvas px-5 py-2.5 text-sm alata-regular text-theme-primary hover:bg-theme-primary-soft transition"
                 >
-                  <FaIcon icon="fa-solid fa-rotate-right" />
+                  <AppIcon name="refresh" size="sm" />
                   <span>Retry Document Analysis</span>
                 </button>
               )}
@@ -451,7 +443,7 @@ export default function ClinicRegistrationPage() {
               {currentAnalysis && (
                 <div role="status" className="space-y-3 rounded-2xl border border-theme-border-strong bg-theme-canvas/70 p-5">
                   <div className="flex items-center gap-2 text-sm alata-regular text-theme-primary">
-                    <FaIcon icon="fa-solid fa-circle-check" />
+                    <AppIcon name="check-circle" />
                     <span>
                       {currentAnalysis.document_type === currentDocument.code
                         ? `Identified as ${currentDocument.title}`
@@ -496,7 +488,7 @@ export default function ClinicRegistrationPage() {
                       className="inline-flex items-center gap-2 rounded-full bg-theme-primary px-6 py-2.5 text-sm alata-regular text-white shadow-sm hover:bg-theme-primary-hover transition"
                     >
                       <span>{step < DOCUMENTS.length - 1 ? 'Continue to next document' : 'Continue to clinic details'}</span>
-                      <FaIcon icon="fa-solid fa-arrow-right" className="text-xs" />
+                      <AppIcon name="arrow-right" className="text-xs" />
                     </button>
                   )}
                 </div>
@@ -511,7 +503,7 @@ export default function ClinicRegistrationPage() {
                   }}
                   className="inline-flex items-center gap-1.5 text-sm alata-regular text-theme-primary hover:text-theme-primary-hover"
                 >
-                  <FaIcon icon="fa-solid fa-arrow-left" className="text-xs" />
+                  <AppIcon name="arrow-left" className="text-xs" />
                   Back to previous document
                 </button>
               )}
@@ -524,7 +516,7 @@ export default function ClinicRegistrationPage() {
                   <ul className="space-y-2">
                     {DOCUMENTS.map((doc) => (
                       <li key={doc.code} className="flex items-center gap-2.5 rounded-2xl border border-theme-border-strong bg-theme-canvas/70 px-4 py-2.5 text-sm text-theme-ink">
-                        <FaIcon icon="fa-solid fa-circle-check" className="text-theme-primary" />
+                        <AppIcon name="check-circle" className="text-theme-primary" />
                         <span>
                           <strong className="alata-regular">{doc.title}:</strong> {files[doc.code]?.name || 'Pre-attached'}
                         </span>
@@ -562,7 +554,7 @@ export default function ClinicRegistrationPage() {
               )}
 
               <div className="flex items-start gap-2.5 rounded-2xl border border-theme-border bg-theme-surface p-4 text-xs text-theme-muted">
-                <FaIcon icon="fa-solid fa-shield-halved" className="mt-0.5 shrink-0 text-theme-primary text-sm" />
+                <AppIcon name="shield-check" className="mt-0.5 shrink-0 text-theme-primary text-sm" />
                 <span>
                   {isEditMode
                     ? 'Submitting these changes will update your pending application and notify the Super Admin for review.'
@@ -579,7 +571,7 @@ export default function ClinicRegistrationPage() {
                   }}
                   className="inline-flex items-center gap-1.5 text-sm alata-regular text-theme-primary hover:text-theme-primary-hover"
                 >
-                  <FaIcon icon="fa-solid fa-arrow-left" className="text-xs" />
+                  <AppIcon name="arrow-left" className="text-xs" />
                   Back to documents
                 </button>
                 <button
@@ -588,7 +580,7 @@ export default function ClinicRegistrationPage() {
                 >
                   {busy ? (
                     <>
-                      <FaIcon icon="fa-solid fa-spinner fa-spin" />
+                      <AppIcon name="spinner" spin />
                       <span>{isEditMode ? 'Saving and resubmitting…' : 'Creating account and submitting…'}</span>
                     </>
                   ) : isEditMode ? (

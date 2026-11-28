@@ -3,7 +3,7 @@ import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import VerificationModal from '../common/VerificationModal';
 import CustomerPreviewModal from '../common/CustomerPreviewModal';
-import FaIcon from '../common/FaIcon';
+import AppIcon from '../common/AppIcon';
 import { useClinic } from '../../context/ClinicContext';
 
 export default function DashboardLayout() {
@@ -52,10 +52,10 @@ export default function DashboardLayout() {
               : 'bg-theme-ink text-white border-slate-700'
           }`}>
             <div className="mt-0.5 text-base">
-              {toast.type === 'success' && <FaIcon icon="fa-solid fa-circle-check" className="text-emerald-400" />}
-              {toast.type === 'error' && <FaIcon icon="fa-solid fa-circle-xmark" className="text-rose-400" />}
-              {toast.type === 'warning' && <FaIcon icon="fa-solid fa-triangle-exclamation" className="text-amber-400" />}
-              {toast.type === 'info' && <FaIcon icon="fa-solid fa-circle-info" className="text-purple-300" />}
+              {toast.type === 'success' && <AppIcon name="check-circle" className="text-emerald-400" />}
+              {toast.type === 'error' && <AppIcon name="x-circle" className="text-rose-400" />}
+              {toast.type === 'warning' && <AppIcon name="warning" className="text-amber-400" />}
+              {toast.type === 'info' && <AppIcon name="info" className="text-theme-accent" />}
             </div>
 
             <div className="space-y-0.5">

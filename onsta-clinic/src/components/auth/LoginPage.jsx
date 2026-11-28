@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import FaIcon from '../common/FaIcon';
+import AppIcon from '../common/AppIcon';
 import BrandLogo from '../common/BrandLogo';
 import { useClinic } from '../../context/ClinicContext';
 
@@ -48,7 +48,7 @@ export default function LoginPage() {
 
         {location.state?.registered && (
           <p role="status" className="mb-5 rounded-2xl border border-emerald-200 bg-emerald-50 p-3.5 text-sm text-emerald-900 flex items-start gap-2.5">
-            <FaIcon icon="fa-solid fa-circle-check" className="mt-0.5 shrink-0 text-emerald-700" />
+            <AppIcon name="check-circle" className="mt-0.5 shrink-0 text-emerald-700" />
             <span>Your clinic application was submitted. Sign in to check its review status.</span>
           </p>
         )}
@@ -60,7 +60,7 @@ export default function LoginPage() {
 
         {error && (
           <p role="alert" className="mt-5 rounded-2xl border border-rose-200 bg-rose-50 p-3.5 text-sm text-rose-800 flex items-start gap-2.5">
-            <FaIcon icon="fa-solid fa-circle-exclamation" className="mt-0.5 shrink-0 text-rose-600" />
+            <AppIcon name="warning-circle" className="mt-0.5 shrink-0 text-rose-600" />
             <span>{error}</span>
           </p>
         )}
@@ -69,7 +69,7 @@ export default function LoginPage() {
           <label className="block text-xs font-semibold uppercase tracking-wider text-theme-muted">
             Email address
             <div className="relative mt-1.5">
-              <FaIcon icon="fa-regular fa-envelope" className="absolute left-3.5 top-3.5 text-sm text-theme-muted" />
+              <AppIcon name="mail" className="absolute left-3.5 top-3.5 text-sm text-theme-muted" />
               <input
                 required
                 type="email"
@@ -84,7 +84,7 @@ export default function LoginPage() {
           <label className="block text-xs font-semibold uppercase tracking-wider text-theme-muted">
             Password
             <div className="relative mt-1.5">
-              <FaIcon icon="fa-solid fa-lock" className="absolute left-3.5 top-3.5 text-sm text-theme-muted" />
+              <AppIcon name="lock" className="absolute left-3.5 top-3.5 text-sm text-theme-muted" />
               <input
                 required
                 type="password"
@@ -102,13 +102,13 @@ export default function LoginPage() {
           >
             {busy ? (
               <>
-                <FaIcon icon="fa-solid fa-spinner fa-spin" />
+                <AppIcon name="spinner" spin />
                 <span>Signing in…</span>
               </>
             ) : (
               <>
                 <span>Sign in</span>
-                <FaIcon icon="fa-solid fa-arrow-right" className="text-xs" />
+                <AppIcon name="arrow-right" className="text-xs" />
               </>
             )}
           </button>

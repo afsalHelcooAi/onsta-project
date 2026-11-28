@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useClinic } from '../../context/ClinicContext';
 import AIDocumentScanModal from '../common/AIDocumentScanModal';
 import DoctorAvatar from '../common/DoctorAvatar';
-import FaIcon from '../common/FaIcon';
+import AppIcon from '../common/AppIcon';
 import { fetchClinicOverview } from '../../api/overviewApi';
 
 export default function Overview({ onOpenPreview }) {
@@ -165,12 +165,12 @@ export default function Overview({ onOpenPreview }) {
             </div>
             <p className="text-xs text-theme-muted mt-2 flex flex-wrap items-center gap-2.5">
               <span className="inline-flex items-center gap-1.5">
-                <FaIcon icon="fa-solid fa-location-dot" className="text-theme-primary" />
+                <AppIcon name="map-pin" className="text-theme-primary" />
                 {clinic.cityArea}, {clinic.emirate}
               </span>
               <span className="text-theme-border-strong">•</span>
               <span className="inline-flex items-center gap-1.5">
-                <FaIcon icon="fa-solid fa-certificate" className="text-theme-primary" />
+                <AppIcon name="certificate" className="text-theme-primary" />
                 DHA / DET Regulatory Compliance Verified
               </span>
             </p>
@@ -179,12 +179,12 @@ export default function Overview({ onOpenPreview }) {
           <div className="flex flex-wrap items-center gap-3">
             {clinic.publicListingActive ? (
               <span className="px-3.5 py-2 rounded-full text-xs alata-regular bg-[#DCFCE7] text-[#166534] border border-[#BBF7D0] flex items-center gap-2">
-                <FaIcon icon="fa-solid fa-circle-check" className="text-[#16A34A]" />
+                <AppIcon name="check-circle" className="text-[#16A34A]" />
                 <span>Live on onsta.ae</span>
               </span>
             ) : (
               <span className="px-3.5 py-2 rounded-full text-xs alata-regular bg-[#FEE2E2] text-[#991B1B] border border-[#FECACA] flex items-center gap-2">
-                <FaIcon icon="fa-solid fa-circle-xmark" className="text-[#DC2626]" />
+                <AppIcon name="x-circle" className="text-[#DC2626]" />
                 <span>Listing Suspended</span>
               </span>
             )}
@@ -193,7 +193,7 @@ export default function Overview({ onOpenPreview }) {
               onClick={onOpenPreview}
               className="px-5 py-2.5 rounded-full bg-theme-primary hover:bg-theme-primary-hover text-white text-xs alata-regular tracking-wide transition-all flex items-center gap-2 shadow-sm hover:shadow-md"
             >
-              <FaIcon icon="fa-regular fa-eye" />
+              <AppIcon name="eye" />
               <span>Customer Preview</span>
             </button>
           </div>
@@ -222,7 +222,7 @@ export default function Overview({ onOpenPreview }) {
                     ? 'bg-theme-accent/20 text-theme-accent'
                     : 'bg-theme-primary-soft text-theme-primary'
                 }`}>
-                  <FaIcon icon="fa-solid fa-triangle-exclamation" className="text-base" />
+                  <AppIcon name="warning" className="text-base" />
                 </div>
                 <div>
                   <h4 className="text-sm alata-regular">{alert.title}</h4>
@@ -237,7 +237,7 @@ export default function Overview({ onOpenPreview }) {
                     className="px-4 py-2 rounded-full bg-theme-primary hover:bg-theme-primary-hover text-white text-xs alata-regular transition-colors shadow-sm inline-flex items-center gap-2"
                   >
                     <span>Re-upload Licence</span>
-                    <FaIcon icon="fa-solid fa-arrow-right" className="text-[11px]" />
+                    <AppIcon name="arrow-right" className="text-[11px]" />
                   </button>
                 ) : alert.action === 'MANAGE_DOCTORS' ? (
                   <button
@@ -245,7 +245,7 @@ export default function Overview({ onOpenPreview }) {
                     className="px-4 py-2 rounded-full bg-theme-primary hover:bg-theme-primary-hover text-white text-xs alata-regular transition-colors shadow-sm inline-flex items-center gap-2"
                   >
                     <span>Renew Doctor Licences</span>
-                    <FaIcon icon="fa-solid fa-arrow-right" className="text-[11px]" />
+                    <AppIcon name="arrow-right" className="text-[11px]" />
                   </button>
                 ) : (
                   <button
@@ -253,7 +253,7 @@ export default function Overview({ onOpenPreview }) {
                     className="px-4 py-2 rounded-full bg-theme-primary hover:bg-theme-primary-hover text-white text-xs alata-regular transition-colors shadow-sm inline-flex items-center gap-2"
                   >
                     <span>View Compliance</span>
-                    <FaIcon icon="fa-solid fa-arrow-right" className="text-[11px]" />
+                    <AppIcon name="arrow-right" className="text-[11px]" />
                   </button>
                 )}
               </div>
@@ -264,7 +264,7 @@ export default function Overview({ onOpenPreview }) {
         <div className="bg-theme-surface border border-theme-border-slate rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-start gap-3.5">
             <div className="w-10 h-10 rounded-xl bg-[#DCFCE7] text-[#166534] flex items-center justify-center flex-shrink-0">
-              <FaIcon icon="fa-solid fa-shield-halved" className="text-base" />
+              <AppIcon name="shield-check" className="text-base" />
             </div>
             <div>
               <h4 className="text-sm alata-regular text-theme-ink flex flex-wrap items-center gap-2">
@@ -283,7 +283,7 @@ export default function Overview({ onOpenPreview }) {
             className="self-end sm:self-center px-4 py-2 rounded-full bg-theme-primary hover:bg-theme-primary-hover text-white text-xs alata-regular transition-colors inline-flex items-center gap-2 flex-shrink-0 shadow-sm"
           >
             <span>Compliance Centre</span>
-            <FaIcon icon="fa-solid fa-arrow-right" className="text-[11px]" />
+            <AppIcon name="arrow-right" className="text-[11px]" />
           </button>
         </div>
       )}
@@ -298,7 +298,7 @@ export default function Overview({ onOpenPreview }) {
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-semibold text-theme-muted uppercase tracking-wider">Medical Team</span>
             <div className="w-9 h-9 rounded-xl bg-theme-primary-soft text-theme-primary group-hover:bg-theme-primary group-hover:text-white flex items-center justify-center transition-colors">
-              <FaIcon icon="fa-solid fa-user-doctor" className="text-sm" />
+              <AppIcon name="doctor" className="text-sm" />
             </div>
           </div>
           <div className="flex items-baseline gap-2">
@@ -309,7 +309,7 @@ export default function Overview({ onOpenPreview }) {
           </div>
           <div className="mt-3 pt-2.5 border-t border-theme-border flex items-center justify-between text-[11px]">
             <span className="text-[#166534] font-semibold">{activeDoctorsCount} Active Licences</span>
-            <FaIcon icon="fa-solid fa-chevron-right" className="text-[10px] text-theme-subtle group-hover:text-theme-primary transition-colors" />
+            <AppIcon name="caret-right" className="text-[10px] text-theme-subtle group-hover:text-theme-primary transition-colors" />
           </div>
         </div>
 
@@ -321,7 +321,7 @@ export default function Overview({ onOpenPreview }) {
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-semibold text-theme-muted uppercase tracking-wider">Services Catalogue</span>
             <div className="w-9 h-9 rounded-xl bg-theme-primary-soft text-theme-primary group-hover:bg-theme-primary group-hover:text-white flex items-center justify-center transition-colors">
-              <FaIcon icon="fa-solid fa-stethoscope" className="text-sm" />
+              <AppIcon name="stethoscope" className="text-sm" />
             </div>
           </div>
           <div className="flex items-baseline gap-2">
@@ -334,7 +334,7 @@ export default function Overview({ onOpenPreview }) {
             <span className="text-theme-muted font-medium">
               {minPrice > 0 ? `AED ${Math.round(minPrice)} – ${Math.round(maxPrice)}` : `${activeServicesCount} Active`}
             </span>
-            <FaIcon icon="fa-solid fa-chevron-right" className="text-[10px] text-theme-subtle group-hover:text-theme-primary transition-colors" />
+            <AppIcon name="caret-right" className="text-[10px] text-theme-subtle group-hover:text-theme-primary transition-colors" />
           </div>
         </div>
 
@@ -346,7 +346,7 @@ export default function Overview({ onOpenPreview }) {
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-semibold text-theme-muted uppercase tracking-wider">Compliance Score</span>
             <div className="w-9 h-9 rounded-xl bg-theme-primary-soft text-theme-primary group-hover:bg-theme-primary group-hover:text-white flex items-center justify-center transition-colors">
-              <FaIcon icon="fa-solid fa-shield-halved" className="text-sm" />
+              <AppIcon name="shield-check" className="text-sm" />
             </div>
           </div>
           <div className="flex items-baseline gap-2">
@@ -359,7 +359,7 @@ export default function Overview({ onOpenPreview }) {
             <span className={facilityDays <= 60 ? 'text-theme-accent font-semibold' : 'text-theme-muted font-medium'}>
               Facility: {facilityDays}d left
             </span>
-            <FaIcon icon="fa-solid fa-chevron-right" className="text-[10px] text-theme-subtle group-hover:text-theme-primary transition-colors" />
+            <AppIcon name="caret-right" className="text-[10px] text-theme-subtle group-hover:text-theme-primary transition-colors" />
           </div>
         </div>
 
@@ -371,7 +371,7 @@ export default function Overview({ onOpenPreview }) {
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-semibold text-theme-muted uppercase tracking-wider">Patient Inquiries</span>
             <div className="w-9 h-9 rounded-xl bg-theme-primary-soft text-theme-primary group-hover:bg-theme-primary group-hover:text-white flex items-center justify-center transition-colors">
-              <FaIcon icon="fa-solid fa-calendar-check" className="text-sm" />
+              <AppIcon name="calendar-check" className="text-sm" />
             </div>
           </div>
           <div className="flex items-baseline gap-2">
@@ -382,7 +382,7 @@ export default function Overview({ onOpenPreview }) {
           </div>
           <div className="mt-3 pt-2.5 border-t border-theme-border flex items-center justify-between text-[11px]">
             <span className="text-theme-primary font-semibold">Direct Bookings</span>
-            <FaIcon icon="fa-solid fa-chevron-right" className="text-[10px] text-theme-subtle group-hover:text-theme-primary transition-colors" />
+            <AppIcon name="caret-right" className="text-[10px] text-theme-subtle group-hover:text-theme-primary transition-colors" />
           </div>
         </div>
       </div>
@@ -395,7 +395,7 @@ export default function Overview({ onOpenPreview }) {
             <div className="flex items-center justify-between pb-4 border-b border-theme-border">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-xl bg-theme-primary-soft text-theme-primary flex items-center justify-center">
-                  <FaIcon icon="fa-solid fa-user-doctor" className="text-sm" />
+                  <AppIcon name="doctor" className="text-sm" />
                 </div>
                 <div>
                   <h3 className="text-lg alata-regular text-theme-ink">Our Medical Team</h3>
@@ -454,7 +454,7 @@ export default function Overview({ onOpenPreview }) {
               className="text-xs alata-regular text-theme-primary hover:text-theme-primary-hover inline-flex items-center gap-1.5 transition-colors"
             >
               <span>All doctors & licences</span>
-              <FaIcon icon="fa-solid fa-chevron-right" className="text-[10px]" />
+              <AppIcon name="caret-right" className="text-[10px]" />
             </button>
           </div>
         </div>
@@ -465,7 +465,7 @@ export default function Overview({ onOpenPreview }) {
             <div className="flex items-center justify-between pb-4 border-b border-theme-border">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-xl bg-theme-primary-soft text-theme-primary flex items-center justify-center">
-                  <FaIcon icon="fa-solid fa-stethoscope" className="text-sm" />
+                  <AppIcon name="stethoscope" className="text-sm" />
                 </div>
                 <div>
                   <h3 className="text-lg alata-regular text-theme-ink">Departments & Services</h3>
@@ -525,7 +525,7 @@ export default function Overview({ onOpenPreview }) {
               className="text-xs alata-regular text-theme-primary hover:text-theme-primary-hover inline-flex items-center gap-1.5 transition-colors"
             >
               <span>All services & tariffs</span>
-              <FaIcon icon="fa-solid fa-chevron-right" className="text-[10px]" />
+              <AppIcon name="caret-right" className="text-[10px]" />
             </button>
           </div>
         </div>
@@ -539,7 +539,7 @@ export default function Overview({ onOpenPreview }) {
             <div className="flex items-center justify-between pb-4 border-b border-theme-border">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-xl bg-theme-primary-soft text-theme-primary flex items-center justify-center">
-                  <FaIcon icon="fa-solid fa-calendar-check" className="text-sm" />
+                  <AppIcon name="calendar-check" className="text-sm" />
                 </div>
                 <div>
                   <h3 className="text-lg alata-regular text-theme-ink">Patient Booking Inquiries</h3>
@@ -590,7 +590,7 @@ export default function Overview({ onOpenPreview }) {
               className="text-xs alata-regular text-theme-primary hover:text-theme-primary-hover inline-flex items-center gap-1.5 transition-colors"
             >
               <span>Open patient enquiries inbox</span>
-              <FaIcon icon="fa-solid fa-chevron-right" className="text-[10px]" />
+              <AppIcon name="caret-right" className="text-[10px]" />
             </button>
           </div>
         </div>
@@ -601,7 +601,7 @@ export default function Overview({ onOpenPreview }) {
             <div className="flex items-center justify-between pb-4 border-b border-theme-border">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-xl bg-theme-accent-soft border border-theme-accent-border text-theme-accent flex items-center justify-center">
-                  <FaIcon icon="fa-solid fa-tags" className="text-sm" />
+                  <AppIcon name="tag" className="text-sm" />
                 </div>
                 <div>
                   <h3 className="text-lg alata-regular text-theme-ink">Promotional Offers</h3>
@@ -638,7 +638,7 @@ export default function Overview({ onOpenPreview }) {
             ) : (
               <div className="py-8 px-4 text-center space-y-3">
                 <div className="w-12 h-12 rounded-2xl bg-theme-canvas text-theme-primary flex items-center justify-center mx-auto border border-theme-border-strong">
-                  <FaIcon icon="fa-solid fa-tag" className="text-lg" />
+                  <AppIcon name="tag" className="text-lg" />
                 </div>
                 <div>
                   <h4 className="text-sm alata-regular text-theme-ink">No Active Promotional Offers</h4>
@@ -650,7 +650,7 @@ export default function Overview({ onOpenPreview }) {
                   onClick={() => navigate('/dashboard/offers')}
                   className="px-5 py-2 rounded-full bg-theme-primary hover:bg-theme-primary-hover text-white text-xs alata-regular transition-all inline-flex items-center gap-2 shadow-sm"
                 >
-                  <FaIcon icon="fa-solid fa-plus" className="text-[11px]" />
+                  <AppIcon name="plus" className="text-[11px]" />
                   <span>Add Your First Offer</span>
                 </button>
               </div>
@@ -663,7 +663,7 @@ export default function Overview({ onOpenPreview }) {
               className="text-xs alata-regular text-theme-primary hover:text-theme-primary-hover inline-flex items-center gap-1.5 transition-colors"
             >
               <span>Manage promotional offers</span>
-              <FaIcon icon="fa-solid fa-chevron-right" className="text-[10px]" />
+              <AppIcon name="caret-right" className="text-[10px]" />
             </button>
           </div>
         </div>
@@ -674,7 +674,7 @@ export default function Overview({ onOpenPreview }) {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-theme-border gap-2">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-xl bg-theme-primary-soft text-theme-primary flex items-center justify-center">
-              <FaIcon icon="fa-solid fa-file-contract" className="text-sm" />
+              <AppIcon name="file-contract" className="text-sm" />
             </div>
             <div>
               <h3 className="text-lg alata-regular text-theme-ink">Institutional Healthcare Licences</h3>
@@ -686,7 +686,7 @@ export default function Overview({ onOpenPreview }) {
             className="text-xs alata-regular text-theme-primary hover:text-theme-primary-hover inline-flex items-center gap-1.5"
           >
             <span>Open Compliance Centre</span>
-            <FaIcon icon="fa-solid fa-chevron-right" className="text-[10px]" />
+            <AppIcon name="caret-right" className="text-[10px]" />
           </button>
         </div>
 
@@ -763,7 +763,7 @@ export default function Overview({ onOpenPreview }) {
               />
             ) : (
               <div className="w-full h-full flex flex-col items-center justify-center text-theme-subtle">
-                <FaIcon icon="fa-solid fa-hospital" className="text-2xl text-theme-border-strong" />
+                <AppIcon name="hospital" className="text-2xl text-theme-border-strong" />
                 <span className="text-[11px] mt-1.5 font-medium">Cover photo</span>
               </div>
             )}
@@ -791,7 +791,7 @@ export default function Overview({ onOpenPreview }) {
                 onClick={onOpenPreview}
                 className="px-5 py-2.5 rounded-full bg-theme-primary hover:bg-theme-primary-hover text-white text-xs alata-regular transition-colors inline-flex items-center gap-2 shadow-sm"
               >
-                <FaIcon icon="fa-regular fa-eye" />
+                <AppIcon name="eye" />
                 <span>Open Live Customer Preview</span>
               </button>
 
@@ -800,7 +800,7 @@ export default function Overview({ onOpenPreview }) {
                 className="px-5 py-2.5 rounded-full border border-theme-border-strong text-theme-primary hover:bg-theme-canvas text-xs alata-regular transition-colors inline-flex items-center gap-2"
               >
                 <span>Edit Profile & Media</span>
-                <FaIcon icon="fa-solid fa-arrow-right" className="text-[11px]" />
+                <AppIcon name="arrow-right" className="text-[11px]" />
               </button>
             </div>
           </div>

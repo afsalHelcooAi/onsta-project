@@ -10,7 +10,7 @@ import {
   uploadDoctorPhoto
 } from '../../api/doctorApi';
 import DoctorAvatar from '../common/DoctorAvatar';
-import FaIcon from '../common/FaIcon';
+import AppIcon from '../common/AppIcon';
 import ModalPortal from '../common/ModalPortal';
 
 export default function DoctorsManagement() {
@@ -427,7 +427,7 @@ export default function DoctorsManagement() {
       <div className="bg-theme-card rounded-3xl border border-theme-border p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
           <div className="w-11 h-11 rounded-2xl bg-theme-primary-soft text-theme-primary flex items-center justify-center flex-shrink-0">
-            <FaIcon icon="fa-solid fa-user-doctor" className="text-lg" />
+            <AppIcon name="doctor" className="text-lg" />
           </div>
           <div>
             <h1 className="text-2xl sm:text-3xl alata-regular text-theme-ink tracking-tight">
@@ -444,7 +444,7 @@ export default function DoctorsManagement() {
           onClick={openAddModal}
           className="px-5 py-2.5 rounded-full bg-theme-primary text-white hover:bg-theme-primary-hover text-xs alata-regular flex items-center gap-2 transition-all shadow-sm hover:shadow-md self-start sm:self-center"
         >
-          <FaIcon icon="fa-solid fa-plus" className="text-xs" />
+          <AppIcon name="plus" className="text-xs" />
           <span>Add New Doctor</span>
         </button>
       </div>
@@ -452,7 +452,7 @@ export default function DoctorsManagement() {
       {/* Filters and Search Bar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-theme-card p-4 rounded-2xl border border-theme-border shadow-sm">
         <div className="relative flex-1">
-          <FaIcon icon="fa-solid fa-magnifying-glass" className="text-xs text-theme-subtle absolute left-4 top-1/2 -translate-y-1/2" />
+          <AppIcon name="search" className="text-xs text-theme-subtle absolute left-4 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             placeholder="Search by doctor name, DHA licence no, or treatment service..."
@@ -481,22 +481,24 @@ export default function DoctorsManagement() {
             <button
               type="button"
               onClick={() => setViewMode('grid')}
-              className={`px-2.5 py-1.5 rounded-lg text-xs transition-all ${
+              aria-label="Cards view"
+              className={`min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-sm transition-all ${
                 viewMode === 'grid' ? 'bg-theme-card shadow-xs text-theme-primary' : 'text-theme-subtle hover:text-theme-ink'
               }`}
               title="Cards view"
             >
-              <FaIcon icon="fa-solid fa-grip" />
+              <AppIcon name="grip" />
             </button>
             <button
               type="button"
               onClick={() => setViewMode('table')}
-              className={`px-2.5 py-1.5 rounded-lg text-xs transition-all ${
+              aria-label="Table view"
+              className={`min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-sm transition-all ${
                 viewMode === 'table' ? 'bg-theme-card shadow-xs text-theme-primary' : 'text-theme-subtle hover:text-theme-ink'
               }`}
               title="Table view"
             >
-              <FaIcon icon="fa-solid fa-list" />
+              <AppIcon name="list" />
             </button>
           </div>
         </div>
@@ -570,18 +572,20 @@ export default function DoctorsManagement() {
                         <button
                           type="button"
                           onClick={() => openEditModal(doc)}
-                          className="w-8 h-8 rounded-xl text-theme-muted hover:text-theme-primary hover:bg-theme-canvas flex items-center justify-center transition-colors"
+                          aria-label={`Edit ${doc.fullName}`}
+                          className="min-w-[44px] min-h-[44px] rounded-xl text-theme-muted hover:text-theme-primary hover:bg-theme-canvas flex items-center justify-center transition-colors"
                           title="Edit doctor"
                         >
-                          <FaIcon icon="fa-solid fa-pen-to-square" className="text-xs" />
+                          <AppIcon name="edit" className="text-sm" />
                         </button>
                         <button
                           type="button"
                           onClick={() => handleDelete(doc)}
-                          className="w-8 h-8 rounded-xl text-theme-subtle hover:text-[#991B1B] hover:bg-[#FEE2E2] flex items-center justify-center transition-colors"
+                          aria-label={`Delete ${doc.fullName}`}
+                          className="min-w-[44px] min-h-[44px] rounded-xl text-theme-subtle hover:text-[#991B1B] hover:bg-[#FEE2E2] flex items-center justify-center transition-colors"
                           title="Delete doctor"
                         >
-                          <FaIcon icon="fa-solid fa-trash-can" className="text-xs" />
+                          <AppIcon name="trash" className="text-sm" />
                         </button>
                       </div>
                     </td>
@@ -642,9 +646,9 @@ export default function DoctorsManagement() {
                   {/* Verified Credentials & Service Details */}
                   <div className="mt-4 space-y-2.5 text-xs">
                     <div className="flex items-center justify-between bg-theme-canvas px-3.5 py-2 rounded-xl border border-theme-border">
-                      <span className="text-[11px] font-medium text-theme-muted">
-                        <FaIcon icon="fa-solid fa-id-card-clip" className="mr-1.5 text-theme-primary" />
-                        {doc.authority || 'DHA'} Licence
+                      <span className="text-[11px] font-medium text-theme-muted inline-flex items-center gap-1.5">
+                        <AppIcon name="id-card" className="text-theme-primary" />
+                        <span>{doc.authority || 'DHA'} Licence</span>
                       </span>
                       <span className="alata-regular text-theme-ink text-[11px]">{doc.licenceNumber}</span>
                     </div>
@@ -695,18 +699,20 @@ export default function DoctorsManagement() {
                     <button
                       type="button"
                       onClick={() => openEditModal(doc)}
-                      className="w-8 h-8 rounded-xl text-theme-muted hover:text-theme-primary hover:bg-theme-canvas flex items-center justify-center transition-colors"
+                      aria-label={`Edit ${doc.fullName}`}
+                      className="min-w-[44px] min-h-[44px] rounded-xl text-theme-muted hover:text-theme-primary hover:bg-theme-canvas flex items-center justify-center transition-colors"
                       title="Edit doctor"
                     >
-                      <FaIcon icon="fa-solid fa-pen-to-square" className="text-xs" />
+                      <AppIcon name="edit" className="text-sm" />
                     </button>
                     <button
                       type="button"
                       onClick={() => handleDelete(doc)}
-                      className="w-8 h-8 rounded-xl text-theme-subtle hover:text-[#991B1B] hover:bg-[#FEE2E2] flex items-center justify-center transition-colors"
+                      aria-label={`Remove ${doc.fullName}`}
+                      className="min-w-[44px] min-h-[44px] rounded-xl text-theme-subtle hover:text-[#991B1B] hover:bg-[#FEE2E2] flex items-center justify-center transition-colors"
                       title="Remove doctor"
                     >
-                      <FaIcon icon="fa-solid fa-trash-can" className="text-xs" />
+                      <AppIcon name="trash" className="text-sm" />
                     </button>
                   </div>
                 </div>
@@ -719,7 +725,7 @@ export default function DoctorsManagement() {
       {filteredDoctors.length === 0 && (
         <div className="text-center py-14 bg-theme-card rounded-3xl border border-theme-border text-theme-muted">
           <div className="w-14 h-14 rounded-2xl bg-theme-canvas text-theme-primary flex items-center justify-center mx-auto mb-3">
-            <FaIcon icon="fa-solid fa-user-doctor" className="text-2xl" />
+            <AppIcon name="doctor" className="text-2xl" />
           </div>
           <p className="text-base alata-regular text-theme-ink">No doctors registered yet</p>
           <p className="text-xs text-theme-muted mt-1">Click "Add New Doctor" to upload a DHA licence and register your clinical team.</p>
@@ -736,7 +742,7 @@ export default function DoctorsManagement() {
             <div className="px-6 py-4 bg-theme-sidebar-bg text-white flex items-center justify-between flex-shrink-0">
               <div className="flex items-center gap-3">
                 <div className="w-9 h-9 rounded-xl bg-theme-primary text-white flex items-center justify-center">
-                  <FaIcon icon="fa-solid fa-user-doctor" className="text-sm" />
+                  <AppIcon name="doctor" className="text-sm" />
                 </div>
                 <div>
                   <h3 className="alata-regular text-base">
@@ -750,9 +756,10 @@ export default function DoctorsManagement() {
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="text-white/70 hover:text-white w-8 h-8 rounded-xl flex items-center justify-center transition-colors hover:bg-white/10"
+                aria-label="Close doctor modal"
+                className="text-white/70 hover:text-white min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center transition-colors hover:bg-white/10"
               >
-                <FaIcon icon="fa-solid fa-xmark" className="text-base" />
+                <AppIcon name="close" className="text-base" />
               </button>
             </div>
 
@@ -773,7 +780,7 @@ export default function DoctorsManagement() {
                   <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] alata-regular ${
                     modalStep === 1 ? 'bg-white/20 text-white' : 'bg-theme-primary-soft text-theme-primary'
                   }`}>
-                    {scanResult ? '✓' : '1'}
+                    {scanResult ? <AppIcon name="check" className="text-[11px]" /> : '1'}
                   </span>
                   <span className="truncate">1. Licence Upload</span>
                 </button>
@@ -805,7 +812,7 @@ export default function DoctorsManagement() {
             {/* Error Banner */}
             {errorMessage && (
               <div role="alert" className="mx-6 mt-4 p-3.5 rounded-2xl bg-[#FEE2E2] border border-[#FECACA] text-xs text-[#991B1B] flex items-start gap-2.5">
-                <FaIcon icon="fa-solid fa-circle-exclamation" className="text-sm text-[#DC2626] shrink-0 mt-0.5" />
+                <AppIcon name="warning-circle" className="text-sm text-[#DC2626] shrink-0 mt-0.5" />
                 <span>{errorMessage}</span>
               </div>
             )}
@@ -847,7 +854,7 @@ export default function DoctorsManagement() {
                     {isScanning ? (
                       <div className="flex flex-col items-center space-y-3">
                         <div className="w-12 h-12 rounded-2xl bg-theme-primary-soft text-theme-primary flex items-center justify-center">
-                          <FaIcon icon="fa-solid fa-spinner fa-spin" className="text-2xl" />
+                          <AppIcon name="spinner" spin className="text-2xl" />
                         </div>
                         <div>
                           <p className="text-sm alata-regular text-theme-ink">
@@ -861,7 +868,7 @@ export default function DoctorsManagement() {
                     ) : scanResult ? (
                       <div className="flex flex-col items-center space-y-3">
                         <div className="w-12 h-12 rounded-full bg-[#DCFCE7] text-[#166534] flex items-center justify-center">
-                          <FaIcon icon="fa-solid fa-circle-check" className="text-2xl" />
+                          <AppIcon name="check-circle" className="text-2xl" />
                         </div>
                         <div>
                           <p className="text-sm alata-regular text-[#166534]">
@@ -878,7 +885,7 @@ export default function DoctorsManagement() {
                     ) : (
                       <div className="flex flex-col items-center space-y-3">
                         <div className="w-12 h-12 rounded-2xl bg-theme-primary-soft text-theme-primary flex items-center justify-center border border-theme-border-strong">
-                          <FaIcon icon="fa-solid fa-cloud-arrow-up" className="text-xl" />
+                          <AppIcon name="cloud-upload" className="text-xl" />
                         </div>
                         <div>
                           <p className="text-sm alata-regular text-theme-ink">
@@ -895,7 +902,7 @@ export default function DoctorsManagement() {
                   {/* Quick Test Option */}
                   <div className="flex items-center justify-between p-4 bg-theme-surface rounded-2xl border border-theme-border-slate">
                     <div className="flex items-center gap-2.5">
-                      <FaIcon icon="fa-solid fa-wand-magic-sparkles" className="text-theme-primary text-base" />
+                      <AppIcon name="ai" className="text-theme-primary text-base" />
                       <div>
                         <p className="text-xs alata-regular text-theme-ink">Don't have a licence file handy?</p>
                         <p className="text-[11px] text-theme-muted">Test the auto-fill flow with a sample DHA licence.</p>
@@ -930,7 +937,7 @@ export default function DoctorsManagement() {
                       className="px-5 py-2.5 rounded-full bg-theme-primary text-white text-xs alata-regular hover:bg-theme-primary-hover shadow-sm flex items-center gap-2 transition-all"
                     >
                       <span>Continue to Doctor Details</span>
-                      <FaIcon icon="fa-solid fa-chevron-right" className="text-[10px]" />
+                      <AppIcon name="caret-right" className="text-[10px]" />
                     </button>
                   )}
                 </div>
@@ -943,7 +950,7 @@ export default function DoctorsManagement() {
                 {scanResult && !editingDoctor && (
                   <div className="p-3.5 rounded-2xl bg-[#DCFCE7] border border-[#BBF7D0] flex items-center justify-between">
                     <div className="flex items-center gap-2">
-                      <FaIcon icon="fa-solid fa-circle-check" className="text-[#166534]" />
+                      <AppIcon name="check-circle" className="text-[#166534]" />
                       <span className="text-xs alata-regular text-[#166534]">
                         Auto-Extracted from {formData.authority || 'DHA'} Licence ({scannedFileName || 'Uploaded file'})
                       </span>
@@ -960,7 +967,7 @@ export default function DoctorsManagement() {
 
                 {scanWarning && (
                   <div className="p-3.5 rounded-2xl bg-[#FFEDD5] border border-[#FED7AA] text-xs text-[#9A3412] flex items-start gap-2.5">
-                    <FaIcon icon="fa-solid fa-triangle-exclamation" className="text-[#C2410C] shrink-0 mt-0.5" />
+                    <AppIcon name="warning" className="text-[#C2410C] shrink-0 mt-0.5" />
                     <div>
                       <p className="alata-regular">Verification Notice</p>
                       <p className="text-[11px] mt-0.5 leading-relaxed">{scanWarning}</p>
@@ -1071,10 +1078,11 @@ export default function DoctorsManagement() {
                       <button
                         type="button"
                         onClick={() => photoInputRef.current?.click()}
+                        aria-label="Upload headshot photo"
                         className="absolute inset-0 bg-theme-overlay/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white"
                         title="Upload photo"
                       >
-                        <FaIcon icon="fa-solid fa-camera" className="text-sm" />
+                        <AppIcon name="camera" className="text-sm" />
                       </button>
                     </div>
 
@@ -1093,7 +1101,7 @@ export default function DoctorsManagement() {
                         onClick={() => photoInputRef.current?.click()}
                         className="mt-1 text-xs alata-regular text-theme-primary hover:underline inline-flex items-center gap-1.5"
                       >
-                        <FaIcon icon="fa-solid fa-upload" className="text-[10px]" />
+                        <AppIcon name="upload" className="text-[10px]" />
                         <span>Upload photo</span>
                       </button>
                     </div>
@@ -1202,7 +1210,7 @@ export default function DoctorsManagement() {
                       onClick={() => setModalStep(1)}
                       className="text-xs text-theme-muted hover:text-theme-ink alata-regular flex items-center gap-1.5"
                     >
-                      <FaIcon icon="fa-solid fa-arrow-left" className="text-[11px]" />
+                      <AppIcon name="arrow-left" className="text-[11px]" />
                       <span>Back to Licence Upload</span>
                     </button>
                   ) : (
@@ -1222,7 +1230,7 @@ export default function DoctorsManagement() {
                       disabled={isSubmitting}
                       className="px-6 py-2.5 rounded-full bg-theme-primary text-white text-xs alata-regular hover:bg-theme-primary-hover shadow-sm flex items-center gap-2 disabled:opacity-50 transition-all"
                     >
-                      <FaIcon icon={isSubmitting ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-circle-check'} />
+                      <AppIcon name={isSubmitting ? 'spinner' : 'check-circle'} spin={isSubmitting} />
                       <span>{isSubmitting ? 'Saving...' : editingDoctor ? 'Update Doctor' : 'Save & Add Doctor'}</span>
                     </button>
                   </div>

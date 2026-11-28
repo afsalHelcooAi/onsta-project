@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ShieldCheck, CheckCircle2, AlertTriangle, Plus, Check, Info } from 'lucide-react';
+import AppIcon from '../common/AppIcon';
 
 const AVAILABLE_DECLARATION_SERVICES = [
   { id: "s1", name: "Full Body Laser Hair Removal", category: "Laser Clinic", duration: "60 mins", specialty: "Dermatology / Laser", scope: "Class 4 Laser Facility", defaultChecked: true },
@@ -145,7 +145,7 @@ export default function Tab4AdvertisingServices({ onNext, onBack, onSaveDraft })
           {hasRestrictedService && (
             <div className="p-3.5 bg-red-50 border border-red-200 rounded-xl text-xs text-red-800 space-y-1">
               <div className="flex items-center gap-2 font-bold text-red-900">
-                <AlertTriangle className="w-4 h-4 text-red-600" />
+                <AppIcon name="warning" className="w-4 h-4 text-red-600" />
                 <span>Scope Conflict Detected: Hair Transplant Selected</span>
               </div>
               <p className="leading-relaxed">
@@ -175,7 +175,7 @@ export default function Tab4AdvertisingServices({ onNext, onBack, onSaveDraft })
                       ? srv.isRestricted ? "bg-red-600 border-red-600 text-white" : "bg-[#0d281e] border-[#0d281e] text-white"
                       : "border-gray-400 bg-white"
                   }`}>
-                    {isChecked && <Check className="w-3 h-3 stroke-[3]" />}
+                    {isChecked && <AppIcon name="check" className="w-3 h-3" />}
                   </div>
 
                   <div className="flex-1 space-y-0.5">
@@ -194,7 +194,7 @@ export default function Tab4AdvertisingServices({ onNext, onBack, onSaveDraft })
           </div>
 
           <div className="p-3 bg-gray-50 rounded-xl border border-gray-200 text-xs text-gray-600 flex items-center gap-2">
-            <Info className="w-4 h-4 text-gray-500 flex-shrink-0" />
+            <AppIcon name="info" className="w-4 h-4 text-gray-500 flex-shrink-0" />
             <span>
               <strong>Note:</strong> Services will be displayed on ONSTA after passing the applicable automated verification rules.
             </span>
@@ -242,19 +242,19 @@ export default function Tab4AdvertisingServices({ onNext, onBack, onSaveDraft })
 
           <div className="space-y-2.5 text-xs text-gray-700">
             <div className="flex items-start gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+              <AppIcon name="check-circle" className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
               <span>Valid MOHAP advertising licence number must be visible.</span>
             </div>
             <div className="flex items-start gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+              <AppIcon name="check-circle" className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
               <span>Services advertised must match the facility's licensed medical activity.</span>
             </div>
             <div className="flex items-start gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+              <AppIcon name="check-circle" className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
               <span>No absolute promises ("100% cure", "best in UAE", "guaranteed results").</span>
             </div>
             <div className="flex items-start gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
+              <AppIcon name="check-circle" className="w-4 h-4 text-emerald-600 flex-shrink-0 mt-0.5" />
               <span>Prices displayed must be all-inclusive and clearly stated in AED.</span>
             </div>
           </div>

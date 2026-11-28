@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { UserCheck, ShieldCheck, FileText, CheckCircle2, AlertTriangle, Cpu, Upload } from 'lucide-react';
+import AppIcon from '../common/AppIcon';
 
 export default function Tab3MedicalDirector({ onNext, onBack, onSaveDraft }) {
   const [director, setDirector] = useState({
@@ -39,7 +39,7 @@ export default function Tab3MedicalDirector({ onNext, onBack, onSaveDraft }) {
               className="w-16 h-16 rounded-xl object-cover border-2 border-white shadow-sm"
             />
             <span className="absolute -bottom-1 -right-1 bg-emerald-500 text-white p-0.5 rounded-full">
-              <ShieldCheck className="w-3.5 h-3.5" />
+              <AppIcon name="shield-check" className="w-3.5 h-3.5" />
             </span>
           </div>
           <div className="flex-1">
@@ -175,7 +175,7 @@ export default function Tab3MedicalDirector({ onNext, onBack, onSaveDraft }) {
           {/* Uploaded File */}
           <div className="p-3.5 rounded-xl border border-gray-200 bg-gray-50 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <FileText className="w-4 h-4 text-emerald-800" />
+              <AppIcon name="file-text" className="w-4 h-4 text-emerald-800" />
               <span className="text-xs font-medium text-gray-800">{director.licenceFile}</span>
             </div>
             <span className="text-[11px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-full">
@@ -237,7 +237,7 @@ export default function Tab3MedicalDirector({ onNext, onBack, onSaveDraft }) {
       <div className="space-y-5">
         <div className="bg-white rounded-2xl border border-[#e7e1d7] p-6 shadow-sm">
           <div className="flex items-center gap-2 mb-3">
-            <Cpu className="w-4 h-4 text-emerald-800" />
+            <AppIcon name="cpu" className="w-4 h-4 text-emerald-800" />
             <h4 className="text-base font-serif font-bold text-gray-900">
               AI Credential Check
             </h4>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useClinic } from '../../context/ClinicContext';
 import VerificationBadge from '../common/VerificationBadge';
-import FaIcon from '../common/FaIcon';
+import AppIcon from '../common/AppIcon';
 import ModalPortal from '../common/ModalPortal';
 
 export default function OffersManagement({ onOpenPreview }) {
@@ -114,7 +114,7 @@ export default function OffersManagement({ onOpenPreview }) {
       <div className="bg-theme-card rounded-3xl border border-theme-border p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
           <div className="w-11 h-11 rounded-2xl bg-theme-primary-soft text-theme-primary flex items-center justify-center flex-shrink-0">
-            <FaIcon icon="fa-solid fa-tags" className="text-lg" />
+            <AppIcon name="tag" className="text-lg" />
           </div>
           <div>
             <h1 className="text-2xl sm:text-3xl alata-regular text-theme-ink tracking-tight">
@@ -133,7 +133,7 @@ export default function OffersManagement({ onOpenPreview }) {
             disabled={services.length === 0}
             className="px-3.5 py-2 rounded-full bg-[#FEE2E2] text-[#991B1B] hover:bg-[#FECACA] border border-[#FECACA] text-xs alata-regular flex items-center gap-1.5 transition-colors disabled:opacity-50"
           >
-            <FaIcon icon="fa-solid fa-wand-magic-sparkles" />
+            <AppIcon name="warning" />
             <span>Test "Best" Wording Warning</span>
           </button>
 
@@ -143,7 +143,7 @@ export default function OffersManagement({ onOpenPreview }) {
             disabled={services.length === 0}
             className="px-5 py-2.5 rounded-full bg-theme-primary text-white hover:bg-theme-primary-hover text-xs alata-regular flex items-center gap-2 transition-all shadow-sm disabled:opacity-50"
           >
-            <FaIcon icon="fa-solid fa-plus" className="text-xs" />
+            <AppIcon name="plus" className="text-xs" />
             <span>Create New Offer</span>
           </button>
         </div>
@@ -152,7 +152,7 @@ export default function OffersManagement({ onOpenPreview }) {
       {/* No Services Added Warning Banner */}
       {services.length === 0 && (
         <div className="p-4 bg-theme-accent-soft border border-theme-accent-border rounded-2xl flex items-start gap-3">
-          <FaIcon icon="fa-solid fa-triangle-exclamation" className="text-base text-theme-accent shrink-0 mt-0.5" />
+          <AppIcon name="warning" className="text-base text-theme-accent shrink-0 mt-0.5" />
           <div className="text-xs text-theme-accent-text">
             <p className="alata-regular">No Services Found in Your Clinic Directory</p>
             <p className="mt-0.5 opacity-90">
@@ -170,7 +170,7 @@ export default function OffersManagement({ onOpenPreview }) {
             <h4 className="text-2xl alata-regular text-theme-ink mt-1">{offers.length}</h4>
           </div>
           <div className="w-10 h-10 rounded-xl bg-theme-accent-soft border border-theme-accent-border text-theme-accent flex items-center justify-center">
-            <FaIcon icon="fa-solid fa-tags" />
+            <AppIcon name="tag" />
           </div>
         </div>
 
@@ -182,7 +182,7 @@ export default function OffersManagement({ onOpenPreview }) {
             </h4>
           </div>
           <div className="w-10 h-10 rounded-xl bg-[#DCFCE7] text-[#166534] flex items-center justify-center">
-            <FaIcon icon="fa-regular fa-eye" />
+            <AppIcon name="eye" />
           </div>
         </div>
 
@@ -194,7 +194,7 @@ export default function OffersManagement({ onOpenPreview }) {
             </h4>
           </div>
           <div className="w-10 h-10 rounded-xl bg-theme-surface text-theme-muted flex items-center justify-center border border-theme-border-slate">
-            <FaIcon icon="fa-solid fa-eye-slash" />
+            <AppIcon name="eye-off" />
           </div>
         </div>
       </div>
@@ -272,17 +272,19 @@ export default function OffersManagement({ onOpenPreview }) {
                     <div className="flex items-center justify-end gap-1.5">
                       <button
                         onClick={() => openEditModal(offerItem)}
-                        className="w-8 h-8 rounded-xl text-theme-muted hover:text-theme-primary hover:bg-theme-canvas flex items-center justify-center transition-colors"
+                        aria-label={`Edit ${offerItem.title}`}
+                        className="min-w-[44px] min-h-[44px] rounded-xl text-theme-muted hover:text-theme-primary hover:bg-theme-canvas flex items-center justify-center transition-colors"
                         title="Edit Offer"
                       >
-                        <FaIcon icon="fa-solid fa-pen-to-square" className="text-xs" />
+                        <AppIcon name="edit" className="text-sm" />
                       </button>
                       <button
                         onClick={() => setDeleteConfirmId(offerItem.id)}
-                        className="w-8 h-8 rounded-xl text-theme-subtle hover:text-[#991B1B] hover:bg-[#FEE2E2] flex items-center justify-center transition-colors"
+                        aria-label={`Delete ${offerItem.title}`}
+                        className="min-w-[44px] min-h-[44px] rounded-xl text-theme-subtle hover:text-[#991B1B] hover:bg-[#FEE2E2] flex items-center justify-center transition-colors"
                         title="Delete Offer"
                       >
-                        <FaIcon icon="fa-solid fa-trash-can" className="text-xs" />
+                        <AppIcon name="trash" className="text-sm" />
                       </button>
                     </div>
                   </td>
@@ -309,9 +311,10 @@ export default function OffersManagement({ onOpenPreview }) {
               </div>
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="text-theme-muted hover:text-theme-ink w-8 h-8 rounded-xl flex items-center justify-center hover:bg-theme-surface"
+                aria-label="Close offer dialog"
+                className="text-theme-muted hover:text-theme-ink min-w-[44px] min-h-[44px] rounded-xl flex items-center justify-center hover:bg-theme-surface"
               >
-                <FaIcon icon="fa-solid fa-xmark" className="text-base" />
+                <AppIcon name="close" className="text-base" />
               </button>
             </div>
 
@@ -482,7 +485,7 @@ export default function OffersManagement({ onOpenPreview }) {
                   </div>
 
                   <div className="h-32 rounded-2xl bg-theme-primary-soft flex flex-col items-center justify-center text-theme-primary text-xs alata-regular">
-                    <FaIcon icon="fa-solid fa-image" className="text-2xl mb-1 opacity-60" />
+                    <AppIcon name="image" className="text-2xl mb-1 opacity-60" />
                     <span>Promotional Banner</span>
                   </div>
 

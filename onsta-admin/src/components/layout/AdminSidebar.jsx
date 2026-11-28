@@ -1,16 +1,16 @@
 import React from 'react';
-import FaIcon from '../common/FaIcon';
+import AppIcon from '../common/AppIcon';
 import BrandLogo from '../common/BrandLogo';
 
 export default function AdminSidebar({ activeTab, setActiveTab, pendingCount = 0, onSignOut }) {
   const menuItems = [
-    { id: 'overview', label: 'Overview', icon: 'fa-solid fa-table-columns' },
-    { id: 'master-catalog', label: 'Master Treatments & AI', icon: 'fa-solid fa-wand-magic-sparkles' },
-    { id: 'review-queue', label: 'Clinic Verifications', icon: 'fa-solid fa-shield-halved', badge: pendingCount },
-    { id: 'all-clinics', label: 'Registered Clinics', icon: 'fa-solid fa-hospital' },
-    { id: 'compliance-audit', label: 'Compliance & Permits', icon: 'fa-solid fa-file-contract' },
-    { id: 'all-users', label: 'All Users', icon: 'fa-solid fa-users' },
-    { id: 'audit-logs', label: 'Audit Logs', icon: 'fa-solid fa-scroll' },
+    { id: 'overview', label: 'Overview', icon: 'overview' },
+    { id: 'master-catalog', label: 'Master Treatments & AI', icon: 'ai' },
+    { id: 'review-queue', label: 'Clinic Verifications', icon: 'shield-check', badge: pendingCount },
+    { id: 'all-clinics', label: 'Registered Clinics', icon: 'hospital' },
+    { id: 'compliance-audit', label: 'Compliance & Permits', icon: 'file-contract' },
+    { id: 'all-users', label: 'All Users', icon: 'users' },
+    { id: 'audit-logs', label: 'Audit Logs', icon: 'scroll' },
   ];
 
   return (
@@ -45,9 +45,10 @@ export default function AdminSidebar({ activeTab, setActiveTab, pendingCount = 0
                 }`}
               >
                 <div className="flex items-center gap-3">
-                  <FaIcon
-                    icon={item.icon}
-                    className={`w-4 text-center text-sm ${
+                  <AppIcon
+                    name={item.icon}
+                    weight={isActive ? 'duotone' : 'regular'}
+                    className={`w-4 text-center text-base ${
                       isActive ? 'text-theme-primary' : 'text-theme-sidebar-muted'
                     }`}
                   />
@@ -74,9 +75,9 @@ export default function AdminSidebar({ activeTab, setActiveTab, pendingCount = 0
           onClick={onSignOut}
           className="flex items-center justify-center gap-2.5 w-full px-4 py-2.5 rounded-xl text-xs alata-regular tracking-wide text-theme-sidebar-logout-text bg-theme-sidebar-logout-bg hover:bg-theme-primary hover:text-white border border-theme-sidebar-logout-border transition-all shadow-sm group"
         >
-          <FaIcon
-            icon="fa-solid fa-arrow-right-from-bracket"
-            className="text-sm text-theme-sidebar-logout-icon group-hover:text-white transition-colors"
+          <AppIcon
+            name="sign-out"
+            className="text-base text-theme-sidebar-logout-icon group-hover:text-white transition-colors"
           />
           <span>Log Out</span>
         </button>

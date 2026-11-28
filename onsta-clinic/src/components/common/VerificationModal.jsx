@@ -1,5 +1,5 @@
 import React from 'react';
-import { ShieldCheck, XCircle, AlertTriangle, CheckCircle2, ArrowRight, X, Sparkles } from 'lucide-react';
+import AppIcon from './AppIcon';
 
 export default function VerificationModal({ isOpen, onClose, result }) {
   if (!isOpen || !result) return null;
@@ -20,7 +20,7 @@ export default function VerificationModal({ isOpen, onClose, result }) {
               <div className={`p-2.5 rounded-xl ${
                 isPass ? "bg-[#137333] text-white" : isFail ? "bg-[#c5221f] text-white" : "bg-[#b06000] text-white"
               }`}>
-                {isPass ? <ShieldCheck className="w-6 h-6" /> : isFail ? <XCircle className="w-6 h-6" /> : <AlertTriangle className="w-6 h-6" />}
+                {isPass ? <AppIcon name="shield-check" className="w-6 h-6" /> : isFail ? <AppIcon name="x-circle" className="w-6 h-6" /> : <AppIcon name="warning" className="w-6 h-6" />}
               </div>
               <div>
                 <span className="text-xs font-semibold tracking-wider uppercase text-gray-500">
@@ -33,9 +33,10 @@ export default function VerificationModal({ isOpen, onClose, result }) {
             </div>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors p-1 rounded-lg"
+              aria-label="Close verification dialog"
+              className="text-gray-400 hover:text-gray-600 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl hover:bg-black/5"
             >
-              <X className="w-5 h-5" />
+              <AppIcon name="close" className="w-5 h-5" />
             </button>
           </div>
 
@@ -47,14 +48,14 @@ export default function VerificationModal({ isOpen, onClose, result }) {
             </div>
             <div className="h-3 w-px bg-gray-300" />
             <div className="flex items-center gap-1 text-[#137333]">
-              <CheckCircle2 className="w-3.5 h-3.5" />
+              <AppIcon name="check-circle" className="w-3.5 h-3.5" />
               <strong>{result.passedCount} passed</strong>
             </div>
             {result.failedCount > 0 && (
               <>
                 <div className="h-3 w-px bg-gray-300" />
                 <div className="flex items-center gap-1 text-[#c5221f]">
-                  <XCircle className="w-3.5 h-3.5" />
+                  <AppIcon name="x-circle" className="w-3.5 h-3.5" />
                   <strong>{result.failedCount} failed</strong>
                 </div>
               </>
@@ -63,7 +64,7 @@ export default function VerificationModal({ isOpen, onClose, result }) {
               <>
                 <div className="h-3 w-px bg-gray-300" />
                 <div className="flex items-center gap-1 text-[#b06000]">
-                  <AlertTriangle className="w-3.5 h-3.5" />
+                  <AppIcon name="warning" className="w-3.5 h-3.5" />
                   <strong>{result.warningCount} warning</strong>
                 </div>
               </>
@@ -77,7 +78,7 @@ export default function VerificationModal({ isOpen, onClose, result }) {
           {isFail && (
             <div className="p-4 bg-red-50 border border-red-200 rounded-xl space-y-2">
               <div className="flex items-center gap-2 text-red-800 font-semibold text-sm">
-                <XCircle className="w-4 h-4 text-red-600" />
+                <AppIcon name="x-circle" className="w-4 h-4 text-red-600" />
                 <span>Update Rejected: Data not saved</span>
               </div>
               <p className="text-xs text-red-700 leading-relaxed">
@@ -89,7 +90,7 @@ export default function VerificationModal({ isOpen, onClose, result }) {
           {isPass && (
             <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl space-y-1">
               <div className="flex items-center gap-2 text-emerald-800 font-semibold text-sm">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                <AppIcon name="check-circle" className="w-4 h-4 text-emerald-600" />
                 <span>Changes Verified & Live</span>
               </div>
               <p className="text-xs text-emerald-700">
@@ -137,7 +138,7 @@ export default function VerificationModal({ isOpen, onClose, result }) {
 
                 {r.correction && (
                   <div className="mt-2.5 pt-2 border-t border-red-200/60 flex items-start gap-1.5 text-xs text-red-800 font-medium bg-red-100/40 p-2 rounded-lg">
-                    <ArrowRight className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-red-600" />
+                    <AppIcon name="arrow-right" className="w-3.5 h-3.5 mt-0.5 flex-shrink-0 text-red-600" />
                     <div>
                       <strong className="text-red-900">How to fix: </strong>
                       {r.correction}

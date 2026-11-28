@@ -7,7 +7,7 @@ import {
   rejectClinic,
   requestClinicInfo,
 } from '../../api/adminApi';
-import FaIcon from '../common/FaIcon';
+import AppIcon from '../common/AppIcon';
 
 export default function ClinicReviewQueue() {
   const [clinics, setClinics] = useState([]);
@@ -119,7 +119,7 @@ export default function ClinicReviewQueue() {
             disabled={loading}
             className="flex items-center gap-2 px-4 py-2 text-xs alata-regular text-theme-primary bg-theme-canvas hover:bg-theme-primary-soft border border-theme-border-strong rounded-full transition"
           >
-            <FaIcon icon="fa-solid fa-arrows-rotate" className={loading ? 'fa-spin' : ''} />
+            <AppIcon name="refresh" spin={loading} />
             Refresh Queue
           </button>
         </div>
@@ -133,8 +133,12 @@ export default function ClinicReviewQueue() {
           'bg-theme-accent-soft text-theme-accent-text border-theme-accent-border'
         }`}>
           <span>{message.text}</span>
-          <button onClick={() => setMessage(null)} className="text-theme-muted hover:text-theme-ink p-1">
-            <FaIcon icon="fa-solid fa-xmark" />
+          <button
+            onClick={() => setMessage(null)}
+            aria-label="Dismiss notification"
+            className="text-theme-muted hover:text-theme-ink min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg"
+          >
+            <AppIcon name="close" />
           </button>
         </div>
       )}
@@ -146,7 +150,7 @@ export default function ClinicReviewQueue() {
           {/* Filter & Search Bar */}
           <div className="p-3.5 border-b border-theme-border bg-theme-card/80 space-y-2.5">
             <div className="relative">
-              <FaIcon icon="fa-solid fa-magnifying-glass" className="text-xs absolute left-3.5 top-2.5 text-theme-muted" />
+              <AppIcon name="search" className="text-xs absolute left-3.5 top-2.5 text-theme-muted" />
               <input
                 type="text"
                 placeholder="Search clinic, city or ID..."
@@ -249,7 +253,7 @@ export default function ClinicReviewQueue() {
                     onClick={() => handleApprove(selectedClinic.id)}
                     className="flex items-center gap-2 px-4 py-2 bg-theme-primary hover:bg-theme-primary-hover disabled:opacity-50 text-white rounded-full text-xs alata-regular shadow-sm transition"
                   >
-                    <FaIcon icon="fa-solid fa-circle-check" />
+                    <AppIcon name="check-circle" />
                     Approve & Unlock Dashboard
                   </button>
                   <button
@@ -257,7 +261,7 @@ export default function ClinicReviewQueue() {
                     onClick={() => handleReject(selectedClinic.id)}
                     className="flex items-center gap-2 px-3.5 py-2 bg-theme-card border border-rose-200 hover:bg-rose-50 text-rose-700 disabled:opacity-50 rounded-full text-xs alata-regular transition"
                   >
-                    <FaIcon icon="fa-solid fa-circle-xmark" />
+                    <AppIcon name="x-circle" />
                     Reject / Corrections
                   </button>
                   <button
@@ -306,7 +310,7 @@ export default function ClinicReviewQueue() {
                           onClick={() => handleDocumentDownload(doc)}
                           className="shrink-0 inline-flex items-center gap-1.5 rounded-full border border-theme-border-strong bg-theme-canvas px-3.5 py-2 alata-regular text-theme-primary hover:bg-theme-primary-soft transition"
                         >
-                          <FaIcon icon="fa-solid fa-download" />
+                          <AppIcon name="download" />
                           Download for review
                         </button>
                       </div>
@@ -337,7 +341,7 @@ export default function ClinicReviewQueue() {
           ) : (
             <div className="flex-1 flex flex-col items-center justify-center text-theme-muted">
               <div className="w-16 h-16 rounded-2xl bg-theme-primary-soft text-theme-primary flex items-center justify-center mb-3 border border-theme-border-strong">
-                <FaIcon icon="fa-solid fa-shield-halved" className="text-2xl" />
+                <AppIcon name="shield-check" className="text-2xl" />
               </div>
               <p className="text-sm alata-regular text-theme-ink">Select a clinic from the list to inspect credentials and documents.</p>
             </div>
