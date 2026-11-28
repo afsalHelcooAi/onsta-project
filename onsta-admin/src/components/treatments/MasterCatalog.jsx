@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import FaIcon from '../common/FaIcon';
 
 export default function MasterCatalog() {
@@ -10,6 +10,12 @@ export default function MasterCatalog() {
   const [showAddModal, setShowAddModal] = useState(false);
   const [showAddCategoryModal, setShowAddCategoryModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [selectedImageFile, setSelectedImageFile] = useState(null);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState('');
+  const [uploadingTreatmentId, setUploadingTreatmentId] = useState(null);
+  const modalImgInputRef = useRef(null);
+  const rowImgInputRef = useRef(null);
+  const targetRowTreatmentId = useRef(null);
 
   // Form State for Treatment
   const [formData, setFormData] = useState({
@@ -146,7 +152,20 @@ export default function MasterCatalog() {
         throw new Error(err.detail || 'Failed to create treatment');
       }
 
+      const created = await res.json();
+      if (selectedImageFile && created?.id) {
+        const fd = new FormData();
+        fd.append('file', selectedImageFile);
+        await fetch(`/api/v1/platform-admin/master-catalog/treatments/${created.id}/image`, {
+          method: 'POST',
+          headers: { Authorization: `Bearer ${token}` },
+          body: fd
+        });
+      }
+
       setShowAddModal(false);
+      setSelectedImageFile(null);
+      setImagePreviewUrl('');
       setFormData({
         name: '',
         category_id: catalog.categories[0]?.id || '',
@@ -163,6 +182,34 @@ export default function MasterCatalog() {
       alert(err.message);
     } finally {
       setSubmitting(false);
+    }
+  };
+
+  const handleRowImageUpload = async (e) => {
+    const file = e.target.files?.[0];
+    const treatmentId = targetRowTreatmentId.current;
+    e.target.value = '';
+    if (!file || !treatmentId) return;
+
+    try {
+      setUploadingTreatmentId(treatmentId);
+      const token = localStorage.getItem('onsta_access_token');
+      const fd = new FormData();
+      fd.append('file', file);
+      const res = await fetch(`/api/v1/platform-admin/master-catalog/treatments/${treatmentId}/image`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: fd
+      });
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.detail || 'Failed to upload treatment image');
+      }
+      fetchCatalog();
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setUploadingTreatmentId(null);
     }
   };
 
@@ -338,13 +385,37 @@ export default function MasterCatalog() {
                 {filteredTreatments.map((t) => (
                   <tr key={t.id} className="hover:bg-theme-canvas/50 transition-colors">
                     <td className="py-4 px-6">
-                      <div className="alata-regular text-theme-ink">{t.name}</div>
-                      <div className="inline-block px-2.5 py-0.5 bg-theme-primary-soft text-theme-primary rounded-full text-xs alata-regular mt-1 border border-theme-border-strong">
-                        {t.category}
+                      <div className="flex items-center gap-3">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            targetRowTreatmentId.current = t.id;
+                            rowImgInputRef.current?.click();
+                          }}
+                          className="w-12 h-12 rounded-xl bg-[#F6F0FA] border border-[#EAE0F2] overflow-hidden flex-shrink-0 flex items-center justify-center relative group"
+                          title="Upload default treatment image"
+                        >
+                          {uploadingTreatmentId === t.id ? (
+                            <FaIcon icon="fa-solid fa-spinner fa-spin" className="text-[#6B3B66]" />
+                          ) : t.default_image_url ? (
+                            <img src={t.default_image_url} alt={t.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <FaIcon icon="fa-regular fa-image" className="text-[#9E77AD]" />
+                          )}
+                          <span className="absolute inset-0 bg-[#1A1320]/55 text-white text-[9px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            Edit
+                          </span>
+                        </button>
+                        <div>
+                          <div className="alata-regular text-theme-ink">{t.name}</div>
+                          <div className="inline-block px-2.5 py-0.5 bg-theme-primary-soft text-theme-primary rounded-full text-xs alata-regular mt-1 border border-theme-border-strong">
+                            {t.category}
+                          </div>
+                          {t.description && (
+                            <div className="text-xs text-theme-muted mt-1 line-clamp-1 max-w-md">{t.description}</div>
+                          )}
+                        </div>
                       </div>
-                      {t.description && (
-                        <div className="text-xs text-theme-muted mt-1 line-clamp-1 max-w-md">{t.description}</div>
-                      )}
                     </td>
                     <td className="py-4 px-6">
                       <div className="flex flex-wrap gap-1.5 max-w-xs">
@@ -605,6 +676,90 @@ export default function MasterCatalog() {
                 </div>
               </div>
 
+              {/* Default Treatment Image (Optional) */}
+              <div className="bg-[#F8FAFC] border border-[#EAE0F2] rounded-2xl p-3.5">
+                <label className="block text-xs font-semibold text-[#1E1B2E] uppercase tracking-wider mb-2">
+                  Default Treatment Image (Optional)
+                </label>
+                <div className="flex items-center gap-3">
+                  <div className="w-14 h-14 rounded-xl bg-white border border-[#DECBE9] overflow-hidden flex items-center justify-center flex-shrink-0">
+                    {imagePreviewUrl ? (
+                      <img src={imagePreviewUrl} alt="Preview" className="w-full h-full object-cover" />
+                    ) : (
+                      <FaIcon icon="fa-regular fa-image" className="text-[#9E77AD]" />
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <button
+                      type="button"
+                      onClick={() => modalImgInputRef.current?.click()}
+                      className="px-3.5 py-1.5 bg-white border border-[#DECBE9] text-[#6B3B66] hover:bg-[#F0E6F6] rounded-full text-xs alata-regular inline-flex items-center gap-1.5 transition"
+                    >
+                      <FaIcon icon="fa-solid fa-cloud-arrow-up" />
+                      <span>{imagePreviewUrl ? 'Change Default Photo' : 'Upload Default Photo'}</span>
+                    </button>
+                    <p className="text-[10px] text-[#64748B] mt-1">
+                      Clinics mapping to this treatment automatically inherit this image unless they upload a custom one.
+                    </p>
+                    <input
+                      ref={modalImgInputRef}
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      onChange={(e) => {
+                        const f = e.target.files?.[0];
+                        if (f) {
+                          setSelectedImageFile(f);
+                          setImagePreviewUrl(URL.createObjectURL(f));
+                        }
+                      }}
+                      className="hidden"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Default Treatment Image (Optional) */}
+              <div className="bg-[#F8FAFC] border border-[#EAE0F2] rounded-2xl p-3.5">
+                <label className="block text-xs font-semibold text-[#1E1B2E] uppercase tracking-wider mb-2">
+                  Default Treatment Image (Optional)
+                </label>
+                <div className="flex items-center gap-3">
+                  <div className="w-14 h-14 rounded-xl bg-white border border-[#DECBE9] overflow-hidden flex items-center justify-center flex-shrink-0">
+                    {imagePreviewUrl ? (
+                      <img src={imagePreviewUrl} alt="Preview" className="w-full h-full object-cover" />
+                    ) : (
+                      <FaIcon icon="fa-regular fa-image" className="text-[#9E77AD]" />
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <button
+                      type="button"
+                      onClick={() => modalImgInputRef.current?.click()}
+                      className="px-3.5 py-1.5 bg-white border border-[#DECBE9] text-[#6B3B66] hover:bg-[#F0E6F6] rounded-full text-xs alata-regular inline-flex items-center gap-1.5 transition"
+                    >
+                      <FaIcon icon="fa-solid fa-cloud-arrow-up" />
+                      <span>{imagePreviewUrl ? 'Change Default Photo' : 'Upload Default Photo'}</span>
+                    </button>
+                    <p className="text-[10px] text-[#64748B] mt-1">
+                      Clinics mapping to this treatment automatically inherit this image unless they upload a custom one.
+                    </p>
+                    <input
+                      ref={modalImgInputRef}
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      onChange={(e) => {
+                        const f = e.target.files?.[0];
+                        if (f) {
+                          setSelectedImageFile(f);
+                          setImagePreviewUrl(URL.createObjectURL(f));
+                        }
+                      }}
+                      className="hidden"
+                    />
+                  </div>
+                </div>
+              </div>
+
               <div className="flex items-center justify-end gap-3 pt-4 border-t border-theme-border">
                 <button
                   type="button"
@@ -625,6 +780,13 @@ export default function MasterCatalog() {
           </div>
         </div>
       )}
+      <input
+        ref={rowImgInputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        onChange={handleRowImageUpload}
+        className="hidden"
+      />
     </main>
   );
 }

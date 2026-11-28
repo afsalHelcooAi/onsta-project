@@ -67,11 +67,12 @@ async def get_clinic_offers(
             COALESCE(o.terms_and_conditions, '') AS "terms",
             o.is_active AS "isActive",
             o.verification_status AS "verificationStatus",
-            o.image_url AS "imageUrl",
+            COALESCE(o.image_url, s.image_url, mt.default_image_url) AS "imageUrl",
             o.created_at AS "createdAt",
             o.updated_at AS "updatedAt"
         FROM clinic_offers o
         JOIN services s ON s.id = o.service_id
+        LEFT JOIN master_treatments mt ON mt.id = s.master_treatment_id
         WHERE o.clinic_id = CAST(:clinic_id AS uuid)
         ORDER BY o.created_at DESC
     """), {"clinic_id": ctx["clinic_id"]})).mappings().all()
@@ -90,9 +91,10 @@ async def create_clinic_offer(
 
     # Verify that the service belongs strictly to this clinic
     service = (await db.execute(text("""
-        SELECT id, name, price 
-        FROM services 
-        WHERE id = CAST(:sid AS uuid) AND clinic_id = CAST(:cid AS uuid)
+        SELECT s.id, s.name, s.price, COALESCE(s.image_url, mt.default_image_url) AS effective_image_url
+        FROM services s
+        LEFT JOIN master_treatments mt ON mt.id = s.master_treatment_id
+        WHERE s.id = CAST(:sid AS uuid) AND s.clinic_id = CAST(:cid AS uuid)
     """), {"sid": payload.service_id, "cid": ctx["clinic_id"]})).mappings().first()
 
     if not service:
@@ -103,6 +105,7 @@ async def create_clinic_offer(
 
     offer_id = str(uuid.uuid4())
     start_dt = payload.start_date or date.today()
+    effective_img = payload.image_url or service["effective_image_url"]
 
     await db.execute(text("""
         INSERT INTO clinic_offers (
@@ -128,7 +131,7 @@ async def create_clinic_offer(
         "end_date": payload.end_date,
         "terms": payload.terms or "",
         "is_active": payload.is_active,
-        "image_url": payload.image_url
+        "image_url": effective_img
     })
     await db.commit()
 

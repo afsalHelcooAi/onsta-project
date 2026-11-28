@@ -147,28 +147,15 @@ export default function ClinicRegistrationPage() {
     }
   };
 
-  const chooseFile = (event) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    setFiles((current) => ({ ...current, [currentDocument.code]: file }));
-    setAnalyses((current) => ({ ...current, [currentDocument.code]: null }));
-    setConfirmedTypes((current) => ({ ...current, [currentDocument.code]: false }));
-    setError('');
-  };
-
-  const analyzeCurrentDocument = async () => {
-    const file = files[currentDocument.code];
-    if (!file) {
-      setError(`Choose your ${currentDocument.title.toLowerCase()} first.`);
-      return;
-    }
+  const analyzeDocumentFile = async (file, docItem) => {
+    if (!file || !docItem) return;
     setBusy(true);
     setError('');
     try {
       // Pass editApplicationId if editing to skip duplicate check against itself
       const result = await analyzeClinicDocuments([file], isEditMode ? editApplicationId : null);
       const documentResult = { ...result.documents[0], document_type: result.documents[0]?.document_type };
-      setAnalyses((current) => ({ ...current, [currentDocument.code]: documentResult }));
+      setAnalyses((current) => ({ ...current, [docItem.code]: documentResult }));
 
       // Auto-fill extracted fields
       setForm((current) => {
@@ -188,6 +175,18 @@ export default function ClinicRegistrationPage() {
     } finally {
       setBusy(false);
     }
+  };
+
+  const chooseFile = (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    const docItem = currentDocument;
+    setFiles((current) => ({ ...current, [docItem.code]: file }));
+    setAnalyses((current) => ({ ...current, [docItem.code]: null }));
+    setConfirmedTypes((current) => ({ ...current, [docItem.code]: false }));
+    setError('');
+    // Automatically analyze & fetch OCR results immediately after upload
+    analyzeDocumentFile(file, docItem);
   };
 
   const canContinue = currentAnalysis && (currentAnalysis.document_type === currentDocument.code || confirmedTypes[currentDocument.code]);
@@ -418,21 +417,36 @@ export default function ClinicRegistrationPage() {
 
               <label className="flex cursor-pointer items-center gap-3.5 rounded-2xl border border-dashed border-theme-border-strong bg-theme-surface/60 p-5 text-sm text-theme-ink hover:border-theme-primary hover:bg-theme-canvas/50 transition">
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-theme-primary-soft text-theme-primary">
-                  <FaIcon icon="fa-solid fa-cloud-arrow-up" className="text-base" />
+                  <FaIcon icon={busy ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-cloud-arrow-up'} className="text-base" />
                 </div>
-                <span>{files[currentDocument.code]?.name || `Choose ${currentDocument.title} (PDF, JPEG, or PNG; up to 15 MB)`}</span>
-                <input type="file" accept="application/pdf,image/jpeg,image/png" onChange={chooseFile} className="sr-only" />
+                <div className="flex-1 min-w-0">
+                  <span className="block truncate">
+                    {files[currentDocument.code]?.name || `Choose ${currentDocument.title} (PDF, JPEG, or PNG; up to 15 MB)`}
+                  </span>
+                  {files[currentDocument.code] && !busy && (
+                    <span className="text-[11px] text-[#64748B]">Click to upload a different file</span>
+                  )}
+                </div>
+                <input type="file" accept="application/pdf,image/jpeg,image/png" onChange={chooseFile} disabled={busy} className="sr-only" />
               </label>
 
-              <button
-                type="button"
-                disabled={busy || !files[currentDocument.code]}
-                onClick={analyzeCurrentDocument}
-                className="flex items-center justify-center gap-2 rounded-full border border-theme-border-strong bg-theme-canvas px-5 py-2.5 text-sm alata-regular text-theme-primary hover:bg-theme-primary-soft transition disabled:opacity-50"
-              >
-                <FaIcon icon={busy ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-wand-magic-sparkles'} />
-                <span>Analyze this document &amp; Check Duplicates</span>
-              </button>
+              {busy && (
+                <div role="status" className="flex items-center gap-2.5 rounded-2xl border border-[#DECBE9] bg-[#F6F0FA] px-4 py-3 text-sm alata-regular text-[#6B3B66]">
+                  <FaIcon icon="fa-solid fa-spinner fa-spin" />
+                  <span>Analyzing {currentDocument.title} with AI OCR &amp; checking duplicates...</span>
+                </div>
+              )}
+
+              {!busy && files[currentDocument.code] && !currentAnalysis && (
+                <button
+                  type="button"
+                  onClick={() => analyzeDocumentFile(files[currentDocument.code], currentDocument)}
+                  className="flex items-center justify-center gap-2 rounded-full border border-theme-border-strong bg-theme-canvas px-5 py-2.5 text-sm alata-regular text-theme-primary hover:bg-theme-primary-soft transition"
+                >
+                  <FaIcon icon="fa-solid fa-rotate-right" />
+                  <span>Retry Document Analysis</span>
+                </button>
+              )}
 
               {currentAnalysis && (
                 <div role="status" className="space-y-3 rounded-2xl border border-theme-border-strong bg-theme-canvas/70 p-5">

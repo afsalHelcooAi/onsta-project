@@ -4,7 +4,7 @@ from typing import Optional
 from uuid import UUID
 from uuid import uuid4
 
-from fastapi import APIRouter, Depends, HTTPException, Query
+from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile
 from fastapi.responses import FileResponse
 from pydantic import BaseModel, Field
 from sqlalchemy import text
@@ -12,6 +12,7 @@ from sqlalchemy import text
 from app.api.v1.auth import Actor, get_current_actor
 from app.config import settings
 from app.db.database import SessionLocal
+from app.services.image_utils import optimize_image, ALLOWED_IMAGE_TYPES, MAX_IMAGE_SIZE
 
 router = APIRouter(prefix="/platform-admin", tags=["Super Admin"])
 
@@ -1230,6 +1231,7 @@ class MasterTreatmentCreate(BaseModel):
     standard_duration_minutes: Optional[int] = 45
     reference_price_min: Optional[float] = None
     reference_price_max: Optional[float] = None
+    default_image_url: Optional[str] = None
     concern_ids: list[str] = []
 
 
@@ -1242,6 +1244,7 @@ class MasterTreatmentUpdate(BaseModel):
     standard_duration_minutes: Optional[int] = None
     reference_price_min: Optional[float] = None
     reference_price_max: Optional[float] = None
+    default_image_url: Optional[str] = None
     is_active: Optional[bool] = None
     concern_ids: Optional[list[str]] = None
 
@@ -1282,6 +1285,7 @@ async def get_master_catalog(actor: Actor = Depends(require_super_admin)):
                 t.standard_duration_minutes,
                 t.reference_price_min::float,
                 t.reference_price_max::float,
+                t.default_image_url,
                 t.is_active,
                 t.created_at,
                 COALESCE(
@@ -1382,10 +1386,10 @@ async def create_master_treatment(
         await session.execute(text("""
             INSERT INTO master_treatments (
                 id, name, category, category_id, description, medical_specialty,
-                standard_duration_minutes, reference_price_min, reference_price_max
+                standard_duration_minutes, reference_price_min, reference_price_max, default_image_url
             ) VALUES (
                 :id, :name, :category, :category_id, :description, :medical_specialty,
-                :duration, :price_min, :price_max
+                :duration, :price_min, :price_max, :default_image_url
             )
         """), {
             "id": treatment_id,
@@ -1397,6 +1401,7 @@ async def create_master_treatment(
             "duration": payload.standard_duration_minutes,
             "price_min": payload.reference_price_min,
             "price_max": payload.reference_price_max,
+            "default_image_url": payload.default_image_url or None,
         })
 
         for cid in payload.concern_ids:
@@ -1454,6 +1459,9 @@ async def update_master_treatment(
         if payload.reference_price_max is not None:
             updates.append("reference_price_max = :pmax")
             params["pmax"] = payload.reference_price_max
+        if payload.default_image_url is not None:
+            updates.append("default_image_url = :img_url")
+            params["img_url"] = payload.default_image_url or None
         if payload.is_active is not None:
             updates.append("is_active = :active")
             params["active"] = payload.is_active
@@ -1482,6 +1490,45 @@ async def update_master_treatment(
         await session.commit()
 
     return {"status": "UPDATED", "message": "Master treatment updated successfully."}
+
+
+@router.post("/master-catalog/treatments/{treatment_id}/image")
+async def upload_master_treatment_image(
+    treatment_id: UUID,
+    file: UploadFile = File(...),
+    actor: Actor = Depends(require_super_admin)
+):
+    """Upload and optimize a default image for a master treatment."""
+    if file.content_type not in ALLOWED_IMAGE_TYPES:
+        raise HTTPException(status_code=415, detail="Upload a JPEG, PNG, or WebP image.")
+
+    content = await file.read(MAX_IMAGE_SIZE + 1)
+    if not content or len(content) > MAX_IMAGE_SIZE:
+        raise HTTPException(status_code=413, detail="Image exceeds the 15 MB limit.")
+
+    async with SessionLocal() as session:
+        treatment = (await session.execute(
+            text("SELECT id FROM master_treatments WHERE id = CAST(:id AS uuid)"),
+            {"id": treatment_id}
+        )).first()
+        if not treatment:
+            raise HTTPException(status_code=404, detail="Master treatment not found.")
+
+        optimized_bytes, ext = optimize_image(content, max_width=800, max_height=600)
+        safe_stem = Path(file.filename or "treatment").stem[:40]
+        storage_key = f"master-catalog/{treatment_id}-{uuid4().hex[:6]}-{safe_stem}{ext}"
+        dest = Path(settings.LOCAL_UPLOAD_DIR) / storage_key
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_bytes(optimized_bytes)
+
+        file_url = f"/uploads/{storage_key}"
+        await session.execute(
+            text("UPDATE master_treatments SET default_image_url = :url WHERE id = CAST(:id AS uuid)"),
+            {"url": file_url, "id": treatment_id}
+        )
+        await session.commit()
+
+    return {"status": "UPDATED", "default_image_url": file_url}
 
 
 @router.post("/master-catalog/concerns")

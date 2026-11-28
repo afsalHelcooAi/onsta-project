@@ -5,6 +5,7 @@ import {
   fetchClinicProfile,
   saveClinicProfile,
   uploadBrandAsset,
+  deleteBrandAsset,
 } from '../../api/clinicProfileApi';
 
 const PROHIBITED_REGEX = /(?:\bbest\b|#\s*1\b|\bno\.?\s*1\b|\bnumber\s*(?:one|1)\b|\bcheapest\b|\b100%\b|\bguarantee[ds]?\b|\bonly\b|\bunbeatable\b|\blowest\s+price\b|\bmost\s+advanced\b)/i;
@@ -30,8 +31,8 @@ export default function ClinicProfile({ onOpenPreview }) {
     cityArea: clinicData.cityArea || "Jumeirah 1",
     address: clinicData.address || "Villa 14, Al Wasl Road, Jumeirah 1, Dubai",
     openingHours: clinicData.openingHours || "Mon - Sat: 9:00 AM - 8:00 PM | Sun: Closed",
-    logo: clinicData.logo || "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=300&auto=format&fit=crop&q=80",
-    coverImage: clinicData.coverImage || "https://images.unsplash.com/photo-1629909615184-74f495363b67?w=1200&auto=format&fit=crop&q=80",
+    logo: clinicData.logo || "",
+    coverImage: clinicData.coverImage || "",
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -58,8 +59,8 @@ export default function ClinicProfile({ onOpenPreview }) {
             cityArea: profile.cityArea || profile.area || '',
             address: profile.address || profile.street_address || '',
             openingHours: profile.openingHours || 'Mon - Sat: 9:00 AM - 8:00 PM | Sun: Closed',
-            logo: profile.logo || form.logo,
-            coverImage: profile.coverImage || form.coverImage,
+            logo: profile.logo || '',
+            coverImage: profile.coverImage || '',
           };
           setForm(updatedProfile);
           setClinicData((prev) => ({ ...prev, ...updatedProfile }));
@@ -143,6 +144,35 @@ export default function ClinicProfile({ onOpenPreview }) {
       setUploadingAsset(null);
     }
   };
+
+  const handleRemoveBrandAsset = async (assetType) => {
+    setUploadingAsset(assetType);
+    setErrorMessage('');
+    try {
+      if (token) {
+        await deleteBrandAsset(assetType, token);
+      }
+      if (assetType === 'cover') {
+        setForm((prev) => ({ ...prev, coverImage: '' }));
+        setClinicData((prev) => ({ ...prev, coverImage: '' }));
+      } else {
+        setForm((prev) => ({ ...prev, logo: '' }));
+        setClinicData((prev) => ({ ...prev, logo: '' }));
+      }
+      showToast?.('info', 'Brand Asset Removed', `${assetType === 'cover' ? 'Cover banner' : 'Clinic logo'} removed.`);
+    } catch (err) {
+      setErrorMessage(err.message || `Failed to remove ${assetType}.`);
+    } finally {
+      setUploadingAsset(null);
+    }
+  };
+
+  const clinicInitials = (form.displayName || 'CL')
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0].toUpperCase())
+    .join('');
 
   const handleTriggerProhibited = () => {
     setForm((prev) => ({

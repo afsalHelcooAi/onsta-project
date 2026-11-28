@@ -48,7 +48,7 @@ export default function CustomerPreviewModal({ isOpen, onClose }) {
   const clinicRating = clinicData.rating || 4.5;
   const clinicReviewsCount = clinicData.reviewCount || 0;
   const clinicDescription = clinicData.description || 'Premium certified aesthetic clinic on Onsta.';
-  const clinicCover = clinicData.coverImage || 'https://images.unsplash.com/photo-1629909615184-74f495363b67?w=1200&auto=format&fit=crop&q=80';
+  const clinicCover = clinicData.coverImage || '';
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-theme-overlay/60 backdrop-blur-sm animate-fadeIn">
@@ -147,12 +147,14 @@ export default function CustomerPreviewModal({ isOpen, onClose }) {
               <div className={deviceMode === 'desktop' ? 'lg:col-span-8' : 'w-full'}>
                 
                 {/* Hero Banner Card */}
-                <div className="relative h-64 sm:h-80 w-full rounded-3xl overflow-hidden shadow-xs bg-gray-200">
-                  <img
-                    src={clinicCover}
-                    alt={clinicName}
-                    className="w-full h-full object-cover"
-                  />
+                <div className="relative h-64 sm:h-80 w-full rounded-3xl overflow-hidden shadow-xs bg-gradient-to-br from-[#2B1B38] via-[#4C2A63] to-[#6B3B66]">
+                  {clinicCover && (
+                    <img
+                      src={clinicCover}
+                      alt={clinicName}
+                      className="w-full h-full object-cover"
+                    />
+                  )}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
 
                   {/* Badge & Title at Bottom Left of Hero */}
@@ -244,13 +246,22 @@ export default function CustomerPreviewModal({ isOpen, onClose }) {
                           key={srv.id}
                           className="bg-white rounded-2xl p-4 sm:p-5 flex items-center justify-between shadow-xs border border-gray-100 hover:border-gray-200 hover:shadow-sm transition-all"
                         >
-                          <div className="pr-4">
-                            <h3 className="font-bold text-gray-900 text-sm sm:text-base">
-                              {srv.name}
-                            </h3>
-                            <div className="flex items-center gap-1.5 text-xs text-gray-500 mt-1">
-                              <Clock className="w-3.5 h-3.5 text-gray-400" />
-                              <span>{srv.duration || '30 min'}</span>
+                          <div className="flex items-center gap-3.5 pr-4">
+                            {srv.imageUrl && (
+                              <img
+                                src={srv.imageUrl}
+                                alt={srv.name}
+                                className="w-14 h-14 rounded-xl object-cover border border-gray-100 flex-shrink-0"
+                              />
+                            )}
+                            <div>
+                              <h3 className="font-bold text-gray-900 text-sm sm:text-base">
+                                {srv.name}
+                              </h3>
+                              <div className="flex items-center gap-1.5 text-xs text-gray-500 mt-1">
+                                <Clock className="w-3.5 h-3.5 text-gray-400" />
+                                <span>{srv.duration || '30 min'}</span>
+                              </div>
                             </div>
                           </div>
 

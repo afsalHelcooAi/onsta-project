@@ -58,6 +58,7 @@ export async function createService(payload, token) {
       offer_price: payload.offerPrice ? parseFloat(payload.offerPrice) : (payload.offer_price ? parseFloat(payload.offer_price) : null),
       applicable_specialty: payload.applicableSpecialty || payload.applicable_specialty || payload.category,
       scope_required: payload.scopeRequired || payload.scope_required || 'Dermatological Outpatient Scope',
+      image_url: payload.imageUrl || payload.image_url || null,
       is_active: payload.isActive !== undefined ? payload.isActive : true,
     }),
   });
@@ -117,6 +118,9 @@ export async function updateService(serviceId, payload, token) {
   }
   if (payload.scopeRequired !== undefined || payload.scope_required !== undefined) {
     body.scope_required = payload.scopeRequired ?? payload.scope_required;
+  }
+  if (payload.imageUrl !== undefined || payload.image_url !== undefined) {
+    body.image_url = payload.imageUrl ?? payload.image_url;
   }
   if (payload.isActive !== undefined || payload.is_active !== undefined) {
     body.is_active = payload.isActive ?? payload.is_active;
@@ -191,6 +195,42 @@ export async function parseTariffSheet(file = null, useSample = false, token = n
   if (!res.ok) {
     const errorData = await res.json().catch(() => ({}));
     throw new Error(errorData.detail || 'Failed to parse tariff document.');
+  }
+
+  return res.json();
+}
+
+export async function uploadServiceImage(serviceId, file, token) {
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const res = await fetch(`/api/v1/clinic/services/${serviceId}/image`, {
+    method: 'POST',
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: formData,
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.detail || 'Failed to upload service image.');
+  }
+
+  return res.json();
+}
+
+export async function deleteServiceImage(serviceId, token) {
+  const res = await fetch(`/api/v1/clinic/services/${serviceId}/image`, {
+    method: 'DELETE',
+    headers: {
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+  });
+
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}));
+    throw new Error(errorData.detail || 'Failed to remove service image.');
   }
 
   return res.json();
