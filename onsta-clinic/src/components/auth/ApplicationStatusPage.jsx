@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import FaIcon from '../common/FaIcon';
+import BrandLogo from '../common/BrandLogo';
 import { useClinic } from '../../context/ClinicContext';
 import { submitClinicApplication, uploadClinicDocument } from '../../api/accountApi';
 
@@ -46,23 +47,21 @@ export default function ApplicationStatusPage() {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#F6F0FA] px-4 py-10">
-      <section className="w-full max-w-xl rounded-3xl border border-[#EAE0F2] bg-white p-8 shadow-xl sm:p-10">
+    <main className="flex min-h-screen items-center justify-center bg-theme-canvas px-4 py-10">
+      <section className="w-full max-w-xl rounded-3xl border border-theme-border bg-theme-card p-8 shadow-xl sm:p-10">
         <div className="mb-6 flex items-center justify-between">
-          <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#F0E6F6] text-[#6B3B66] border border-[#DECBE9]">
-            <FaIcon icon="fa-solid fa-shield-halved" className="text-xl" />
-          </span>
+          <BrandLogo className="h-12 w-12 rounded-2xl shadow-sm" />
           <button
             onClick={logout}
-            className="flex items-center gap-2 rounded-full border border-[#EAE0F2] bg-[#F8FAFC] px-4 py-2 text-xs alata-regular text-[#64748B] hover:bg-[#F6F0FA] hover:text-[#6B3B66] transition"
+            className="flex items-center gap-2 rounded-full border border-theme-border bg-theme-surface px-4 py-2 text-xs alata-regular text-theme-muted hover:bg-theme-canvas hover:text-theme-primary transition"
           >
             <FaIcon icon="fa-solid fa-arrow-right-from-bracket" /> Sign out
           </button>
         </div>
 
-        <p className="text-xs alata-regular uppercase tracking-[0.2em] text-[#6B3B66]">Clinic Onboarding Status</p>
+        <p className="text-xs alata-regular uppercase tracking-[0.2em] text-theme-primary">Clinic Onboarding Status</p>
 
-        <h1 className="mt-2 alata-regular text-2xl sm:text-3xl text-[#1E1B2E]">
+        <h1 className="mt-2 alata-regular text-2xl sm:text-3xl text-theme-ink">
           {isRejected
             ? 'Application Not Approved'
             : isInfoRequested
@@ -70,7 +69,7 @@ export default function ApplicationStatusPage() {
             : 'Your application is under review'}
         </h1>
 
-        <p className="mt-3 text-sm leading-6 text-[#64748B]">
+        <p className="mt-3 text-sm leading-6 text-theme-muted">
           {isRejected
             ? 'The Super Admin reviewed your registration and identified issues that need correction before access can be granted.'
             : isInfoRequested
@@ -113,7 +112,7 @@ export default function ApplicationStatusPage() {
         <div className={`mt-6 flex flex-wrap items-center justify-between gap-3 rounded-2xl border p-4 ${
           isRejected
             ? 'border-rose-200 bg-rose-50 text-rose-900'
-            : 'border-[#DECBE9] bg-[#F6F0FA] text-[#6B3B66]'
+            : 'border-theme-border-strong bg-theme-canvas text-theme-primary'
         }`}>
           <div className="flex items-center gap-3">
             <FaIcon icon="fa-regular fa-clock" className="text-lg" />
@@ -126,7 +125,7 @@ export default function ApplicationStatusPage() {
           {canEdit && (
             <button
               onClick={handleEditApplication}
-              className="flex items-center gap-1.5 rounded-full bg-white px-4 py-2 text-xs alata-regular text-[#6B3B66] shadow-sm border border-[#DECBE9] hover:bg-[#F0E6F6] transition"
+              className="flex items-center gap-1.5 rounded-full bg-theme-card px-4 py-2 text-xs alata-regular text-theme-primary shadow-sm border border-theme-border-strong hover:bg-theme-primary-soft transition"
             >
               <FaIcon icon="fa-solid fa-pen-to-square" />
               Edit Registration
@@ -135,14 +134,14 @@ export default function ApplicationStatusPage() {
         </div>
 
         {application?.application_reference && (
-          <p className="mt-4 text-xs text-[#64748B]">
-            Application Reference: <span className="font-mono font-semibold text-[#6B3B66]">{application.application_reference}</span>
+          <p className="mt-4 text-xs text-theme-muted">
+            Application Reference: <span className="font-mono font-semibold text-theme-primary">{application.application_reference}</span>
           </p>
         )}
 
         {needsAction && (
           <div className="mt-6 space-y-3">
-            <h2 className="text-sm alata-regular text-[#1E1B2E]">
+            <h2 className="text-sm alata-regular text-theme-ink">
               {isInfoRequested ? 'Replace requested documents' : 'Upload required documents'}
             </h2>
             {error && <p role="alert" className="rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800">{error}</p>}
@@ -150,17 +149,17 @@ export default function ApplicationStatusPage() {
               {DOCUMENTS.map(([code, label]) => (
                 <label
                   key={code}
-                  className="rounded-2xl border border-dashed border-[#DECBE9] bg-[#F8FAFC] p-3 text-xs hover:border-[#6B3B66] hover:bg-[#F6F0FA]/50 transition cursor-pointer"
+                  className="rounded-2xl border border-dashed border-theme-border-strong bg-theme-surface p-3 text-xs hover:border-theme-primary hover:bg-theme-canvas/50 transition cursor-pointer"
                 >
-                  <span className="mb-2 flex items-center gap-1.5 alata-regular text-[#1E1B2E]">
-                    <FaIcon icon="fa-solid fa-cloud-arrow-up" className="text-[#6B3B66]" />
+                  <span className="mb-2 flex items-center gap-1.5 alata-regular text-theme-ink">
+                    <FaIcon icon="fa-solid fa-cloud-arrow-up" className="text-theme-primary" />
                     <span>{label}</span>
                   </span>
                   <input
                     type="file"
                     accept="application/pdf,image/jpeg,image/png"
                     onChange={(event) => setFiles((current) => ({ ...current, [code]: event.target.files?.[0] }))}
-                    className="w-full text-[10px] text-[#64748B]"
+                    className="w-full text-[10px] text-theme-muted"
                   />
                 </label>
               ))}
@@ -168,7 +167,7 @@ export default function ApplicationStatusPage() {
             <button
               disabled={busy}
               onClick={resubmit}
-              className="flex w-full items-center justify-center gap-2 rounded-full bg-[#6B3B66] px-5 py-3 text-sm alata-regular text-white shadow-sm hover:bg-[#552B51] transition disabled:opacity-50"
+              className="flex w-full items-center justify-center gap-2 rounded-full bg-theme-primary px-5 py-3 text-sm alata-regular text-white shadow-sm hover:bg-theme-primary-hover transition disabled:opacity-50"
             >
               {busy ? (
                 <>

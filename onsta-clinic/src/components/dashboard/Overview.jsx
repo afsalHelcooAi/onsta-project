@@ -150,27 +150,27 @@ export default function Overview({ onOpenPreview }) {
   return (
     <div className="space-y-7 animate-fadeIn pb-12">
       {/* 1. Executive Welcome Banner */}
-      <div className="relative overflow-hidden bg-white rounded-3xl border border-[#EAE0F2] p-6 sm:p-7 shadow-sm">
-        {/* Subtle decorative lilac accent corner inspired by Polyclinic.ae */}
-        <div className="pointer-events-none absolute -right-10 -top-10 w-44 h-44 rounded-full bg-[#F6F0FA] opacity-80" />
+      <div className="relative overflow-hidden bg-theme-card rounded-3xl border border-theme-border p-6 sm:p-7 shadow-sm">
+        {/* Subtle decorative canvas accent corner */}
+        <div className="pointer-events-none absolute -right-10 -top-10 w-44 h-44 rounded-full bg-theme-canvas opacity-80" />
         <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-5">
           <div>
             <div className="flex flex-wrap items-center gap-3">
-              <h1 className="text-2xl sm:text-3xl alata-regular text-[#1E1B2E] tracking-tight">
+              <h1 className="text-2xl sm:text-3xl alata-regular text-theme-ink tracking-tight">
                 Welcome, {clinic.displayName || clinic.legalName}
               </h1>
-              <span className="px-3 py-1 rounded-full text-[11px] alata-regular bg-[#F0E6F6] text-[#6B3B66] border border-[#DECBE9]">
+              <span className="px-3 py-1 rounded-full text-[11px] alata-regular bg-theme-primary-soft text-theme-primary border border-theme-border-strong">
                 {clinic.facilityType}
               </span>
             </div>
-            <p className="text-xs text-[#64748B] mt-2 flex flex-wrap items-center gap-2.5">
+            <p className="text-xs text-theme-muted mt-2 flex flex-wrap items-center gap-2.5">
               <span className="inline-flex items-center gap-1.5">
-                <FaIcon icon="fa-solid fa-location-dot" className="text-[#6B3B66]" />
+                <FaIcon icon="fa-solid fa-location-dot" className="text-theme-primary" />
                 {clinic.cityArea}, {clinic.emirate}
               </span>
-              <span className="text-[#DECBE9]">•</span>
+              <span className="text-theme-border-strong">•</span>
               <span className="inline-flex items-center gap-1.5">
-                <FaIcon icon="fa-solid fa-certificate" className="text-[#6B3B66]" />
+                <FaIcon icon="fa-solid fa-certificate" className="text-theme-primary" />
                 DHA / DET Regulatory Compliance Verified
               </span>
             </p>
@@ -191,7 +191,7 @@ export default function Overview({ onOpenPreview }) {
 
             <button
               onClick={onOpenPreview}
-              className="px-5 py-2.5 rounded-full bg-[#6B3B66] hover:bg-[#552B51] text-white text-xs alata-regular tracking-wide transition-all flex items-center gap-2 shadow-sm hover:shadow-md"
+              className="px-5 py-2.5 rounded-full bg-theme-primary hover:bg-theme-primary-hover text-white text-xs alata-regular tracking-wide transition-all flex items-center gap-2 shadow-sm hover:shadow-md"
             >
               <FaIcon icon="fa-regular fa-eye" />
               <span>Customer Preview</span>
@@ -210,8 +210,8 @@ export default function Overview({ onOpenPreview }) {
                 alert.severity === 'CRITICAL'
                   ? 'bg-[#FFF5F5] border-[#FECACA] text-[#7F1D1D]'
                   : alert.severity === 'WARNING'
-                  ? 'bg-[#FFF9F2] border-[#FED7AA] text-[#7C2D12]'
-                  : 'bg-[#F8FAFC] border-[#E2E8F0] text-[#1E293B]'
+                  ? 'bg-theme-accent-soft border-theme-accent-border text-theme-accent-text'
+                  : 'bg-theme-surface border-theme-border-slate text-theme-ink'
               }`}
             >
               <div className="flex items-start gap-3.5">
@@ -219,8 +219,8 @@ export default function Overview({ onOpenPreview }) {
                   alert.severity === 'CRITICAL'
                     ? 'bg-[#FEE2E2] text-[#B91C1C]'
                     : alert.severity === 'WARNING'
-                    ? 'bg-[#FFEDD5] text-[#C2410C]'
-                    : 'bg-[#F0E6F6] text-[#6B3B66]'
+                    ? 'bg-theme-accent/20 text-theme-accent'
+                    : 'bg-theme-primary-soft text-theme-primary'
                 }`}>
                   <FaIcon icon="fa-solid fa-triangle-exclamation" className="text-base" />
                 </div>
@@ -234,7 +234,7 @@ export default function Overview({ onOpenPreview }) {
                 {alert.action === 'RENEW_FACILITY' || alert.action === 'RETRY_RENEWAL' ? (
                   <button
                     onClick={() => handleOpenRenewModal(alert.documentCode || 'FACILITY_LICENSE')}
-                    className="px-4 py-2 rounded-full bg-[#6B3B66] hover:bg-[#552B51] text-white text-xs alata-regular transition-colors shadow-sm inline-flex items-center gap-2"
+                    className="px-4 py-2 rounded-full bg-theme-primary hover:bg-theme-primary-hover text-white text-xs alata-regular transition-colors shadow-sm inline-flex items-center gap-2"
                   >
                     <span>Re-upload Licence</span>
                     <FaIcon icon="fa-solid fa-arrow-right" className="text-[11px]" />
@@ -242,7 +242,7 @@ export default function Overview({ onOpenPreview }) {
                 ) : alert.action === 'MANAGE_DOCTORS' ? (
                   <button
                     onClick={() => navigate('/dashboard/doctors')}
-                    className="px-4 py-2 rounded-full bg-[#6B3B66] hover:bg-[#552B51] text-white text-xs alata-regular transition-colors shadow-sm inline-flex items-center gap-2"
+                    className="px-4 py-2 rounded-full bg-theme-primary hover:bg-theme-primary-hover text-white text-xs alata-regular transition-colors shadow-sm inline-flex items-center gap-2"
                   >
                     <span>Renew Doctor Licences</span>
                     <FaIcon icon="fa-solid fa-arrow-right" className="text-[11px]" />
@@ -250,7 +250,7 @@ export default function Overview({ onOpenPreview }) {
                 ) : (
                   <button
                     onClick={() => navigate('/dashboard/compliance')}
-                    className="px-4 py-2 rounded-full bg-[#6B3B66] hover:bg-[#552B51] text-white text-xs alata-regular transition-colors shadow-sm inline-flex items-center gap-2"
+                    className="px-4 py-2 rounded-full bg-theme-primary hover:bg-theme-primary-hover text-white text-xs alata-regular transition-colors shadow-sm inline-flex items-center gap-2"
                   >
                     <span>View Compliance</span>
                     <FaIcon icon="fa-solid fa-arrow-right" className="text-[11px]" />
@@ -261,26 +261,26 @@ export default function Overview({ onOpenPreview }) {
           ))}
         </div>
       ) : (
-        <div className="bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="bg-theme-surface border border-theme-border-slate rounded-2xl p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="flex items-start gap-3.5">
             <div className="w-10 h-10 rounded-xl bg-[#DCFCE7] text-[#166534] flex items-center justify-center flex-shrink-0">
               <FaIcon icon="fa-solid fa-shield-halved" className="text-base" />
             </div>
             <div>
-              <h4 className="text-sm alata-regular text-[#1E1B2E] flex flex-wrap items-center gap-2">
+              <h4 className="text-sm alata-regular text-theme-ink flex flex-wrap items-center gap-2">
                 <span>All UAE Regulatory Systems Compliant & Active</span>
                 <span className="px-2.5 py-0.5 rounded-full text-[10px] alata-regular bg-[#DCFCE7] text-[#166534] border border-[#BBF7D0]">
                   12/12 Rules Pass
                 </span>
               </h4>
-              <p className="text-xs text-[#64748B] mt-1 leading-relaxed">
+              <p className="text-xs text-theme-muted mt-1 leading-relaxed">
                 Healthcare facility licence, registered medical practitioners, and AED services catalogue fulfill all statutory DHA, DET, and MOHAP advertising criteria.
               </p>
             </div>
           </div>
           <button
             onClick={() => navigate('/dashboard/compliance')}
-            className="self-end sm:self-center px-4 py-2 rounded-full bg-[#6B3B66] hover:bg-[#552B51] text-white text-xs alata-regular transition-colors inline-flex items-center gap-2 flex-shrink-0 shadow-sm"
+            className="self-end sm:self-center px-4 py-2 rounded-full bg-theme-primary hover:bg-theme-primary-hover text-white text-xs alata-regular transition-colors inline-flex items-center gap-2 flex-shrink-0 shadow-sm"
           >
             <span>Compliance Centre</span>
             <FaIcon icon="fa-solid fa-arrow-right" className="text-[11px]" />
@@ -293,132 +293,132 @@ export default function Overview({ onOpenPreview }) {
         {/* Doctors KPI */}
         <div
           onClick={() => navigate('/dashboard/doctors')}
-          className="bg-white rounded-2xl border border-[#EAE0F2] p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:border-[#DECBE9] transition-all cursor-pointer group"
+          className="bg-theme-card rounded-2xl border border-theme-border p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:border-theme-border-strong transition-all cursor-pointer group"
         >
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-semibold text-[#64748B] uppercase tracking-wider">Medical Team</span>
-            <div className="w-9 h-9 rounded-xl bg-[#F0E6F6] text-[#6B3B66] group-hover:bg-[#6B3B66] group-hover:text-white flex items-center justify-center transition-colors">
+            <span className="text-xs font-semibold text-theme-muted uppercase tracking-wider">Medical Team</span>
+            <div className="w-9 h-9 rounded-xl bg-theme-primary-soft text-theme-primary group-hover:bg-theme-primary group-hover:text-white flex items-center justify-center transition-colors">
               <FaIcon icon="fa-solid fa-user-doctor" className="text-sm" />
             </div>
           </div>
           <div className="flex items-baseline gap-2">
-            <h3 className="text-3xl alata-regular text-[#1E1B2E]">
+            <h3 className="text-3xl alata-regular text-theme-ink">
               {totalDoctorsCount}
             </h3>
-            <span className="text-xs text-[#64748B] font-medium">Registered</span>
+            <span className="text-xs text-theme-muted font-medium">Registered</span>
           </div>
-          <div className="mt-3 pt-2.5 border-t border-[#F1EDF6] flex items-center justify-between text-[11px]">
+          <div className="mt-3 pt-2.5 border-t border-theme-border flex items-center justify-between text-[11px]">
             <span className="text-[#166534] font-semibold">{activeDoctorsCount} Active Licences</span>
-            <FaIcon icon="fa-solid fa-chevron-right" className="text-[10px] text-[#94A3B8] group-hover:text-[#6B3B66] transition-colors" />
+            <FaIcon icon="fa-solid fa-chevron-right" className="text-[10px] text-theme-subtle group-hover:text-theme-primary transition-colors" />
           </div>
         </div>
 
         {/* Services KPI */}
         <div
           onClick={() => navigate('/dashboard/services')}
-          className="bg-white rounded-2xl border border-[#EAE0F2] p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:border-[#DECBE9] transition-all cursor-pointer group"
+          className="bg-theme-card rounded-2xl border border-theme-border p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:border-theme-border-strong transition-all cursor-pointer group"
         >
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-semibold text-[#64748B] uppercase tracking-wider">Services Catalogue</span>
-            <div className="w-9 h-9 rounded-xl bg-[#F0E6F6] text-[#6B3B66] group-hover:bg-[#6B3B66] group-hover:text-white flex items-center justify-center transition-colors">
+            <span className="text-xs font-semibold text-theme-muted uppercase tracking-wider">Services Catalogue</span>
+            <div className="w-9 h-9 rounded-xl bg-theme-primary-soft text-theme-primary group-hover:bg-theme-primary group-hover:text-white flex items-center justify-center transition-colors">
               <FaIcon icon="fa-solid fa-stethoscope" className="text-sm" />
             </div>
           </div>
           <div className="flex items-baseline gap-2">
-            <h3 className="text-3xl alata-regular text-[#1E1B2E]">
+            <h3 className="text-3xl alata-regular text-theme-ink">
               {totalServicesCount}
             </h3>
-            <span className="text-xs text-[#64748B] font-medium">Treatments</span>
+            <span className="text-xs text-theme-muted font-medium">Treatments</span>
           </div>
-          <div className="mt-3 pt-2.5 border-t border-[#F1EDF6] flex items-center justify-between text-[11px]">
-            <span className="text-[#475569] font-medium">
+          <div className="mt-3 pt-2.5 border-t border-theme-border flex items-center justify-between text-[11px]">
+            <span className="text-theme-muted font-medium">
               {minPrice > 0 ? `AED ${Math.round(minPrice)} – ${Math.round(maxPrice)}` : `${activeServicesCount} Active`}
             </span>
-            <FaIcon icon="fa-solid fa-chevron-right" className="text-[10px] text-[#94A3B8] group-hover:text-[#6B3B66] transition-colors" />
+            <FaIcon icon="fa-solid fa-chevron-right" className="text-[10px] text-theme-subtle group-hover:text-theme-primary transition-colors" />
           </div>
         </div>
 
         {/* Compliance Score KPI */}
         <div
           onClick={() => navigate('/dashboard/compliance')}
-          className="bg-white rounded-2xl border border-[#EAE0F2] p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:border-[#DECBE9] transition-all cursor-pointer group"
+          className="bg-theme-card rounded-2xl border border-theme-border p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:border-theme-border-strong transition-all cursor-pointer group"
         >
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-semibold text-[#64748B] uppercase tracking-wider">Compliance Score</span>
-            <div className="w-9 h-9 rounded-xl bg-[#F0E6F6] text-[#6B3B66] group-hover:bg-[#6B3B66] group-hover:text-white flex items-center justify-center transition-colors">
+            <span className="text-xs font-semibold text-theme-muted uppercase tracking-wider">Compliance Score</span>
+            <div className="w-9 h-9 rounded-xl bg-theme-primary-soft text-theme-primary group-hover:bg-theme-primary group-hover:text-white flex items-center justify-center transition-colors">
               <FaIcon icon="fa-solid fa-shield-halved" className="text-sm" />
             </div>
           </div>
           <div className="flex items-baseline gap-2">
-            <h3 className="text-3xl alata-regular text-[#1E1B2E]">
+            <h3 className="text-3xl alata-regular text-theme-ink">
               {complianceScore}%
             </h3>
             <span className="text-xs text-[#166534] font-semibold">DHA Rulebook</span>
           </div>
-          <div className="mt-3 pt-2.5 border-t border-[#F1EDF6] flex items-center justify-between text-[11px]">
-            <span className={facilityDays <= 60 ? 'text-[#9A3412] font-semibold' : 'text-[#475569] font-medium'}>
+          <div className="mt-3 pt-2.5 border-t border-theme-border flex items-center justify-between text-[11px]">
+            <span className={facilityDays <= 60 ? 'text-theme-accent font-semibold' : 'text-theme-muted font-medium'}>
               Facility: {facilityDays}d left
             </span>
-            <FaIcon icon="fa-solid fa-chevron-right" className="text-[10px] text-[#94A3B8] group-hover:text-[#6B3B66] transition-colors" />
+            <FaIcon icon="fa-solid fa-chevron-right" className="text-[10px] text-theme-subtle group-hover:text-theme-primary transition-colors" />
           </div>
         </div>
 
         {/* Enquiries KPI */}
         <div
           onClick={() => navigate('/dashboard/enquiries')}
-          className="bg-white rounded-2xl border border-[#EAE0F2] p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:border-[#DECBE9] transition-all cursor-pointer group"
+          className="bg-theme-card rounded-2xl border border-theme-border p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:border-theme-border-strong transition-all cursor-pointer group"
         >
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-semibold text-[#64748B] uppercase tracking-wider">Patient Inquiries</span>
-            <div className="w-9 h-9 rounded-xl bg-[#F0E6F6] text-[#6B3B66] group-hover:bg-[#6B3B66] group-hover:text-white flex items-center justify-center transition-colors">
+            <span className="text-xs font-semibold text-theme-muted uppercase tracking-wider">Patient Inquiries</span>
+            <div className="w-9 h-9 rounded-xl bg-theme-primary-soft text-theme-primary group-hover:bg-theme-primary group-hover:text-white flex items-center justify-center transition-colors">
               <FaIcon icon="fa-solid fa-calendar-check" className="text-sm" />
             </div>
           </div>
           <div className="flex items-baseline gap-2">
-            <h3 className="text-3xl alata-regular text-[#1E1B2E]">
+            <h3 className="text-3xl alata-regular text-theme-ink">
               {enquiriesList.length}
             </h3>
-            <span className="text-xs text-[#64748B] font-medium">Portal Leads</span>
+            <span className="text-xs text-theme-muted font-medium">Portal Leads</span>
           </div>
-          <div className="mt-3 pt-2.5 border-t border-[#F1EDF6] flex items-center justify-between text-[11px]">
-            <span className="text-[#6B3B66] font-semibold">Direct Bookings</span>
-            <FaIcon icon="fa-solid fa-chevron-right" className="text-[10px] text-[#94A3B8] group-hover:text-[#6B3B66] transition-colors" />
+          <div className="mt-3 pt-2.5 border-t border-theme-border flex items-center justify-between text-[11px]">
+            <span className="text-theme-primary font-semibold">Direct Bookings</span>
+            <FaIcon icon="fa-solid fa-chevron-right" className="text-[10px] text-theme-subtle group-hover:text-theme-primary transition-colors" />
           </div>
         </div>
       </div>
 
-      {/* 4. Two-Column Operational Snapshots (Polyclinic.ae Card Inspiration) */}
+      {/* 4. Two-Column Operational Snapshots */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Module A: Medical Practitioners Watchdog */}
-        <div className="bg-white rounded-3xl border border-[#EAE0F2] p-6 shadow-sm flex flex-col justify-between">
+        <div className="bg-theme-card rounded-3xl border border-theme-border p-6 shadow-sm flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between pb-4 border-b border-[#F1EDF6]">
+            <div className="flex items-center justify-between pb-4 border-b border-theme-border">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-[#F0E6F6] text-[#6B3B66] flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-theme-primary-soft text-theme-primary flex items-center justify-center">
                   <FaIcon icon="fa-solid fa-user-doctor" className="text-sm" />
                 </div>
                 <div>
-                  <h3 className="text-lg alata-regular text-[#1E1B2E]">Our Medical Team</h3>
-                  <p className="text-xs text-[#64748B]">Licensed practitioners & licence horizon</p>
+                  <h3 className="text-lg alata-regular text-theme-ink">Our Medical Team</h3>
+                  <p className="text-xs text-theme-muted">Licensed practitioners & licence horizon</p>
                 </div>
               </div>
-              <span className="px-3 py-1 rounded-full text-[11px] alata-regular bg-[#F6F0FA] text-[#6B3B66] border border-[#DECBE9]">
+              <span className="px-3 py-1 rounded-full text-[11px] alata-regular bg-theme-canvas text-theme-primary border border-theme-border-strong">
                 {totalDoctorsCount} Doctors
               </span>
             </div>
 
-            <div className="divide-y divide-[#F1EDF6] mt-2">
+            <div className="divide-y divide-theme-border mt-2">
               {doctorsList.length > 0 ? (
                 doctorsList.map((doc, idx) => (
                   <div key={doc.id || idx} className="py-3.5 flex items-center justify-between gap-3">
                     <div className="flex items-center gap-3 min-w-0">
                       <DoctorAvatar photo={doc.photo} name={doc.fullName} className="w-11 h-11" iconSize="text-base" />
                       <div className="min-w-0">
-                        <p className="alata-regular text-sm text-[#1E1B2E] truncate">{doc.fullName}</p>
-                        <p className="text-[11px] text-[#64748B] truncate">
+                        <p className="alata-regular text-sm text-theme-ink truncate">{doc.fullName}</p>
+                        <p className="text-[11px] text-theme-muted truncate">
                           {doc.professionalTitle} • {doc.specialty}
                         </p>
-                        <p className="text-[10px] text-[#94A3B8] mt-0.5 font-medium">
+                        <p className="text-[10px] text-theme-subtle mt-0.5 font-medium">
                           {doc.authority} • {doc.licenseNumber}
                         </p>
                       </div>
@@ -429,29 +429,29 @@ export default function Overview({ onOpenPreview }) {
                         doc.status === 'EXPIRED'
                           ? 'bg-[#FEE2E2] text-[#991B1B]'
                           : doc.status === 'CRITICAL' || doc.status === 'WARNING'
-                          ? 'bg-[#FFEDD5] text-[#9A3412]'
+                          ? 'bg-theme-accent-soft text-theme-accent-text border border-theme-accent-border'
                           : 'bg-[#DCFCE7] text-[#166534]'
                       }`}>
                         {doc.statusLabel || (doc.isActive ? 'Active & Valid' : 'Inactive')}
                       </span>
-                      <p className="text-[10px] text-[#94A3B8] mt-1">
+                      <p className="text-[10px] text-theme-subtle mt-1">
                         Exp: {doc.expiryDate}
                       </p>
                     </div>
                   </div>
                 ))
               ) : (
-                <div className="py-8 text-center text-xs text-[#64748B]">
+                <div className="py-8 text-center text-xs text-theme-muted">
                   No doctors registered yet. Add practitioners to accept patient appointments on onsta.ae.
                 </div>
               )}
             </div>
           </div>
 
-          <div className="pt-4 border-t border-[#F1EDF6] mt-3">
+          <div className="pt-4 border-t border-theme-border mt-3">
             <button
               onClick={() => navigate('/dashboard/doctors')}
-              className="text-xs alata-regular text-[#6B3B66] hover:text-[#552B51] inline-flex items-center gap-1.5 transition-colors"
+              className="text-xs alata-regular text-theme-primary hover:text-theme-primary-hover inline-flex items-center gap-1.5 transition-colors"
             >
               <span>All doctors & licences</span>
               <FaIcon icon="fa-solid fa-chevron-right" className="text-[10px]" />
@@ -460,30 +460,30 @@ export default function Overview({ onOpenPreview }) {
         </div>
 
         {/* Module B: Services & Price Book Snapshot */}
-        <div className="bg-white rounded-3xl border border-[#EAE0F2] p-6 shadow-sm flex flex-col justify-between">
+        <div className="bg-theme-card rounded-3xl border border-theme-border p-6 shadow-sm flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between pb-4 border-b border-[#F1EDF6]">
+            <div className="flex items-center justify-between pb-4 border-b border-theme-border">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-[#F0E6F6] text-[#6B3B66] flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-theme-primary-soft text-theme-primary flex items-center justify-center">
                   <FaIcon icon="fa-solid fa-stethoscope" className="text-sm" />
                 </div>
                 <div>
-                  <h3 className="text-lg alata-regular text-[#1E1B2E]">Departments & Services</h3>
-                  <p className="text-xs text-[#64748B]">Published outpatient treatments & AED tariffs</p>
+                  <h3 className="text-lg alata-regular text-theme-ink">Departments & Services</h3>
+                  <p className="text-xs text-theme-muted">Published outpatient treatments & AED tariffs</p>
                 </div>
               </div>
-              <span className="px-3 py-1 rounded-full text-[11px] alata-regular bg-[#F6F0FA] text-[#6B3B66] border border-[#DECBE9]">
+              <span className="px-3 py-1 rounded-full text-[11px] alata-regular bg-theme-canvas text-theme-primary border border-theme-border-strong">
                 {totalServicesCount} Services
               </span>
             </div>
 
-            <div className="divide-y divide-[#F1EDF6] mt-2">
+            <div className="divide-y divide-theme-border mt-2">
               {servicesList.length > 0 ? (
                 servicesList.map((srv, idx) => (
                   <div key={srv.id || idx} className="py-3.5 flex items-center justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="alata-regular text-sm text-[#1E1B2E] truncate">{srv.name}</p>
-                      <span className="inline-block mt-1 px-2 py-0.5 rounded-md bg-[#F8FAFC] border border-[#E2E8F0] text-[10px] text-[#64748B] font-medium">
+                      <p className="alata-regular text-sm text-theme-ink truncate">{srv.name}</p>
+                      <span className="inline-block mt-1 px-2 py-0.5 rounded-md bg-theme-surface border border-theme-border-slate text-[10px] text-theme-muted font-medium">
                         {srv.category}
                       </span>
                     </div>
@@ -492,15 +492,15 @@ export default function Overview({ onOpenPreview }) {
                       <div className="flex items-baseline justify-end gap-1.5">
                         {srv.offerPrice ? (
                           <>
-                            <span className="text-[11px] text-[#94A3B8] line-through">
+                            <span className="text-[11px] text-theme-subtle line-through">
                               {Math.round(srv.price)} AED
                             </span>
-                            <span className="alata-regular text-[#6B3B66] text-sm">
+                            <span className="alata-regular text-theme-accent text-sm">
                               {Math.round(srv.offerPrice)} AED
                             </span>
                           </>
                         ) : (
-                          <span className="alata-regular text-[#1E1B2E] text-sm">
+                          <span className="alata-regular text-theme-ink text-sm">
                             {Math.round(srv.price)} AED
                           </span>
                         )}
@@ -512,17 +512,17 @@ export default function Overview({ onOpenPreview }) {
                   </div>
                 ))
               ) : (
-                <div className="py-8 text-center text-xs text-[#64748B]">
+                <div className="py-8 text-center text-xs text-theme-muted">
                   No services added yet. Import or add services to display transparent pricing to patients.
                 </div>
               )}
             </div>
           </div>
 
-          <div className="pt-4 border-t border-[#F1EDF6] mt-3">
+          <div className="pt-4 border-t border-theme-border mt-3">
             <button
               onClick={() => navigate('/dashboard/services')}
-              className="text-xs alata-regular text-[#6B3B66] hover:text-[#552B51] inline-flex items-center gap-1.5 transition-colors"
+              className="text-xs alata-regular text-theme-primary hover:text-theme-primary-hover inline-flex items-center gap-1.5 transition-colors"
             >
               <span>All services & tariffs</span>
               <FaIcon icon="fa-solid fa-chevron-right" className="text-[10px]" />
@@ -534,48 +534,48 @@ export default function Overview({ onOpenPreview }) {
       {/* 5. Second Grid: Patient Inquiries & Promotional Offers */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Module C: Patient Booking Inquiries */}
-        <div className="bg-white rounded-3xl border border-[#EAE0F2] p-6 shadow-sm flex flex-col justify-between">
+        <div className="bg-theme-card rounded-3xl border border-theme-border p-6 shadow-sm flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between pb-4 border-b border-[#F1EDF6]">
+            <div className="flex items-center justify-between pb-4 border-b border-theme-border">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-[#F0E6F6] text-[#6B3B66] flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-theme-primary-soft text-theme-primary flex items-center justify-center">
                   <FaIcon icon="fa-solid fa-calendar-check" className="text-sm" />
                 </div>
                 <div>
-                  <h3 className="text-lg alata-regular text-[#1E1B2E]">Patient Booking Inquiries</h3>
-                  <p className="text-xs text-[#64748B]">Direct appointment requests from onsta.ae</p>
+                  <h3 className="text-lg alata-regular text-theme-ink">Patient Booking Inquiries</h3>
+                  <p className="text-xs text-theme-muted">Direct appointment requests from onsta.ae</p>
                 </div>
               </div>
-              <span className="px-3 py-1 rounded-full text-[11px] alata-regular bg-[#F8FAFC] text-[#475569] border border-[#E2E8F0]">
+              <span className="px-3 py-1 rounded-full text-[11px] alata-regular bg-theme-surface text-theme-muted border border-theme-border-slate">
                 Portal Inbox
               </span>
             </div>
 
-            <div className="divide-y divide-[#F1EDF6] mt-2">
+            <div className="divide-y divide-theme-border mt-2">
               {enquiriesList.map((enq) => (
                 <div key={enq.id} className="py-3.5 flex items-center justify-between gap-3">
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className="alata-regular text-sm text-[#1E1B2E]">{enq.patientName}</p>
+                      <p className="alata-regular text-sm text-theme-ink">{enq.patientName}</p>
                       <span className={`px-2 py-0.5 rounded-full text-[9px] alata-regular uppercase tracking-wider ${
                         enq.status === 'new'
-                          ? 'bg-[#FFEDD5] text-[#9A3412]'
+                          ? 'bg-theme-accent-soft text-theme-accent-text border border-theme-accent-border'
                           : enq.status === 'booked'
                           ? 'bg-[#DCFCE7] text-[#166534]'
-                          : 'bg-[#F0E6F6] text-[#6B3B66]'
+                          : 'bg-theme-primary-soft text-theme-primary'
                       }`}>
                         {enq.status}
                       </span>
                     </div>
-                    <p className="text-xs text-[#475569] mt-0.5 truncate">{enq.requestedService}</p>
-                    <p className="text-[10px] text-[#94A3B8] mt-0.5">
+                    <p className="text-xs text-theme-muted mt-0.5 truncate">{enq.requestedService}</p>
+                    <p className="text-[10px] text-theme-subtle mt-0.5">
                       Doctor: {enq.preferredDoctor} • {enq.preferredDate}
                     </p>
                   </div>
 
                   <button
                     onClick={() => navigate('/dashboard/enquiries')}
-                    className="px-3.5 py-1.5 rounded-full border border-[#DECBE9] text-[#6B3B66] hover:bg-[#F6F0FA] text-[11px] alata-regular flex-shrink-0 transition-colors"
+                    className="px-3.5 py-1.5 rounded-full border border-theme-border-strong text-theme-primary hover:bg-theme-canvas text-[11px] alata-regular flex-shrink-0 transition-colors"
                   >
                     Respond
                   </button>
@@ -584,10 +584,10 @@ export default function Overview({ onOpenPreview }) {
             </div>
           </div>
 
-          <div className="pt-4 border-t border-[#F1EDF6] mt-3">
+          <div className="pt-4 border-t border-theme-border mt-3">
             <button
               onClick={() => navigate('/dashboard/enquiries')}
-              className="text-xs alata-regular text-[#6B3B66] hover:text-[#552B51] inline-flex items-center gap-1.5 transition-colors"
+              className="text-xs alata-regular text-theme-primary hover:text-theme-primary-hover inline-flex items-center gap-1.5 transition-colors"
             >
               <span>Open patient enquiries inbox</span>
               <FaIcon icon="fa-solid fa-chevron-right" className="text-[10px]" />
@@ -596,39 +596,39 @@ export default function Overview({ onOpenPreview }) {
         </div>
 
         {/* Module D: Promotional Offers & Campaigns */}
-        <div className="bg-white rounded-3xl border border-[#EAE0F2] p-6 shadow-sm flex flex-col justify-between">
+        <div className="bg-theme-card rounded-3xl border border-theme-border p-6 shadow-sm flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between pb-4 border-b border-[#F1EDF6]">
+            <div className="flex items-center justify-between pb-4 border-b border-theme-border">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-[#F0E6F6] text-[#6B3B66] flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-theme-accent-soft border border-theme-accent-border text-theme-accent flex items-center justify-center">
                   <FaIcon icon="fa-solid fa-tags" className="text-sm" />
                 </div>
                 <div>
-                  <h3 className="text-lg alata-regular text-[#1E1B2E]">Promotional Offers</h3>
-                  <p className="text-xs text-[#64748B]">MOHAP Advertising compliant packages</p>
+                  <h3 className="text-lg alata-regular text-theme-ink">Promotional Offers</h3>
+                  <p className="text-xs text-theme-muted">MOHAP Advertising compliant packages</p>
                 </div>
               </div>
-              <span className="px-3 py-1 rounded-full text-[11px] alata-regular bg-[#F6F0FA] text-[#6B3B66] border border-[#DECBE9]">
+              <span className="px-3 py-1 rounded-full text-[11px] alata-regular bg-theme-accent-soft text-theme-accent-text border border-theme-accent-border">
                 {activeOffersCount} Active
               </span>
             </div>
 
             {offersList.length > 0 ? (
-              <div className="divide-y divide-[#F1EDF6] mt-2">
+              <div className="divide-y divide-theme-border mt-2">
                 {offersList.map((off, idx) => (
                   <div key={off.id || idx} className="py-3.5 flex items-center justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="alata-regular text-sm text-[#1E1B2E] truncate">{off.title}</p>
-                      <p className="text-[11px] text-[#64748B] truncate">
+                      <p className="alata-regular text-sm text-theme-ink truncate">{off.title}</p>
+                      <p className="text-[11px] text-theme-muted truncate">
                         {off.linkedServiceName || 'Treatment Package'}
                       </p>
                     </div>
 
                     <div className="text-right flex-shrink-0">
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] alata-regular bg-[#F0E6F6] text-[#6B3B66]">
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] alata-regular bg-theme-primary text-theme-accent">
                         {off.discountPercent}% OFF
                       </span>
-                      <p className="text-sm alata-regular text-[#6B3B66] mt-1">
+                      <p className="text-sm alata-regular text-theme-accent mt-1">
                         {Math.round(off.offerPrice)} AED
                       </p>
                     </div>
@@ -637,18 +637,18 @@ export default function Overview({ onOpenPreview }) {
               </div>
             ) : (
               <div className="py-8 px-4 text-center space-y-3">
-                <div className="w-12 h-12 rounded-2xl bg-[#F6F0FA] text-[#6B3B66] flex items-center justify-center mx-auto border border-[#DECBE9]">
+                <div className="w-12 h-12 rounded-2xl bg-theme-canvas text-theme-primary flex items-center justify-center mx-auto border border-theme-border-strong">
                   <FaIcon icon="fa-solid fa-tag" className="text-lg" />
                 </div>
                 <div>
-                  <h4 className="text-sm alata-regular text-[#1E1B2E]">No Active Promotional Offers</h4>
-                  <p className="text-xs text-[#64748B] max-w-sm mx-auto mt-1 leading-relaxed">
+                  <h4 className="text-sm alata-regular text-theme-ink">No Active Promotional Offers</h4>
+                  <p className="text-xs text-theme-muted max-w-sm mx-auto mt-1 leading-relaxed">
                     Launch curated seasonal packages to attract new patients on onsta.ae. Every offer is checked against MOHAP wording norms.
                   </p>
                 </div>
                 <button
                   onClick={() => navigate('/dashboard/offers')}
-                  className="px-5 py-2 rounded-full bg-[#6B3B66] hover:bg-[#552B51] text-white text-xs alata-regular transition-all inline-flex items-center gap-2 shadow-sm"
+                  className="px-5 py-2 rounded-full bg-theme-primary hover:bg-theme-primary-hover text-white text-xs alata-regular transition-all inline-flex items-center gap-2 shadow-sm"
                 >
                   <FaIcon icon="fa-solid fa-plus" className="text-[11px]" />
                   <span>Add Your First Offer</span>
@@ -657,10 +657,10 @@ export default function Overview({ onOpenPreview }) {
             )}
           </div>
 
-          <div className="pt-4 border-t border-[#F1EDF6] mt-3">
+          <div className="pt-4 border-t border-theme-border mt-3">
             <button
               onClick={() => navigate('/dashboard/offers')}
-              className="text-xs alata-regular text-[#6B3B66] hover:text-[#552B51] inline-flex items-center gap-1.5 transition-colors"
+              className="text-xs alata-regular text-theme-primary hover:text-theme-primary-hover inline-flex items-center gap-1.5 transition-colors"
             >
               <span>Manage promotional offers</span>
               <FaIcon icon="fa-solid fa-chevron-right" className="text-[10px]" />
@@ -669,21 +669,21 @@ export default function Overview({ onOpenPreview }) {
         </div>
       </div>
 
-      {/* 6. Institutional Healthcare Licences Horizon (#F8FAFC surface cards) */}
-      <div className="bg-white rounded-3xl border border-[#EAE0F2] p-6 shadow-sm">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-[#F1EDF6] gap-2">
+      {/* 6. Institutional Healthcare Licences Horizon */}
+      <div className="bg-theme-card rounded-3xl border border-theme-border p-6 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-theme-border gap-2">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-[#F0E6F6] text-[#6B3B66] flex items-center justify-center">
+            <div className="w-9 h-9 rounded-xl bg-theme-primary-soft text-theme-primary flex items-center justify-center">
               <FaIcon icon="fa-solid fa-file-contract" className="text-sm" />
             </div>
             <div>
-              <h3 className="text-lg alata-regular text-[#1E1B2E]">Institutional Healthcare Licences</h3>
-              <p className="text-xs text-[#64748B]">Statutory accreditation with DHA & Department of Economy and Tourism</p>
+              <h3 className="text-lg alata-regular text-theme-ink">Institutional Healthcare Licences</h3>
+              <p className="text-xs text-theme-muted">Statutory accreditation with DHA & Department of Economy and Tourism</p>
             </div>
           </div>
           <button
             onClick={() => navigate('/dashboard/compliance')}
-            className="text-xs alata-regular text-[#6B3B66] hover:text-[#552B51] inline-flex items-center gap-1.5"
+            className="text-xs alata-regular text-theme-primary hover:text-theme-primary-hover inline-flex items-center gap-1.5"
           >
             <span>Open Compliance Centre</span>
             <FaIcon icon="fa-solid fa-chevron-right" className="text-[10px]" />
@@ -692,17 +692,17 @@ export default function Overview({ onOpenPreview }) {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-5">
           {/* Facility Licence */}
-          <div className="p-5 rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] flex items-start justify-between gap-3">
+          <div className="p-5 rounded-2xl border border-theme-border-slate bg-theme-surface flex items-start justify-between gap-3">
             <div>
-              <span className="text-[10px] alata-regular text-[#6B3B66] uppercase tracking-wider block">
+              <span className="text-[10px] alata-regular text-theme-primary uppercase tracking-wider block">
                 Healthcare Facility Licence
               </span>
-              <p className="alata-regular text-[#1E1B2E] text-sm mt-1">DHA Clinical Facility Accreditation</p>
-              <p className="text-xs text-[#64748B] mt-1.5 font-medium">
+              <p className="alata-regular text-theme-ink text-sm mt-1">DHA Clinical Facility Accreditation</p>
+              <p className="text-xs text-theme-muted mt-1.5 font-medium">
                 Licence: {overviewData?.credentials?.[0]?.licenseNumber || 'DHA-F-0012345'}
               </p>
-              <p className="text-xs text-[#475569] mt-1">
-                Expiry: <strong className="text-[#1E1B2E]">{facilityExpiry}</strong>
+              <p className="text-xs text-theme-muted mt-1">
+                Expiry: <strong className="text-theme-ink">{facilityExpiry}</strong>
               </p>
             </div>
 
@@ -719,7 +719,7 @@ export default function Overview({ onOpenPreview }) {
               {facilityDays <= 60 && (
                 <button
                   onClick={() => handleOpenRenewModal('FACILITY_LICENSE', 'Healthcare Facility Licence')}
-                  className="mt-2.5 text-xs alata-regular text-[#6B3B66] hover:underline block ml-auto"
+                  className="mt-2.5 text-xs alata-regular text-theme-primary hover:underline block ml-auto"
                 >
                   Renew Now
                 </button>
@@ -728,17 +728,17 @@ export default function Overview({ onOpenPreview }) {
           </div>
 
           {/* Trade Licence */}
-          <div className="p-5 rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] flex items-start justify-between gap-3">
+          <div className="p-5 rounded-2xl border border-theme-border-slate bg-theme-surface flex items-start justify-between gap-3">
             <div>
-              <span className="text-[10px] alata-regular text-[#6B3B66] uppercase tracking-wider block">
+              <span className="text-[10px] alata-regular text-theme-primary uppercase tracking-wider block">
                 Commercial Trade Licence
               </span>
-              <p className="alata-regular text-[#1E1B2E] text-sm mt-1">DET Commercial Registration</p>
-              <p className="text-xs text-[#64748B] mt-1.5 font-medium">
+              <p className="alata-regular text-theme-ink text-sm mt-1">DET Commercial Registration</p>
+              <p className="text-xs text-theme-muted mt-1.5 font-medium">
                 Licence: {overviewData?.credentials?.[1]?.licenseNumber || 'DET-129845'}
               </p>
-              <p className="text-xs text-[#475569] mt-1">
-                Expiry: <strong className="text-[#1E1B2E]">{overviewData?.credentials?.[1]?.expiryDate || '2027-06-30'}</strong>
+              <p className="text-xs text-theme-muted mt-1">
+                Expiry: <strong className="text-theme-ink">{overviewData?.credentials?.[1]?.expiryDate || '2027-06-30'}</strong>
               </p>
             </div>
 
@@ -752,9 +752,9 @@ export default function Overview({ onOpenPreview }) {
       </div>
 
       {/* 7. Live Patient Profile Preview Card */}
-      <div className="bg-white rounded-3xl border border-[#EAE0F2] p-6 shadow-sm">
+      <div className="bg-theme-card rounded-3xl border border-theme-border p-6 shadow-sm">
         <div className="flex flex-col sm:flex-row items-center gap-6">
-          <div className="w-full sm:w-52 h-36 rounded-2xl bg-[#F8FAFC] overflow-hidden border border-[#E2E8F0] flex-shrink-0 relative">
+          <div className="w-full sm:w-52 h-36 rounded-2xl bg-theme-surface overflow-hidden border border-theme-border-slate flex-shrink-0 relative">
             {clinic.coverImage ? (
               <img
                 src={clinic.coverImage}
@@ -762,8 +762,8 @@ export default function Overview({ onOpenPreview }) {
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full flex flex-col items-center justify-center text-[#94A3B8]">
-                <FaIcon icon="fa-solid fa-hospital" className="text-2xl text-[#DECBE9]" />
+              <div className="w-full h-full flex flex-col items-center justify-center text-theme-subtle">
+                <FaIcon icon="fa-solid fa-hospital" className="text-2xl text-theme-border-strong" />
                 <span className="text-[11px] mt-1.5 font-medium">Cover photo</span>
               </div>
             )}
@@ -771,25 +771,25 @@ export default function Overview({ onOpenPreview }) {
 
           <div className="flex-1 space-y-2.5 text-center sm:text-left">
             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
-              <h3 className="text-xl alata-regular text-[#1E1B2E]">
+              <h3 className="text-xl alata-regular text-theme-ink">
                 {clinic.displayName}
               </h3>
               <span className="px-2.5 py-0.5 rounded-full text-[10px] alata-regular bg-[#DCFCE7] text-[#166534] border border-[#BBF7D0]">
                 Live on onsta.ae
               </span>
-              <span className="text-xs text-[#64748B]">
+              <span className="text-xs text-theme-muted">
                 {clinic.category} • {clinic.cityArea}, {clinic.emirate}
               </span>
             </div>
 
-            <p className="text-xs text-[#475569] leading-relaxed max-w-2xl">
+            <p className="text-xs text-theme-muted leading-relaxed max-w-2xl">
               Patients browsing on onsta.ae see your verified clinic profile, licensed specialists, transparent AED treatment pricing, and authentic care details.
             </p>
 
             <div className="pt-2 flex flex-wrap items-center justify-center sm:justify-start gap-3">
               <button
                 onClick={onOpenPreview}
-                className="px-5 py-2.5 rounded-full bg-[#6B3B66] hover:bg-[#552B51] text-white text-xs alata-regular transition-colors inline-flex items-center gap-2 shadow-sm"
+                className="px-5 py-2.5 rounded-full bg-theme-primary hover:bg-theme-primary-hover text-white text-xs alata-regular transition-colors inline-flex items-center gap-2 shadow-sm"
               >
                 <FaIcon icon="fa-regular fa-eye" />
                 <span>Open Live Customer Preview</span>
@@ -797,7 +797,7 @@ export default function Overview({ onOpenPreview }) {
 
               <button
                 onClick={() => navigate('/dashboard/profile')}
-                className="px-5 py-2.5 rounded-full border border-[#DECBE9] text-[#6B3B66] hover:bg-[#F6F0FA] text-xs alata-regular transition-colors inline-flex items-center gap-2"
+                className="px-5 py-2.5 rounded-full border border-theme-border-strong text-theme-primary hover:bg-theme-canvas text-xs alata-regular transition-colors inline-flex items-center gap-2"
               >
                 <span>Edit Profile & Media</span>
                 <FaIcon icon="fa-solid fa-arrow-right" className="text-[11px]" />

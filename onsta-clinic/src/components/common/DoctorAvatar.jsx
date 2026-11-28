@@ -26,18 +26,18 @@ export default function DoctorAvatar({
         src={actualPhoto}
         alt={name || 'Doctor'}
         onError={() => setImgError(true)}
-        className={`${className} object-cover rounded-2xl border border-[#EAE0F2] bg-[#F8FAFC]`}
+        className={`${className} object-cover rounded-2xl border border-theme-border bg-theme-surface`}
       />
     );
   }
 
   return (
     <div
-      className={`${className} rounded-2xl bg-gradient-to-br from-[#F0E6F6] via-[#F6F0FA] to-[#E6D6F0] text-[#6B3B66] flex flex-col items-center justify-center border border-[#DECBE9] select-none flex-shrink-0 relative overflow-hidden shadow-xs`}
+      className={`${className} rounded-2xl bg-gradient-to-br from-theme-primary-soft via-theme-canvas to-theme-primary-tint text-theme-primary flex flex-col items-center justify-center border border-theme-border-strong select-none flex-shrink-0 relative overflow-hidden shadow-xs`}
       title={name || 'Healthcare Practitioner'}
     >
-      <FaIcon icon="fa-solid fa-user-doctor" className={`${iconSize} text-[#6B3B66]`} />
-      <span className="text-[10px] alata-regular text-[#552B51] tracking-wider uppercase mt-0.5">
+      <FaIcon icon="fa-solid fa-user-doctor" className={`${iconSize} text-theme-primary`} />
+      <span className="text-[10px] alata-regular text-theme-primary-hover tracking-wider uppercase mt-0.5">
         {initials}
       </span>
     </div>

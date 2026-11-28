@@ -9,8 +9,8 @@ export default function VerificationModal({ isOpen, onClose, result }) {
   const isReview = result.status === "REVIEW_REQUIRED";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden border border-[#e7e1d7] animate-scaleUp">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-theme-overlay/50 backdrop-blur-sm animate-fadeIn">
+      <div className="bg-theme-card rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border border-theme-border animate-scaleUp">
         {/* Header */}
         <div className={`p-6 border-b ${
           isPass ? "bg-[#eef8f1] border-[#ceead6]" : isFail ? "bg-[#fdf2f1] border-[#fad2cf]" : "bg-[#fef9eb] border-[#fde293]"
@@ -150,13 +150,13 @@ export default function VerificationModal({ isOpen, onClose, result }) {
         </div>
 
         {/* Footer */}
-        <div className="p-4 bg-gray-50 border-t border-gray-200 flex justify-end gap-3">
+        <div className="p-4 bg-theme-surface border-t border-theme-border flex justify-end gap-3">
           <button
             onClick={onClose}
-            className={`px-5 py-2.5 rounded-xl text-sm font-medium transition-colors shadow-sm ${
+            className={`px-5 py-2.5 rounded-full text-sm alata-regular transition-colors shadow-sm ${
               isPass
-                ? "bg-[#0d281e] text-white hover:bg-[#153f2f]"
-                : "bg-gray-800 text-white hover:bg-gray-900"
+                ? "bg-theme-primary text-white hover:bg-theme-primary-hover"
+                : "bg-theme-ink text-white hover:opacity-90"
             }`}
           >
             {isPass ? "Continue" : "Understand & Revise"}

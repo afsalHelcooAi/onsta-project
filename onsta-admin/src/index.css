@@ -4,25 +4,70 @@
 
 :root {
   color-scheme: light;
+  --onsta-canvas: 255 255 255;
+  --onsta-surface: 247 250 248;
+  --onsta-surface-muted: 238 244 241;
+  --onsta-card: 255 255 255;
+  --onsta-border: 226 235 230;
+  --onsta-border-strong: 200 218 209;
+  --onsta-border-slate: 221 230 225;
+
+  --onsta-primary: 5 62 43;
+  --onsta-primary-hover: 3 43 30;
+  --onsta-primary-light: 11 90 63;
+  --onsta-primary-soft: 234 244 240;
+  --onsta-primary-tint: 210 231 221;
+
+  --onsta-accent: 201 169 97;
+  --onsta-accent-hover: 179 146 73;
+  --onsta-accent-soft: 251 247 235;
+  --onsta-accent-border: 232 213 163;
+  --onsta-accent-text: 138 107 34;
+
+  --onsta-ink: 16 33 26;
+  --onsta-muted: 90 109 101;
+  --onsta-subtle: 143 161 153;
+
+  --onsta-sidebar-bg: 4 36 25;
+  --onsta-sidebar-surface: 7 51 36;
+  --onsta-sidebar-hover: 10 62 44;
+  --onsta-sidebar-active-panel: 6 43 30;
+  --onsta-sidebar-border: 13 70 50;
+  --onsta-sidebar-control-border: 22 93 68;
+  --onsta-sidebar-text: 197 221 211;
+  --onsta-sidebar-muted: 136 176 160;
+  --onsta-sidebar-heading: 243 250 246;
+  --onsta-sidebar-kicker: 201 169 97;
+  --onsta-sidebar-logout-bg: 8 54 38;
+  --onsta-sidebar-logout-border: 19 84 61;
+  --onsta-sidebar-logout-text: 245 232 199;
+  --onsta-sidebar-logout-icon: 201 169 97;
+
+  --onsta-scrollbar: 196 214 205;
+  --onsta-scrollbar-hover: 143 174 160;
+  --onsta-overlay: 4 28 20;
+
+  --onsta-font-display: "Alata", sans-serif;
+  --onsta-font-body: "Plus Jakarta Sans", "Alata", system-ui, sans-serif;
 }
 
 @layer base {
   body {
     margin: 0;
-    background-color: #F6F0FA;
-    color: #1E1B2E;
-    font-family: 'Plus Jakarta Sans', 'Alata', system-ui, sans-serif;
+    background-color: rgb(var(--onsta-canvas));
+    color: rgb(var(--onsta-ink));
+    font-family: var(--onsta-font-body);
   }
 
   h1, h2, h3, h4, .font-serif, .alata-regular {
-    font-family: "Alata", sans-serif;
+    font-family: var(--onsta-font-display);
     font-weight: 400;
     font-style: normal;
   }
 }
 
 .alata-regular {
-  font-family: "Alata", sans-serif;
+  font-family: var(--onsta-font-display);
   font-weight: 400;
   font-style: normal;
 }
@@ -30,16 +75,14 @@
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(4px);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
   }
 }
 
 .animate-fadeIn {
-  animation: fadeIn 0.25s ease-out forwards;
+  animation: fadeIn 0.2s ease-out;
 }
 
 ::-webkit-scrollbar {
@@ -47,12 +90,12 @@
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #F6F0FA;
+  background: rgb(var(--onsta-canvas));
 }
 ::-webkit-scrollbar-thumb {
-  background: #D7C6E3;
+  background: rgb(var(--onsta-scrollbar));
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #B99CCB;
+  background: rgb(var(--onsta-scrollbar-hover));
 }

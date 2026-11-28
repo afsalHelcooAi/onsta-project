@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import FaIcon from '../common/FaIcon';
+import BrandLogo from '../common/BrandLogo';
 import { useClinic } from '../../context/ClinicContext';
 
 export default function LoginPage() {
@@ -35,15 +36,13 @@ export default function LoginPage() {
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#F6F0FA] px-4 py-12">
-      <div className="w-full max-w-md rounded-3xl border border-[#EAE0F2] bg-white p-8 shadow-xl sm:p-10">
+    <main className="flex min-h-screen items-center justify-center bg-theme-canvas px-4 py-12">
+      <div className="w-full max-w-md rounded-3xl border border-theme-border bg-theme-card p-8 shadow-xl sm:p-10">
         <div className="mb-8 flex items-center gap-3.5">
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#6B3B66] text-white shadow-sm">
-            <FaIcon icon="fa-solid fa-shield-halved" className="text-lg" />
-          </div>
+          <BrandLogo className="h-12 w-12 rounded-2xl shadow-sm" />
           <div>
-            <div className="alata-regular text-xs tracking-[0.2em] text-[#6B3B66] uppercase">ONSTA</div>
-            <div className="text-sm text-[#64748B]">Clinic partner portal</div>
+            <div className="alata-regular text-xs tracking-[0.2em] text-theme-primary uppercase">ONSTA</div>
+            <div className="text-sm text-theme-muted">Clinic partner portal</div>
           </div>
         </div>
 
@@ -54,8 +53,8 @@ export default function LoginPage() {
           </p>
         )}
 
-        <h1 className="alata-regular text-3xl text-[#1E1B2E]">Clinic sign in</h1>
-        <p className="mt-2 text-sm text-[#64748B]">
+        <h1 className="alata-regular text-3xl text-theme-ink">Clinic sign in</h1>
+        <p className="mt-2 text-sm text-theme-muted">
           Your account role and clinic access are checked securely after sign in.
         </p>
 
@@ -67,39 +66,39 @@ export default function LoginPage() {
         )}
 
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
-          <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B]">
+          <label className="block text-xs font-semibold uppercase tracking-wider text-theme-muted">
             Email address
             <div className="relative mt-1.5">
-              <FaIcon icon="fa-regular fa-envelope" className="absolute left-3.5 top-3.5 text-sm text-[#64748B]" />
+              <FaIcon icon="fa-regular fa-envelope" className="absolute left-3.5 top-3.5 text-sm text-theme-muted" />
               <input
                 required
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="clinic@example.ae"
-                className="w-full rounded-xl border border-[#EAE0F2] bg-[#F8FAFC] py-2.5 pl-10 pr-3.5 text-sm font-normal text-[#1E1B2E] outline-none transition focus:border-[#6B3B66] focus:bg-white focus:ring-2 focus:ring-[#6B3B66]/15"
+                className="w-full rounded-xl border border-theme-border bg-theme-surface py-2.5 pl-10 pr-3.5 text-sm font-normal text-theme-ink outline-none transition focus:border-theme-primary focus:bg-theme-card focus:ring-2 focus:ring-theme-primary/15"
               />
             </div>
           </label>
 
-          <label className="block text-xs font-semibold uppercase tracking-wider text-[#64748B]">
+          <label className="block text-xs font-semibold uppercase tracking-wider text-theme-muted">
             Password
             <div className="relative mt-1.5">
-              <FaIcon icon="fa-solid fa-lock" className="absolute left-3.5 top-3.5 text-sm text-[#64748B]" />
+              <FaIcon icon="fa-solid fa-lock" className="absolute left-3.5 top-3.5 text-sm text-theme-muted" />
               <input
                 required
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full rounded-xl border border-[#EAE0F2] bg-[#F8FAFC] py-2.5 pl-10 pr-3.5 text-sm font-normal text-[#1E1B2E] outline-none transition focus:border-[#6B3B66] focus:bg-white focus:ring-2 focus:ring-[#6B3B66]/15"
+                className="w-full rounded-xl border border-theme-border bg-theme-surface py-2.5 pl-10 pr-3.5 text-sm font-normal text-theme-ink outline-none transition focus:border-theme-primary focus:bg-theme-card focus:ring-2 focus:ring-theme-primary/15"
               />
             </div>
           </label>
 
           <button
             disabled={busy}
-            className="mt-2 flex w-full items-center justify-center gap-2 rounded-full bg-[#6B3B66] py-3 text-sm alata-regular text-white shadow-sm transition hover:bg-[#552B51] disabled:opacity-60"
+            className="mt-2 flex w-full items-center justify-center gap-2 rounded-full bg-theme-primary py-3 text-sm alata-regular text-white shadow-sm transition hover:bg-theme-primary-hover disabled:opacity-60"
           >
             {busy ? (
               <>
@@ -115,16 +114,16 @@ export default function LoginPage() {
           </button>
         </form>
 
-        <div className="mt-6 border-t border-[#EAE0F2] pt-5 text-center text-sm text-[#64748B]">
+        <div className="mt-6 border-t border-theme-border pt-5 text-center text-sm text-theme-muted">
           New to ONSTA?{' '}
-          <Link to="/register" className="alata-regular text-[#6B3B66] hover:text-[#552B51] hover:underline">
+          <Link to="/register" className="alata-regular text-theme-primary hover:text-theme-primary-hover hover:underline">
             Register your clinic
           </Link>
         </div>
 
-        <p className="mt-3 text-center text-xs text-[#64748B]">
+        <p className="mt-3 text-center text-xs text-theme-muted">
           Super Admins use the{' '}
-          <a href={adminPortalUrl} className="alata-regular text-[#6B3B66] underline hover:text-[#552B51]">
+          <a href={adminPortalUrl} className="alata-regular text-theme-primary underline hover:text-theme-primary-hover">
             admin portal
           </a>
           .

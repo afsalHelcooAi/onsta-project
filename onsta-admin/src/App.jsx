@@ -28,7 +28,7 @@ export default function App() {
   if (!admin) return <AdminLogin onSignedIn={setAdmin} />;
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-[#F6F0FA] text-[#1E1B2E]">
+    <div className="flex h-screen w-screen overflow-hidden bg-theme-canvas text-theme-ink">
       <AdminSidebar activeTab={activeTab} setActiveTab={setActiveTab} pendingCount={0} onSignOut={() => { localStorage.removeItem('onsta_access_token'); setAdmin(null); }} />
       {activeTab === 'overview' && <Overview onNavigate={setActiveTab} />}
       {activeTab === 'review-queue' && <ClinicReviewQueue />}

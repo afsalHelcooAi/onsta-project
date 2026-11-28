@@ -11,6 +11,7 @@ import {
 } from '../../api/doctorApi';
 import DoctorAvatar from '../common/DoctorAvatar';
 import FaIcon from '../common/FaIcon';
+import ModalPortal from '../common/ModalPortal';
 
 export default function DoctorsManagement() {
   const {
@@ -423,16 +424,16 @@ export default function DoctorsManagement() {
   return (
     <div className="space-y-6 animate-fadeIn pb-12">
       {/* Title & Actions */}
-      <div className="bg-white rounded-3xl border border-[#EAE0F2] p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="bg-theme-card rounded-3xl border border-theme-border p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-3.5">
-          <div className="w-11 h-11 rounded-2xl bg-[#F0E6F6] text-[#6B3B66] flex items-center justify-center flex-shrink-0">
+          <div className="w-11 h-11 rounded-2xl bg-theme-primary-soft text-theme-primary flex items-center justify-center flex-shrink-0">
             <FaIcon icon="fa-solid fa-user-doctor" className="text-lg" />
           </div>
           <div>
-            <h1 className="text-2xl sm:text-3xl alata-regular text-[#1E1B2E] tracking-tight">
+            <h1 className="text-2xl sm:text-3xl alata-regular text-theme-ink tracking-tight">
               Our Doctors & Clinical Team
             </h1>
-            <p className="text-xs text-[#64748B] mt-0.5">
+            <p className="text-xs text-theme-muted mt-0.5">
               Manage licensed medical practitioners. Upload practice licences to auto-extract credentials instantly.
             </p>
           </div>
@@ -441,7 +442,7 @@ export default function DoctorsManagement() {
         <button
           type="button"
           onClick={openAddModal}
-          className="px-5 py-2.5 rounded-full bg-[#6B3B66] text-white hover:bg-[#552B51] text-xs alata-regular flex items-center gap-2 transition-all shadow-sm hover:shadow-md self-start sm:self-center"
+          className="px-5 py-2.5 rounded-full bg-theme-primary text-white hover:bg-theme-primary-hover text-xs alata-regular flex items-center gap-2 transition-all shadow-sm hover:shadow-md self-start sm:self-center"
         >
           <FaIcon icon="fa-solid fa-plus" className="text-xs" />
           <span>Add New Doctor</span>
@@ -449,25 +450,25 @@ export default function DoctorsManagement() {
       </div>
 
       {/* Filters and Search Bar */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-white p-4 rounded-2xl border border-[#EAE0F2] shadow-sm">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 bg-theme-card p-4 rounded-2xl border border-theme-border shadow-sm">
         <div className="relative flex-1">
-          <FaIcon icon="fa-solid fa-magnifying-glass" className="text-xs text-[#94A3B8] absolute left-4 top-1/2 -translate-y-1/2" />
+          <FaIcon icon="fa-solid fa-magnifying-glass" className="text-xs text-theme-subtle absolute left-4 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             placeholder="Search by doctor name, DHA licence no, or treatment service..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] text-xs text-[#1E1B2E] focus:outline-none focus:bg-white focus:ring-2 focus:ring-[#6B3B66]/30 focus:border-[#6B3B66]"
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-theme-border-slate bg-theme-surface text-xs text-theme-ink focus:outline-none focus:bg-theme-card focus:ring-2 focus:ring-theme-primary/30 focus:border-theme-primary"
           />
         </div>
 
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <span className="text-xs text-[#64748B] font-medium">Service:</span>
+            <span className="text-xs text-theme-muted font-medium">Service:</span>
             <select
               value={selectedService}
               onChange={(e) => setSelectedService(e.target.value)}
-              className="px-3 py-2 rounded-xl border border-[#E2E8F0] text-xs text-[#1E1B2E] bg-[#F8FAFC] focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/30 focus:border-[#6B3B66] max-w-[220px]"
+              className="px-3 py-2 rounded-xl border border-theme-border-slate text-xs text-theme-ink bg-theme-surface focus:outline-none focus:ring-2 focus:ring-theme-primary/30 focus:border-theme-primary max-w-[220px]"
             >
               {serviceFilterOptions.map((s) => (
                 <option key={s} value={s}>{s}</option>
@@ -476,12 +477,12 @@ export default function DoctorsManagement() {
           </div>
 
           {/* View Mode Switcher */}
-          <div className="hidden sm:flex items-center bg-[#F6F0FA] p-1 rounded-xl border border-[#EAE0F2]">
+          <div className="hidden sm:flex items-center bg-theme-canvas p-1 rounded-xl border border-theme-border">
             <button
               type="button"
               onClick={() => setViewMode('grid')}
               className={`px-2.5 py-1.5 rounded-lg text-xs transition-all ${
-                viewMode === 'grid' ? 'bg-white shadow-xs text-[#6B3B66]' : 'text-[#94A3B8] hover:text-[#1E1B2E]'
+                viewMode === 'grid' ? 'bg-theme-card shadow-xs text-theme-primary' : 'text-theme-subtle hover:text-theme-ink'
               }`}
               title="Cards view"
             >
@@ -491,7 +492,7 @@ export default function DoctorsManagement() {
               type="button"
               onClick={() => setViewMode('table')}
               className={`px-2.5 py-1.5 rounded-lg text-xs transition-all ${
-                viewMode === 'table' ? 'bg-white shadow-xs text-[#6B3B66]' : 'text-[#94A3B8] hover:text-[#1E1B2E]'
+                viewMode === 'table' ? 'bg-theme-card shadow-xs text-theme-primary' : 'text-theme-subtle hover:text-theme-ink'
               }`}
               title="Table view"
             >
@@ -501,12 +502,12 @@ export default function DoctorsManagement() {
         </div>
       </div>
 
-      {/* Doctors List: Cards View (Polyclinic.ae Inspiration) or Table View */}
+      {/* Doctors List: Cards View or Table View */}
       {viewMode === 'table' ? (
-        <div className="bg-white rounded-3xl border border-[#EAE0F2] overflow-hidden shadow-sm">
+        <div className="bg-theme-card rounded-3xl border border-theme-border overflow-hidden shadow-sm">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-[#F6F0FA] border-b border-[#EAE0F2] text-[#552B51] alata-regular uppercase tracking-wider text-[11px]">
+              <thead className="bg-theme-canvas border-b border-theme-border text-theme-primary-hover alata-regular uppercase tracking-wider text-[11px]">
                 <tr>
                   <th className="py-3.5 px-5">Doctor / Specialist</th>
                   <th className="py-3.5 px-4">Authority & Licence</th>
@@ -516,31 +517,31 @@ export default function DoctorsManagement() {
                   <th className="py-3.5 px-4 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[#F1EDF6]">
+              <tbody className="divide-y divide-theme-border">
                 {filteredDoctors.map((doc) => (
-                  <tr key={doc.id} className="hover:bg-[#F8FAFC] transition-colors">
+                  <tr key={doc.id} className="hover:bg-theme-surface transition-colors">
                     <td className="py-3.5 px-5">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0">
                           <DoctorAvatar photo={doc.photo} name={doc.fullName} className="w-10 h-10" iconSize="text-sm" />
                         </div>
                         <div>
-                          <div className="alata-regular text-[#1E1B2E] text-sm">{doc.fullName}</div>
-                          <div className="text-[11px] text-[#6B3B66] font-medium">{doc.title || doc.specialty}</div>
+                          <div className="alata-regular text-theme-ink text-sm">{doc.fullName}</div>
+                          <div className="text-[11px] text-theme-primary font-medium">{doc.title || doc.specialty}</div>
                         </div>
                       </div>
                     </td>
                     <td className="py-3.5 px-4">
-                      <span className="alata-regular text-[#1E1B2E] bg-[#F8FAFC] px-2.5 py-0.5 rounded-lg border border-[#E2E8F0] text-[11px]">
+                      <span className="alata-regular text-theme-ink bg-theme-surface px-2.5 py-0.5 rounded-lg border border-theme-border-slate text-[11px]">
                         {doc.licenceNumber}
                       </span>
-                      <div className="text-[10px] text-[#64748B] mt-0.5">{doc.authority || 'DHA'} Licensed</div>
+                      <div className="text-[10px] text-theme-muted mt-0.5">{doc.authority || 'DHA'} Licensed</div>
                     </td>
                     <td className="py-3.5 px-4">
                       <select
                         value={doc.service || ''}
                         onChange={(e) => handleServiceChange(doc, e.target.value)}
-                        className="w-full text-xs py-1.5 px-2.5 rounded-xl border border-[#E2E8F0] bg-white hover:border-[#DECBE9] font-medium text-[#1E1B2E] focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/30 cursor-pointer"
+                        className="w-full text-xs py-1.5 px-2.5 rounded-xl border border-theme-border-slate bg-theme-card hover:border-theme-border-strong font-medium text-theme-ink focus:outline-none focus:ring-2 focus:ring-theme-primary/30 cursor-pointer"
                       >
                         <option value="">Unassigned</option>
                         {clinicServiceNames.map((s) => (
@@ -548,7 +549,7 @@ export default function DoctorsManagement() {
                         ))}
                       </select>
                     </td>
-                    <td className="py-3.5 px-4 alata-regular text-[#6B3B66] text-sm">
+                    <td className="py-3.5 px-4 alata-regular text-theme-primary text-sm">
                       {doc.consultationFee ? `${doc.consultationFee} AED` : '—'}
                     </td>
                     <td className="py-3.5 px-4">
@@ -558,7 +559,7 @@ export default function DoctorsManagement() {
                         className={`text-[11px] alata-regular px-3 py-1 rounded-full transition-colors ${
                           doc.isActive
                             ? 'bg-[#DCFCE7] text-[#166534] hover:bg-[#BBF7D0]'
-                            : 'bg-[#F1F5F9] text-[#475569] hover:bg-[#E2E8F0]'
+                            : 'bg-theme-surface-muted text-theme-muted hover:bg-theme-border-slate'
                         }`}
                       >
                         {doc.isActive ? 'Active' : 'Inactive'}
@@ -569,7 +570,7 @@ export default function DoctorsManagement() {
                         <button
                           type="button"
                           onClick={() => openEditModal(doc)}
-                          className="w-8 h-8 rounded-xl text-[#64748B] hover:text-[#6B3B66] hover:bg-[#F6F0FA] flex items-center justify-center transition-colors"
+                          className="w-8 h-8 rounded-xl text-theme-muted hover:text-theme-primary hover:bg-theme-canvas flex items-center justify-center transition-colors"
                           title="Edit doctor"
                         >
                           <FaIcon icon="fa-solid fa-pen-to-square" className="text-xs" />
@@ -577,7 +578,7 @@ export default function DoctorsManagement() {
                         <button
                           type="button"
                           onClick={() => handleDelete(doc)}
-                          className="w-8 h-8 rounded-xl text-[#94A3B8] hover:text-[#991B1B] hover:bg-[#FEE2E2] flex items-center justify-center transition-colors"
+                          className="w-8 h-8 rounded-xl text-theme-subtle hover:text-[#991B1B] hover:bg-[#FEE2E2] flex items-center justify-center transition-colors"
                           title="Delete doctor"
                         >
                           <FaIcon icon="fa-solid fa-trash-can" className="text-xs" />
@@ -591,25 +592,25 @@ export default function DoctorsManagement() {
           </div>
         </div>
       ) : (
-        /* Doctors Grid (Polyclinic.ae Luxury Card Style) */
+        /* Doctors Grid */
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredDoctors.map((doc) => {
             const langTags = getLanguageTags(doc.languages);
             return (
               <div
                 key={doc.id}
-                className={`bg-white rounded-3xl border p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between ${
-                  doc.isActive ? 'border-[#EAE0F2] hover:border-[#DECBE9]' : 'border-[#E2E8F0] opacity-75'
+                className={`bg-theme-card rounded-3xl border p-5 shadow-sm hover:shadow-md transition-all flex flex-col justify-between ${
+                  doc.isActive ? 'border-theme-border hover:border-theme-border-strong' : 'border-theme-border-slate opacity-75'
                 }`}
               >
                 <div>
-                  {/* Top Portrait & Language Tags (Inspired by Polyclinic.ae Screenshot 3) */}
-                  <div className="relative rounded-2xl bg-[#F8FAFC] border border-[#F1F5F9] p-4 flex items-center gap-4">
+                  {/* Top Portrait & Language Tags */}
+                  <div className="relative rounded-2xl bg-theme-surface border border-theme-surface-muted p-4 flex items-center gap-4">
                     <div className="relative w-16 h-16 rounded-2xl overflow-hidden flex-shrink-0">
                       <DoctorAvatar photo={doc.photo} name={doc.fullName} className="w-full h-full" iconSize="text-xl" />
                       <span
                         className={`absolute bottom-0 right-0 w-3.5 h-3.5 rounded-full border-2 border-white ${
-                          doc.isActive ? 'bg-[#16A34A]' : 'bg-[#94A3B8]'
+                          doc.isActive ? 'bg-[#16A34A]' : 'bg-theme-subtle'
                         }`}
                       />
                     </div>
@@ -620,19 +621,19 @@ export default function DoctorsManagement() {
                           <span
                             key={lt.code}
                             title={lt.label}
-                            className="px-1.5 py-0.5 rounded bg-white border border-[#E2E8F0] text-[9px] alata-regular text-[#475569]"
+                            className="px-1.5 py-0.5 rounded bg-theme-card border border-theme-border-slate text-[9px] alata-regular text-theme-muted"
                           >
                             {lt.code}
                           </span>
                         ))}
                       </div>
-                      <h3 className="text-base alata-regular text-[#1E1B2E] truncate">
+                      <h3 className="text-base alata-regular text-theme-ink truncate">
                         {doc.fullName}
                       </h3>
-                      <p className="text-xs text-[#64748B] truncate mt-0.5">
+                      <p className="text-xs text-theme-muted truncate mt-0.5">
                         {doc.title || 'Medical Specialist'}
                       </p>
-                      <span className="inline-block mt-1.5 px-2.5 py-0.5 rounded-full bg-[#F0E6F6] text-[#6B3B66] text-[10px] alata-regular truncate max-w-full">
+                      <span className="inline-block mt-1.5 px-2.5 py-0.5 rounded-full bg-theme-primary-soft text-theme-primary text-[10px] alata-regular truncate max-w-full">
                         {doc.specialty}
                       </span>
                     </div>
@@ -640,20 +641,20 @@ export default function DoctorsManagement() {
 
                   {/* Verified Credentials & Service Details */}
                   <div className="mt-4 space-y-2.5 text-xs">
-                    <div className="flex items-center justify-between bg-[#F6F0FA] px-3.5 py-2 rounded-xl border border-[#EAE0F2]">
-                      <span className="text-[11px] font-medium text-[#64748B]">
-                        <FaIcon icon="fa-solid fa-id-card-clip" className="mr-1.5 text-[#6B3B66]" />
+                    <div className="flex items-center justify-between bg-theme-canvas px-3.5 py-2 rounded-xl border border-theme-border">
+                      <span className="text-[11px] font-medium text-theme-muted">
+                        <FaIcon icon="fa-solid fa-id-card-clip" className="mr-1.5 text-theme-primary" />
                         {doc.authority || 'DHA'} Licence
                       </span>
-                      <span className="alata-regular text-[#1E1B2E] text-[11px]">{doc.licenceNumber}</span>
+                      <span className="alata-regular text-theme-ink text-[11px]">{doc.licenceNumber}</span>
                     </div>
 
                     <div className="flex items-center justify-between text-[11px] px-1">
-                      <span className="font-medium text-[#64748B]">Assigned Service</span>
+                      <span className="font-medium text-theme-muted">Assigned Service</span>
                       <select
                         value={doc.service || ''}
                         onChange={(e) => handleServiceChange(doc, e.target.value)}
-                        className="text-[11px] py-1 px-2.5 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] font-medium text-[#1E1B2E] max-w-[175px] truncate focus:outline-none focus:ring-1 focus:ring-[#6B3B66]"
+                        className="text-[11px] py-1 px-2.5 rounded-xl border border-theme-border-slate bg-theme-surface font-medium text-theme-ink max-w-[175px] truncate focus:outline-none focus:ring-1 focus:ring-theme-primary"
                       >
                         <option value="">Unassigned</option>
                         {clinicServiceNames.map((s) => (
@@ -663,13 +664,13 @@ export default function DoctorsManagement() {
                     </div>
 
                     <div className="flex items-center justify-between text-[11px] px-1">
-                      <span className="text-[#64748B]">Consultation Fee</span>
-                      <span className="alata-regular text-[#6B3B66] text-xs">{doc.consultationFee} AED</span>
+                      <span className="text-theme-muted">Consultation Fee</span>
+                      <span className="alata-regular text-theme-primary text-xs">{doc.consultationFee} AED</span>
                     </div>
 
                     {doc.licenceExpiry && (
                       <div className="flex items-center justify-between text-[11px] px-1">
-                        <span className="text-[#64748B]">Valid Until</span>
+                        <span className="text-theme-muted">Valid Until</span>
                         <span className="alata-regular text-[#166534]">{doc.licenceExpiry}</span>
                       </div>
                     )}
@@ -677,14 +678,14 @@ export default function DoctorsManagement() {
                 </div>
 
                 {/* Bottom Actions */}
-                <div className="mt-5 pt-3.5 border-t border-[#F1EDF6] flex items-center justify-between">
+                <div className="mt-5 pt-3.5 border-t border-theme-border flex items-center justify-between">
                   <button
                     type="button"
                     onClick={() => handleToggleStatus(doc)}
                     className={`text-[11px] alata-regular px-3 py-1 rounded-full transition-colors ${
                       doc.isActive
                         ? 'bg-[#DCFCE7] text-[#166534] hover:bg-[#BBF7D0]'
-                        : 'bg-[#F1F5F9] text-[#475569] hover:bg-[#E2E8F0]'
+                        : 'bg-theme-surface-muted text-theme-muted hover:bg-theme-border-slate'
                     }`}
                   >
                     {doc.isActive ? 'Active on onsta.ae' : 'Hidden'}
@@ -694,7 +695,7 @@ export default function DoctorsManagement() {
                     <button
                       type="button"
                       onClick={() => openEditModal(doc)}
-                      className="w-8 h-8 rounded-xl text-[#64748B] hover:text-[#6B3B66] hover:bg-[#F6F0FA] flex items-center justify-center transition-colors"
+                      className="w-8 h-8 rounded-xl text-theme-muted hover:text-theme-primary hover:bg-theme-canvas flex items-center justify-center transition-colors"
                       title="Edit doctor"
                     >
                       <FaIcon icon="fa-solid fa-pen-to-square" className="text-xs" />
@@ -702,7 +703,7 @@ export default function DoctorsManagement() {
                     <button
                       type="button"
                       onClick={() => handleDelete(doc)}
-                      className="w-8 h-8 rounded-xl text-[#94A3B8] hover:text-[#991B1B] hover:bg-[#FEE2E2] flex items-center justify-center transition-colors"
+                      className="w-8 h-8 rounded-xl text-theme-subtle hover:text-[#991B1B] hover:bg-[#FEE2E2] flex items-center justify-center transition-colors"
                       title="Remove doctor"
                     >
                       <FaIcon icon="fa-solid fa-trash-can" className="text-xs" />
@@ -716,31 +717,32 @@ export default function DoctorsManagement() {
       )}
 
       {filteredDoctors.length === 0 && (
-        <div className="text-center py-14 bg-white rounded-3xl border border-[#EAE0F2] text-[#64748B]">
-          <div className="w-14 h-14 rounded-2xl bg-[#F6F0FA] text-[#6B3B66] flex items-center justify-center mx-auto mb-3">
+        <div className="text-center py-14 bg-theme-card rounded-3xl border border-theme-border text-theme-muted">
+          <div className="w-14 h-14 rounded-2xl bg-theme-canvas text-theme-primary flex items-center justify-center mx-auto mb-3">
             <FaIcon icon="fa-solid fa-user-doctor" className="text-2xl" />
           </div>
-          <p className="text-base alata-regular text-[#1E1B2E]">No doctors registered yet</p>
-          <p className="text-xs text-[#64748B] mt-1">Click "Add New Doctor" to upload a DHA licence and register your clinical team.</p>
+          <p className="text-base alata-regular text-theme-ink">No doctors registered yet</p>
+          <p className="text-xs text-theme-muted mt-1">Click "Add New Doctor" to upload a DHA licence and register your clinical team.</p>
         </div>
       )}
 
       {/* Add / Edit Doctor Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-[#1A1320]/60 backdrop-blur-sm animate-fadeIn">
-          <div className="bg-white rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden border border-[#EAE0F2] max-h-[92vh] flex flex-col">
+        <ModalPortal>
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto bg-theme-overlay/60 backdrop-blur-sm animate-fadeIn">
+            <div className="my-auto bg-theme-card rounded-3xl shadow-2xl max-w-2xl w-full overflow-hidden border border-theme-border max-h-[92vh] flex flex-col">
 
             {/* Modal Header */}
-            <div className="px-6 py-4 bg-[#1A1320] text-white flex items-center justify-between flex-shrink-0">
+            <div className="px-6 py-4 bg-theme-sidebar-bg text-white flex items-center justify-between flex-shrink-0">
               <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-[#6B3B66] text-white flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-theme-primary text-white flex items-center justify-center">
                   <FaIcon icon="fa-solid fa-user-doctor" className="text-sm" />
                 </div>
                 <div>
                   <h3 className="alata-regular text-base">
                     {editingDoctor ? 'Edit Doctor Profile' : 'Add Healthcare Practitioner'}
                   </h3>
-                  <p className="text-[#C7B0D8] text-xs">
+                  <p className="text-theme-sidebar-kicker text-xs">
                     {modalStep === 1 ? 'Step 1: Upload doctor medical licence' : 'Step 2: Review auto-filled details'}
                   </p>
                 </div>
@@ -756,20 +758,20 @@ export default function DoctorsManagement() {
 
             {/* Stepper Tabs */}
             {!editingDoctor && (
-              <div className="grid grid-cols-2 gap-2 p-3 sm:px-6 sm:py-3 bg-[#F6F0FA] border-b border-[#EAE0F2] flex-shrink-0">
+              <div className="grid grid-cols-2 gap-2 p-3 sm:px-6 sm:py-3 bg-theme-canvas border-b border-theme-border flex-shrink-0">
                 <button
                   type="button"
                   onClick={() => setModalStep(1)}
                   className={`rounded-xl px-3.5 py-2 text-left text-xs alata-regular flex items-center gap-2 transition ${
                     modalStep === 1
-                      ? 'bg-[#6B3B66] text-white shadow-sm'
+                      ? 'bg-theme-primary text-white shadow-sm'
                       : scanResult
                       ? 'bg-[#DCFCE7] text-[#166534] hover:bg-[#BBF7D0]'
-                      : 'bg-white text-[#475569] hover:bg-[#F8FAFC]'
+                      : 'bg-theme-card text-theme-muted hover:bg-theme-surface'
                   }`}
                 >
                   <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] alata-regular ${
-                    modalStep === 1 ? 'bg-white/20 text-white' : 'bg-[#F0E6F6] text-[#6B3B66]'
+                    modalStep === 1 ? 'bg-white/20 text-white' : 'bg-theme-primary-soft text-theme-primary'
                   }`}>
                     {scanResult ? '✓' : '1'}
                   </span>
@@ -784,14 +786,14 @@ export default function DoctorsManagement() {
                   disabled={!scanResult}
                   className={`rounded-xl px-3.5 py-2 text-left text-xs alata-regular flex items-center gap-2 transition ${
                     modalStep === 2
-                      ? 'bg-[#6B3B66] text-white shadow-sm'
+                      ? 'bg-theme-primary text-white shadow-sm'
                       : scanResult
-                      ? 'bg-white text-[#1E1B2E] hover:bg-[#F8FAFC] border border-[#EAE0F2]'
-                      : 'bg-[#F1F5F9] text-[#94A3B8] cursor-not-allowed'
+                      ? 'bg-theme-card text-theme-ink hover:bg-theme-surface border border-theme-border'
+                      : 'bg-theme-surface-muted text-theme-subtle cursor-not-allowed'
                   }`}
                 >
                   <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] alata-regular ${
-                    modalStep === 2 ? 'bg-white/20 text-white' : 'bg-[#E2E8F0] text-[#475569]'
+                    modalStep === 2 ? 'bg-white/20 text-white' : 'bg-theme-border-slate text-theme-muted'
                   }`}>
                     2
                   </span>
@@ -813,13 +815,13 @@ export default function DoctorsManagement() {
               <div className="p-6 overflow-y-auto space-y-6 flex-1 flex flex-col justify-between">
                 <div className="space-y-4">
                   <div>
-                    <span className="text-[11px] alata-regular uppercase tracking-wider text-[#6B3B66]">
+                    <span className="text-[11px] alata-regular uppercase tracking-wider text-theme-primary">
                       AI Powered Registration
                     </span>
-                    <h2 className="text-xl alata-regular text-[#1E1B2E] mt-0.5">
+                    <h2 className="text-xl alata-regular text-theme-ink mt-0.5">
                       Upload Medical Practice Licence
                     </h2>
-                    <p className="text-xs text-[#64748B] mt-1 leading-relaxed">
+                    <p className="text-xs text-theme-muted mt-1 leading-relaxed">
                       Upload the doctor's UAE healthcare professional licence (DHA, DoH Abu Dhabi, or MOHAP). Our AI scanner extracts credentials automatically.
                     </p>
                   </div>
@@ -836,22 +838,22 @@ export default function DoctorsManagement() {
                     onClick={() => !isScanning && licenseInputRef.current?.click()}
                     className={`border-2 border-dashed rounded-3xl p-8 sm:p-10 text-center cursor-pointer transition-all flex flex-col items-center justify-center min-h-[220px] ${
                       isScanning
-                        ? 'border-[#6B3B66] bg-[#F6F0FA] cursor-wait'
+                        ? 'border-theme-primary bg-theme-canvas cursor-wait'
                         : scanResult
                         ? 'border-[#16A34A] bg-[#F0FDF4]'
-                        : 'border-[#DECBE9] hover:border-[#6B3B66] hover:bg-[#F6F0FA]/60 bg-[#F8FAFC]'
+                        : 'border-theme-border-strong hover:border-theme-primary hover:bg-theme-canvas/60 bg-theme-surface'
                     }`}
                   >
                     {isScanning ? (
                       <div className="flex flex-col items-center space-y-3">
-                        <div className="w-12 h-12 rounded-2xl bg-[#F0E6F6] text-[#6B3B66] flex items-center justify-center">
+                        <div className="w-12 h-12 rounded-2xl bg-theme-primary-soft text-theme-primary flex items-center justify-center">
                           <FaIcon icon="fa-solid fa-spinner fa-spin" className="text-2xl" />
                         </div>
                         <div>
-                          <p className="text-sm alata-regular text-[#1E1B2E]">
+                          <p className="text-sm alata-regular text-theme-ink">
                             AI Analyzing Medical Licence...
                           </p>
-                          <p className="text-xs text-[#64748B] mt-0.5">
+                          <p className="text-xs text-theme-muted mt-0.5">
                             Extracting full name, licence number, specialty, and authority.
                           </p>
                         </div>
@@ -869,20 +871,20 @@ export default function DoctorsManagement() {
                             {scannedFileName || 'Medical Licence File'} • {scanResult.authority || 'DHA'} Verified
                           </p>
                         </div>
-                        <span className="text-xs text-[#64748B] underline pt-1">
+                        <span className="text-xs text-theme-muted underline pt-1">
                           Click to upload a different file
                         </span>
                       </div>
                     ) : (
                       <div className="flex flex-col items-center space-y-3">
-                        <div className="w-12 h-12 rounded-2xl bg-[#F0E6F6] text-[#6B3B66] flex items-center justify-center border border-[#DECBE9]">
+                        <div className="w-12 h-12 rounded-2xl bg-theme-primary-soft text-theme-primary flex items-center justify-center border border-theme-border-strong">
                           <FaIcon icon="fa-solid fa-cloud-arrow-up" className="text-xl" />
                         </div>
                         <div>
-                          <p className="text-sm alata-regular text-[#1E1B2E]">
-                            Drop licence document here, or <span className="text-[#6B3B66] underline">browse</span>
+                          <p className="text-sm alata-regular text-theme-ink">
+                            Drop licence document here, or <span className="text-theme-primary underline">browse</span>
                           </p>
-                          <p className="text-xs text-[#94A3B8] mt-1">
+                          <p className="text-xs text-theme-subtle mt-1">
                             Supports PDF, JPEG, PNG • DHA, DoH, MOHAP Licences (Up to 15MB)
                           </p>
                         </div>
@@ -891,12 +893,12 @@ export default function DoctorsManagement() {
                   </div>
 
                   {/* Quick Test Option */}
-                  <div className="flex items-center justify-between p-4 bg-[#F8FAFC] rounded-2xl border border-[#E2E8F0]">
+                  <div className="flex items-center justify-between p-4 bg-theme-surface rounded-2xl border border-theme-border-slate">
                     <div className="flex items-center gap-2.5">
-                      <FaIcon icon="fa-solid fa-wand-magic-sparkles" className="text-[#6B3B66] text-base" />
+                      <FaIcon icon="fa-solid fa-wand-magic-sparkles" className="text-theme-primary text-base" />
                       <div>
-                        <p className="text-xs alata-regular text-[#1E1B2E]">Don't have a licence file handy?</p>
-                        <p className="text-[11px] text-[#64748B]">Test the auto-fill flow with a sample DHA licence.</p>
+                        <p className="text-xs alata-regular text-theme-ink">Don't have a licence file handy?</p>
+                        <p className="text-[11px] text-theme-muted">Test the auto-fill flow with a sample DHA licence.</p>
                       </div>
                     </div>
 
@@ -904,7 +906,7 @@ export default function DoctorsManagement() {
                       type="button"
                       disabled={isScanning}
                       onClick={handleSampleDhaLicense}
-                      className="px-4 py-1.5 bg-white text-[#6B3B66] border border-[#DECBE9] hover:bg-[#F6F0FA] rounded-full text-xs alata-regular transition-colors disabled:opacity-50"
+                      className="px-4 py-1.5 bg-theme-card text-theme-primary border border-theme-border-strong hover:bg-theme-canvas rounded-full text-xs alata-regular transition-colors disabled:opacity-50"
                     >
                       Try Sample Licence
                     </button>
@@ -912,11 +914,11 @@ export default function DoctorsManagement() {
                 </div>
 
                 {/* Footer buttons for Step 1 */}
-                <div className="pt-4 border-t border-[#F1EDF6] flex items-center justify-between">
+                <div className="pt-4 border-t border-theme-border flex items-center justify-between">
                   <button
                     type="button"
                     onClick={() => setIsModalOpen(false)}
-                    className="px-4 py-2 rounded-full border border-[#E2E8F0] text-[#475569] text-xs font-medium hover:bg-[#F8FAFC]"
+                    className="px-4 py-2 rounded-full border border-theme-border-slate text-theme-muted text-xs font-medium hover:bg-theme-surface"
                   >
                     Cancel
                   </button>
@@ -925,7 +927,7 @@ export default function DoctorsManagement() {
                     <button
                       type="button"
                       onClick={() => setModalStep(2)}
-                      className="px-5 py-2.5 rounded-full bg-[#6B3B66] text-white text-xs alata-regular hover:bg-[#552B51] shadow-sm flex items-center gap-2 transition-all"
+                      className="px-5 py-2.5 rounded-full bg-theme-primary text-white text-xs alata-regular hover:bg-theme-primary-hover shadow-sm flex items-center gap-2 transition-all"
                     >
                       <span>Continue to Doctor Details</span>
                       <FaIcon icon="fa-solid fa-chevron-right" className="text-[10px]" />
@@ -968,17 +970,17 @@ export default function DoctorsManagement() {
 
                 {/* SECTION 1: ESSENTIAL REQUIRED FIELDS */}
                 <div className="space-y-4">
-                  <div className="flex items-center justify-between pb-2 border-b border-[#F1EDF6]">
-                    <h4 className="text-xs alata-regular uppercase tracking-wider text-[#1E1B2E] flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-[#6B3B66]" />
+                  <div className="flex items-center justify-between pb-2 border-b border-theme-border">
+                    <h4 className="text-xs alata-regular uppercase tracking-wider text-theme-ink flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-theme-primary" />
                       Essential Details (Required)
                     </h4>
-                    <span className="text-[10px] text-[#94A3B8] font-medium">* Required for discovery</span>
+                    <span className="text-[10px] text-theme-subtle font-medium">* Required for discovery</span>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-semibold text-[#1E1B2E] mb-1">
+                      <label className="block text-xs font-semibold text-theme-ink mb-1">
                         Doctor Full Name *
                       </label>
                       <input
@@ -987,12 +989,12 @@ export default function DoctorsManagement() {
                         value={formData.fullName}
                         onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                         placeholder="e.g. Dr. Sarah Al Mansoori"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] text-xs text-[#1E1B2E] font-semibold focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/30 focus:border-[#6B3B66]"
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-theme-border-slate text-xs text-theme-ink font-semibold focus:outline-none focus:ring-2 focus:ring-theme-primary/30 focus:border-theme-primary"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-[#1E1B2E] mb-1">
+                      <label className="block text-xs font-semibold text-theme-ink mb-1">
                         Medical Licence Number *
                       </label>
                       <input
@@ -1001,12 +1003,12 @@ export default function DoctorsManagement() {
                         value={formData.licenceNumber}
                         onChange={(e) => setFormData({ ...formData, licenceNumber: e.target.value })}
                         placeholder="e.g. DHA-P-0091823"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] text-xs alata-regular text-[#1E1B2E] focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/30 focus:border-[#6B3B66]"
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-theme-border-slate text-xs alata-regular text-theme-ink focus:outline-none focus:ring-2 focus:ring-theme-primary/30 focus:border-theme-primary"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-[#1E1B2E] mb-1">
+                      <label className="block text-xs font-semibold text-theme-ink mb-1">
                         Primary Medical Specialty *
                       </label>
                       <input
@@ -1015,12 +1017,12 @@ export default function DoctorsManagement() {
                         value={formData.specialty}
                         onChange={(e) => setFormData({ ...formData, specialty: e.target.value })}
                         placeholder="e.g. Dermatology & Aesthetic Medicine"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] text-xs text-[#1E1B2E] font-semibold focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/30 focus:border-[#6B3B66]"
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-theme-border-slate text-xs text-theme-ink font-semibold focus:outline-none focus:ring-2 focus:ring-theme-primary/30 focus:border-theme-primary"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-[#1E1B2E] mb-1">
+                      <label className="block text-xs font-semibold text-theme-ink mb-1">
                         Consultation Fee (AED) *
                       </label>
                       <input
@@ -1030,18 +1032,18 @@ export default function DoctorsManagement() {
                         value={formData.consultationFee}
                         onChange={(e) => setFormData({ ...formData, consultationFee: e.target.value })}
                         placeholder="e.g. 350"
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] text-xs alata-regular text-[#1E1B2E] focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/30 focus:border-[#6B3B66]"
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-theme-border-slate text-xs alata-regular text-theme-ink focus:outline-none focus:ring-2 focus:ring-theme-primary/30 focus:border-theme-primary"
                       />
                     </div>
 
                     <div className="sm:col-span-2">
-                      <label className="block text-xs font-semibold text-[#1E1B2E] mb-1">
+                      <label className="block text-xs font-semibold text-theme-ink mb-1">
                         Assigned Service
                       </label>
                       <select
                         value={formData.service}
                         onChange={(e) => setFormData({ ...formData, service: e.target.value })}
-                        className="w-full px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] text-xs font-medium text-[#1E1B2E] bg-white focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/30 focus:border-[#6B3B66]"
+                        className="w-full px-3.5 py-2.5 rounded-xl border border-theme-border-slate text-xs font-medium text-theme-ink bg-theme-card focus:outline-none focus:ring-2 focus:ring-theme-primary/30 focus:border-theme-primary"
                       >
                         <option value="">Unassigned (Assign now or later from roster)</option>
                         {clinicServiceNames.map((s) => (
@@ -1053,23 +1055,23 @@ export default function DoctorsManagement() {
                 </div>
 
                 {/* SECTION 2: OPTIONAL PRACTICE & PROFILE DETAILS */}
-                <div className="space-y-4 pt-2 border-t border-[#F1EDF6]">
-                  <div className="flex items-center justify-between pb-2 border-b border-[#F1EDF6]">
-                    <h4 className="text-xs alata-regular uppercase tracking-wider text-[#64748B] flex items-center gap-2">
-                      <span className="w-2 h-2 rounded-full bg-[#DECBE9]" />
+                <div className="space-y-4 pt-2 border-t border-theme-border">
+                  <div className="flex items-center justify-between pb-2 border-b border-theme-border">
+                    <h4 className="text-xs alata-regular uppercase tracking-wider text-theme-muted flex items-center gap-2">
+                      <span className="w-2 h-2 rounded-full bg-theme-border-strong" />
                       Additional Profile Details (Optional)
                     </h4>
-                    <span className="text-[10px] text-[#94A3B8]">Can be added anytime</span>
+                    <span className="text-[10px] text-theme-subtle">Can be added anytime</span>
                   </div>
 
                   {/* Headshot Upload */}
-                  <div className="flex items-center gap-4 p-3.5 bg-[#F8FAFC] rounded-2xl border border-[#E2E8F0]">
+                  <div className="flex items-center gap-4 p-3.5 bg-theme-surface rounded-2xl border border-theme-border-slate">
                     <div className="relative w-14 h-14 rounded-2xl overflow-hidden flex-shrink-0 group">
                       <DoctorAvatar photo={formData.photo} name={formData.fullName} className="w-full h-full" iconSize="text-base" />
                       <button
                         type="button"
                         onClick={() => photoInputRef.current?.click()}
-                        className="absolute inset-0 bg-[#1A1320]/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white"
+                        className="absolute inset-0 bg-theme-overlay/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white"
                         title="Upload photo"
                       >
                         <FaIcon icon="fa-solid fa-camera" className="text-sm" />
@@ -1077,8 +1079,8 @@ export default function DoctorsManagement() {
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs alata-regular text-[#1E1B2E]">Doctor Headshot Photo</p>
-                      <p className="text-[11px] text-[#64748B]">Professional portrait shown to patients.</p>
+                      <p className="text-xs alata-regular text-theme-ink">Doctor Headshot Photo</p>
+                      <p className="text-[11px] text-theme-muted">Professional portrait shown to patients.</p>
                       <input
                         type="file"
                         ref={photoInputRef}
@@ -1089,7 +1091,7 @@ export default function DoctorsManagement() {
                       <button
                         type="button"
                         onClick={() => photoInputRef.current?.click()}
-                        className="mt-1 text-xs alata-regular text-[#6B3B66] hover:underline inline-flex items-center gap-1.5"
+                        className="mt-1 text-xs alata-regular text-theme-primary hover:underline inline-flex items-center gap-1.5"
                       >
                         <FaIcon icon="fa-solid fa-upload" className="text-[10px]" />
                         <span>Upload photo</span>
@@ -1099,7 +1101,7 @@ export default function DoctorsManagement() {
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-xs font-semibold text-[#475569] mb-1">
+                      <label className="block text-xs font-semibold text-theme-muted mb-1">
                         Professional Title / Designation
                       </label>
                       <input
@@ -1107,18 +1109,18 @@ export default function DoctorsManagement() {
                         value={formData.title}
                         onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                         placeholder="e.g. Consultant Dermatologist"
-                        className="w-full px-3 py-2 rounded-xl border border-[#E2E8F0] text-xs text-[#1E1B2E] focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/30"
+                        className="w-full px-3 py-2 rounded-xl border border-theme-border-slate text-xs text-theme-ink focus:outline-none focus:ring-2 focus:ring-theme-primary/30"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-[#475569] mb-1">
+                      <label className="block text-xs font-semibold text-theme-muted mb-1">
                         Licensing Authority
                       </label>
                       <select
                         value={formData.authority}
                         onChange={(e) => setFormData({ ...formData, authority: e.target.value })}
-                        className="w-full px-3 py-2 rounded-xl border border-[#E2E8F0] text-xs text-[#1E1B2E] bg-white focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/30"
+                        className="w-full px-3 py-2 rounded-xl border border-theme-border-slate text-xs text-theme-ink bg-theme-card focus:outline-none focus:ring-2 focus:ring-theme-primary/30"
                       >
                         <option value="DHA">Dubai Health Authority (DHA)</option>
                         <option value="DOH">Department of Health Abu Dhabi (DOH)</option>
@@ -1127,19 +1129,19 @@ export default function DoctorsManagement() {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-[#475569] mb-1">
+                      <label className="block text-xs font-semibold text-theme-muted mb-1">
                         Licence Expiry Date
                       </label>
                       <input
                         type="date"
                         value={formData.licenceExpiry}
                         onChange={(e) => setFormData({ ...formData, licenceExpiry: e.target.value })}
-                        className="w-full px-3 py-2 rounded-xl border border-[#E2E8F0] text-xs text-[#1E1B2E] focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/30"
+                        className="w-full px-3 py-2 rounded-xl border border-theme-border-slate text-xs text-theme-ink focus:outline-none focus:ring-2 focus:ring-theme-primary/30"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-[#475569] mb-1">
+                      <label className="block text-xs font-semibold text-theme-muted mb-1">
                         Spoken Languages
                       </label>
                       <input
@@ -1147,12 +1149,12 @@ export default function DoctorsManagement() {
                         value={formData.languages}
                         onChange={(e) => setFormData({ ...formData, languages: e.target.value })}
                         placeholder="e.g. English, Arabic, French"
-                        className="w-full px-3 py-2 rounded-xl border border-[#E2E8F0] text-xs text-[#1E1B2E] focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/30"
+                        className="w-full px-3 py-2 rounded-xl border border-theme-border-slate text-xs text-theme-ink focus:outline-none focus:ring-2 focus:ring-theme-primary/30"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-[#475569] mb-1">
+                      <label className="block text-xs font-semibold text-theme-muted mb-1">
                         Available Schedule
                       </label>
                       <input
@@ -1160,12 +1162,12 @@ export default function DoctorsManagement() {
                         value={formData.availableDays}
                         onChange={(e) => setFormData({ ...formData, availableDays: e.target.value })}
                         placeholder="e.g. Mon, Wed, Fri"
-                        className="w-full px-3 py-2 rounded-xl border border-[#E2E8F0] text-xs text-[#1E1B2E] focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/30"
+                        className="w-full px-3 py-2 rounded-xl border border-theme-border-slate text-xs text-theme-ink focus:outline-none focus:ring-2 focus:ring-theme-primary/30"
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-[#475569] mb-1">
+                      <label className="block text-xs font-semibold text-theme-muted mb-1">
                         Contact Phone
                       </label>
                       <input
@@ -1173,32 +1175,32 @@ export default function DoctorsManagement() {
                         value={formData.phone}
                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                         placeholder="+971 50 123 4567"
-                        className="w-full px-3 py-2 rounded-xl border border-[#E2E8F0] text-xs text-[#1E1B2E] focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/30"
+                        className="w-full px-3 py-2 rounded-xl border border-theme-border-slate text-xs text-theme-ink focus:outline-none focus:ring-2 focus:ring-theme-primary/30"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-[#475569] mb-1">
+                    <label className="block text-xs font-semibold text-theme-muted mb-1">
                       Qualifications Summary
                     </label>
                     <textarea
                       rows={2}
                       value={formData.qualifications}
                       onChange={(e) => setFormData({ ...formData, qualifications: e.target.value })}
-                      className="w-full px-3 py-2 rounded-xl border border-[#E2E8F0] text-xs text-[#1E1B2E] focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/30"
+                      className="w-full px-3 py-2 rounded-xl border border-theme-border-slate text-xs text-theme-ink focus:outline-none focus:ring-2 focus:ring-theme-primary/30"
                       placeholder="e.g. MD, Board Certified Dermatologist, 10+ years aesthetic medicine experience"
                     />
                   </div>
                 </div>
 
                 {/* Modal Footer */}
-                <div className="pt-4 border-t border-[#F1EDF6] flex items-center justify-between flex-shrink-0">
+                <div className="pt-4 border-t border-theme-border flex items-center justify-between flex-shrink-0">
                   {!editingDoctor ? (
                     <button
                       type="button"
                       onClick={() => setModalStep(1)}
-                      className="text-xs text-[#64748B] hover:text-[#1E1B2E] alata-regular flex items-center gap-1.5"
+                      className="text-xs text-theme-muted hover:text-theme-ink alata-regular flex items-center gap-1.5"
                     >
                       <FaIcon icon="fa-solid fa-arrow-left" className="text-[11px]" />
                       <span>Back to Licence Upload</span>
@@ -1211,14 +1213,14 @@ export default function DoctorsManagement() {
                     <button
                       type="button"
                       onClick={() => setIsModalOpen(false)}
-                      className="px-4 py-2 rounded-full border border-[#E2E8F0] text-[#475569] text-xs font-medium hover:bg-[#F8FAFC] transition-colors"
+                      className="px-4 py-2 rounded-full border border-theme-border-slate text-theme-muted text-xs font-medium hover:bg-theme-surface transition-colors"
                     >
                       Cancel
                     </button>
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="px-6 py-2.5 rounded-full bg-[#6B3B66] text-white text-xs alata-regular hover:bg-[#552B51] shadow-sm flex items-center gap-2 disabled:opacity-50 transition-all"
+                      className="px-6 py-2.5 rounded-full bg-theme-primary text-white text-xs alata-regular hover:bg-theme-primary-hover shadow-sm flex items-center gap-2 disabled:opacity-50 transition-all"
                     >
                       <FaIcon icon={isSubmitting ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-circle-check'} />
                       <span>{isSubmitting ? 'Saving...' : editingDoctor ? 'Update Doctor' : 'Save & Add Doctor'}</span>
@@ -1227,8 +1229,9 @@ export default function DoctorsManagement() {
                 </div>
               </form>
             )}
+            </div>
           </div>
-        </div>
+        </ModalPortal>
       )}
     </div>
   );

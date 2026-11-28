@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import FaIcon from './FaIcon';
+import ModalPortal from './ModalPortal';
 import { scanComplianceDocumentApi, submitRenewalRequestApi, renewDocumentCredential } from '../../api/complianceApi';
 import { scanDoctorLicense, renewDoctorLicenseApi } from '../../api/doctorApi';
 
@@ -154,17 +155,18 @@ export default function AIDocumentScanModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#1A1320]/60 backdrop-blur-sm animate-fadeIn">
-      <div className="bg-white rounded-3xl shadow-2xl max-w-xl w-full overflow-hidden border border-[#EAE0F2]">
+    <ModalPortal>
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto bg-theme-overlay/60 backdrop-blur-sm animate-fadeIn">
+        <div className="my-auto bg-theme-card rounded-3xl shadow-2xl max-w-xl w-full max-h-[92vh] overflow-y-auto border border-theme-border">
         {/* Header */}
-        <div className="p-6 bg-[#1A1320] text-white flex items-start justify-between">
+        <div className="p-6 bg-theme-sidebar-bg text-white flex items-start justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#6B3B66] text-white flex items-center justify-center">
+            <div className="w-10 h-10 rounded-xl bg-theme-primary text-white flex items-center justify-center">
               <FaIcon icon="fa-solid fa-microchip" className="text-base" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[11px] alata-regular uppercase tracking-wider text-[#DECBE9] flex items-center gap-1.5">
+                <span className="text-[11px] alata-regular uppercase tracking-wider text-theme-border-strong flex items-center gap-1.5">
                   <FaIcon icon="fa-solid fa-wand-magic-sparkles" /> UAE Regulatory Vision Engine
                 </span>
               </div>
@@ -182,38 +184,38 @@ export default function AIDocumentScanModal({
         </div>
 
         {/* 4-Tier Pipeline Indicator */}
-        <div className="px-6 py-3.5 bg-[#F6F0FA] border-b border-[#EAE0F2]">
+        <div className="px-6 py-3.5 bg-theme-canvas border-b border-theme-border">
           <div className="grid grid-cols-4 gap-2 text-center text-[10px]">
-            <div className={`flex flex-col items-center ${pipelineStep >= 1 ? 'text-[#6B3B66] alata-regular' : 'text-[#94A3B8]'}`}>
+            <div className={`flex flex-col items-center ${pipelineStep >= 1 ? 'text-theme-primary alata-regular' : 'text-theme-subtle'}`}>
               <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs mb-1 ${
-                pipelineStep > 1 ? 'bg-[#16A34A] text-white' : pipelineStep === 1 ? 'bg-[#6B3B66] text-white ring-2 ring-[#DECBE9]' : 'bg-[#E2E8F0] text-[#64748B]'
+                pipelineStep > 1 ? 'bg-[#16A34A] text-white' : pipelineStep === 1 ? 'bg-theme-primary text-white ring-2 ring-theme-border-strong' : 'bg-theme-border-slate text-theme-muted'
               }`}>
                 {pipelineStep > 1 ? <FaIcon icon="fa-solid fa-check" className="text-[10px]" /> : '1'}
               </div>
               <span>Upload Doc</span>
             </div>
 
-            <div className={`flex flex-col items-center ${pipelineStep >= 2 ? 'text-[#6B3B66] alata-regular' : 'text-[#94A3B8]'}`}>
+            <div className={`flex flex-col items-center ${pipelineStep >= 2 ? 'text-theme-primary alata-regular' : 'text-theme-subtle'}`}>
               <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs mb-1 ${
-                pipelineStep > 2 ? 'bg-[#16A34A] text-white' : pipelineStep === 2 ? 'bg-[#6B3B66] text-white ring-2 ring-[#DECBE9]' : 'bg-[#E2E8F0] text-[#64748B]'
+                pipelineStep > 2 ? 'bg-[#16A34A] text-white' : pipelineStep === 2 ? 'bg-theme-primary text-white ring-2 ring-theme-border-strong' : 'bg-theme-border-slate text-theme-muted'
               }`}>
                 {pipelineStep > 2 ? <FaIcon icon="fa-solid fa-check" className="text-[10px]" /> : '2'}
               </div>
               <span>Multimodal AI</span>
             </div>
 
-            <div className={`flex flex-col items-center ${pipelineStep >= 2 ? 'text-[#6B3B66] alata-regular' : 'text-[#94A3B8]'}`}>
+            <div className={`flex flex-col items-center ${pipelineStep >= 2 ? 'text-theme-primary alata-regular' : 'text-theme-subtle'}`}>
               <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs mb-1 ${
-                pipelineStep > 2 ? 'bg-[#16A34A] text-white' : pipelineStep === 2 ? 'bg-[#6B3B66] text-white ring-2 ring-[#DECBE9]' : 'bg-[#E2E8F0] text-[#64748B]'
+                pipelineStep > 2 ? 'bg-[#16A34A] text-white' : pipelineStep === 2 ? 'bg-theme-primary text-white ring-2 ring-theme-border-strong' : 'bg-theme-border-slate text-theme-muted'
               }`}>
                 {pipelineStep > 2 ? <FaIcon icon="fa-solid fa-check" className="text-[10px]" /> : '3'}
               </div>
               <span>Sanity Checks</span>
             </div>
 
-            <div className={`flex flex-col items-center ${pipelineStep === 3 ? 'text-[#6B3B66] alata-regular' : 'text-[#94A3B8]'}`}>
+            <div className={`flex flex-col items-center ${pipelineStep === 3 ? 'text-theme-primary alata-regular' : 'text-theme-subtle'}`}>
               <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs mb-1 ${
-                pipelineStep === 3 ? 'bg-[#6B3B66] text-white ring-2 ring-[#DECBE9]' : 'bg-[#E2E8F0] text-[#64748B]'
+                pipelineStep === 3 ? 'bg-theme-primary text-white ring-2 ring-theme-border-strong' : 'bg-theme-border-slate text-theme-muted'
               }`}>
                 {'4'}
               </div>
@@ -233,7 +235,7 @@ export default function AIDocumentScanModal({
 
           {pipelineStep === 1 && (
             <div className="space-y-4">
-              <div className="border-2 border-dashed border-[#DECBE9] hover:border-[#6B3B66] rounded-3xl p-8 text-center transition-colors bg-[#F8FAFC]">
+              <div className="border-2 border-dashed border-theme-border-strong hover:border-theme-primary rounded-3xl p-8 text-center transition-colors bg-theme-surface">
                 <input
                   type="file"
                   id="renewal-doc-file"
@@ -242,26 +244,26 @@ export default function AIDocumentScanModal({
                   onChange={handleFileChange}
                 />
                 <label htmlFor="renewal-doc-file" className="cursor-pointer block space-y-3">
-                  <div className="w-14 h-14 rounded-2xl bg-[#F0E6F6] flex items-center justify-center mx-auto text-[#6B3B66] border border-[#DECBE9]">
+                  <div className="w-14 h-14 rounded-2xl bg-theme-primary-soft flex items-center justify-center mx-auto text-theme-primary border border-theme-border-strong">
                     <FaIcon icon="fa-solid fa-cloud-arrow-up" className="text-2xl" />
                   </div>
                   <div>
-                    <span className="text-sm alata-regular text-[#1E1B2E] block">
+                    <span className="text-sm alata-regular text-theme-ink block">
                       Click to upload renewed licence file
                     </span>
-                    <span className="text-xs text-[#64748B]">
+                    <span className="text-xs text-theme-muted">
                       Supports PDF original, colour JPEG, or PNG scans (Max 15MB)
                     </span>
                   </div>
-                  <span className="inline-block px-5 py-2 bg-[#6B3B66] text-white text-xs alata-regular rounded-full hover:bg-[#552B51] transition-colors shadow-sm">
+                  <span className="inline-block px-5 py-2 bg-theme-primary text-white text-xs alata-regular rounded-full hover:bg-theme-primary-hover transition-colors shadow-sm">
                     Select File
                   </span>
                 </label>
               </div>
 
-              <div className="p-3.5 bg-[#F6F0FA] rounded-2xl border border-[#EAE0F2] text-xs text-[#64748B] flex items-center justify-between">
+              <div className="p-3.5 bg-theme-canvas rounded-2xl border border-theme-border text-xs text-theme-muted flex items-center justify-between">
                 <span>Current registered licence number:</span>
-                <span className="alata-regular text-[#1E1B2E]">{currentLicenceNumber}</span>
+                <span className="alata-regular text-theme-ink">{currentLicenceNumber}</span>
               </div>
             </div>
           )}
@@ -269,22 +271,22 @@ export default function AIDocumentScanModal({
           {pipelineStep === 2 && (
             <div className="py-8 text-center space-y-5">
               <div className="relative inline-block">
-                <div className="w-16 h-16 rounded-2xl bg-[#F0E6F6] border border-[#DECBE9] flex items-center justify-center text-[#6B3B66] mx-auto shadow-sm">
+                <div className="w-16 h-16 rounded-2xl bg-theme-primary-soft border border-theme-border-strong flex items-center justify-center text-theme-primary mx-auto shadow-sm">
                   <FaIcon icon="fa-solid fa-file-contract" className="text-2xl animate-pulse" />
                 </div>
-                <div className="w-7 h-7 rounded-full bg-white border border-[#EAE0F2] flex items-center justify-center text-[#6B3B66] absolute -bottom-1 -right-1 shadow-xs">
+                <div className="w-7 h-7 rounded-full bg-theme-card border border-theme-border flex items-center justify-center text-theme-primary absolute -bottom-1 -right-1 shadow-xs">
                   <FaIcon icon="fa-solid fa-spinner fa-spin" className="text-xs" />
                 </div>
               </div>
               <div className="space-y-1">
-                <h4 className="text-sm alata-regular text-[#1E1B2E]">
+                <h4 className="text-sm alata-regular text-theme-ink">
                   Multimodal Vision AI Extracting Credentials
                 </h4>
-                <p className="text-xs text-[#64748B] max-w-sm mx-auto">
+                <p className="text-xs text-theme-muted max-w-sm mx-auto">
                   Running multimodal layout OCR, classifying certified subject entity, and checking authority issue stamps...
                 </p>
               </div>
-              <div className="p-3.5 bg-[#F8FAFC] border border-[#E2E8F0] rounded-2xl text-left text-xs text-[#1E1B2E] space-y-2 max-w-md mx-auto">
+              <div className="p-3.5 bg-theme-surface border border-theme-border-slate rounded-2xl text-left text-xs text-theme-ink space-y-2 max-w-md mx-auto">
                 <div className="flex items-center gap-2">
                   <FaIcon icon="fa-solid fa-circle-check" className="text-[#16A34A]" />
                   <span>1. Multimodal Vision AI: Parsed header & issuing authority</span>
@@ -323,65 +325,65 @@ export default function AIDocumentScanModal({
                 </div>
               )}
 
-              <div className="border border-[#EAE0F2] rounded-2xl p-4 bg-[#F8FAFC] space-y-3">
+              <div className="border border-theme-border rounded-2xl p-4 bg-theme-surface space-y-3">
                 {extractedData.doctorName && (
                   <div>
-                    <label className="block text-xs font-semibold text-[#1E1B2E] mb-1 flex items-center gap-1.5">
-                      <FaIcon icon="fa-solid fa-user-doctor" className="text-[#6B3B66]" />
+                    <label className="block text-xs font-semibold text-theme-ink mb-1 flex items-center gap-1.5">
+                      <FaIcon icon="fa-solid fa-user-doctor" className="text-theme-primary" />
                       <span>Doctor / Professional Full Name</span>
                     </label>
                     <input
                       type="text"
                       value={extractedData.doctorName}
                       onChange={(e) => setExtractedData({ ...extractedData, doctorName: e.target.value })}
-                      className="w-full px-3 py-2 text-xs border border-[#E2E8F0] bg-white rounded-xl font-medium focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/30"
+                      className="w-full px-3 py-2 text-xs border border-theme-border-slate bg-theme-card rounded-xl font-medium focus:outline-none focus:ring-2 focus:ring-theme-primary/30"
                     />
                   </div>
                 )}
 
                 <div>
-                  <label className="block text-xs font-semibold text-[#1E1B2E] mb-1 flex items-center gap-1.5">
-                    <FaIcon icon="fa-solid fa-hashtag" className="text-[#6B3B66]" />
+                  <label className="block text-xs font-semibold text-theme-ink mb-1 flex items-center gap-1.5">
+                    <FaIcon icon="fa-solid fa-hashtag" className="text-theme-primary" />
                     <span>Licence Number</span>
                   </label>
                   <input
                     type="text"
                     value={extractedData.documentNumber}
                     onChange={(e) => setExtractedData({ ...extractedData, documentNumber: e.target.value })}
-                    className="w-full px-3 py-2 text-xs border border-[#E2E8F0] bg-white rounded-xl alata-regular focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/30"
+                    className="w-full px-3 py-2 text-xs border border-theme-border-slate bg-theme-card rounded-xl alata-regular focus:outline-none focus:ring-2 focus:ring-theme-primary/30"
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block text-xs font-semibold text-[#1E1B2E] mb-1 flex items-center gap-1.5">
-                      <FaIcon icon="fa-solid fa-building" className="text-[#6B3B66]" />
+                    <label className="block text-xs font-semibold text-theme-ink mb-1 flex items-center gap-1.5">
+                      <FaIcon icon="fa-solid fa-building" className="text-theme-primary" />
                       <span>Issuing Authority</span>
                     </label>
                     <input
                       type="text"
                       value={extractedData.authority}
                       onChange={(e) => setExtractedData({ ...extractedData, authority: e.target.value })}
-                      className="w-full px-3 py-2 text-xs border border-[#E2E8F0] bg-white rounded-xl font-medium focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/30"
+                      className="w-full px-3 py-2 text-xs border border-theme-border-slate bg-theme-card rounded-xl font-medium focus:outline-none focus:ring-2 focus:ring-theme-primary/30"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-[#1E1B2E] mb-1 flex items-center gap-1.5">
-                      <FaIcon icon="fa-regular fa-calendar" className="text-[#6B3B66]" />
+                    <label className="block text-xs font-semibold text-theme-ink mb-1 flex items-center gap-1.5">
+                      <FaIcon icon="fa-regular fa-calendar" className="text-theme-primary" />
                       <span>New Expiry Date</span>
                     </label>
                     <input
                       type="date"
                       value={extractedData.expiryDate}
                       onChange={(e) => setExtractedData({ ...extractedData, expiryDate: e.target.value })}
-                      className="w-full px-3 py-2 text-xs border border-[#E2E8F0] bg-white rounded-xl alata-regular focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/30"
+                      className="w-full px-3 py-2 text-xs border border-theme-border-slate bg-theme-card rounded-xl alata-regular focus:outline-none focus:ring-2 focus:ring-theme-primary/30"
                     />
                   </div>
                 </div>
               </div>
 
-              <p className="text-[11px] text-[#64748B] leading-relaxed">
+              <p className="text-[11px] text-theme-muted leading-relaxed">
                 Review the fields extracted by the backend AI model above. Confirming will submit your renewal to ONSTA Compliance Administration for verification.
               </p>
             </div>
@@ -389,10 +391,10 @@ export default function AIDocumentScanModal({
         </div>
 
         {/* Footer */}
-        <div className="p-4 bg-[#F8FAFC] border-t border-[#EAE0F2] flex justify-between items-center">
+        <div className="p-4 bg-theme-surface border-t border-theme-border flex justify-between items-center">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-xs font-medium text-[#64748B] hover:text-[#1E1B2E] transition-colors"
+            className="px-4 py-2 text-xs font-medium text-theme-muted hover:text-theme-ink transition-colors"
           >
             Cancel
           </button>
@@ -401,7 +403,7 @@ export default function AIDocumentScanModal({
             <button
               onClick={handleConfirmRenewal}
               disabled={isSubmitting}
-              className="px-5 py-2.5 rounded-full bg-[#6B3B66] text-white text-xs alata-regular hover:bg-[#552B51] transition-colors flex items-center gap-2 shadow-sm disabled:opacity-50"
+              className="px-5 py-2.5 rounded-full bg-theme-primary text-white text-xs alata-regular hover:bg-theme-primary-hover transition-colors flex items-center gap-2 shadow-sm disabled:opacity-50"
             >
               {isSubmitting ? (
                 <>
@@ -418,6 +420,7 @@ export default function AIDocumentScanModal({
           )}
         </div>
       </div>
-    </div>
+      </div>
+    </ModalPortal>
   );
 }
