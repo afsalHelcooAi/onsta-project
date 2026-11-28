@@ -11,11 +11,9 @@ from sqlalchemy import text
 from app.api.v1.auth import Actor, get_current_actor
 from app.config import settings
 from app.db.database import SessionLocal
+from app.services.image_utils import optimize_image, ALLOWED_IMAGE_TYPES, MAX_IMAGE_SIZE
 
 router = APIRouter(prefix="/clinic", tags=["Clinic Profile & Media"])
-
-ALLOWED_IMAGE_TYPES = {"image/jpeg", "image/png", "image/webp"}
-MAX_IMAGE_SIZE = 15 * 1024 * 1024  # 15 MB
 
 # MOHAP Compliance: Prohibited Promotional Superlatives under UAE Healthcare Advertising Law
 PROHIBITED_PATTERNS = [
@@ -192,8 +190,8 @@ async def get_clinic_profile(actor: Actor = Depends(get_current_actor)):
             "emirate": branch["emirate"] if branch else "Dubai",
             "cityArea": branch["area"] if branch and branch["area"] else "",
             "address": branch["street_address"] if branch else "",
-            "logo": clinic["logo_storage_key"] or "https://images.unsplash.com/photo-1629909613654-28e377c37b09?w=300&auto=format&fit=crop&q=80",
-            "coverImage": clinic["cover_image_storage_key"] or "https://images.unsplash.com/photo-1629909615184-74f495363b67?w=1200&auto=format&fit=crop&q=80",
+            "logo": clinic["logo_storage_key"] or None,
+            "coverImage": clinic["cover_image_storage_key"] or None,
             "rating": float(clinic["rating"] or 4.9),
             "reviewCount": int(clinic["review_count"] or 142),
             "verificationStatus": clinic["verification_status"],
@@ -298,11 +296,12 @@ async def upload_clinic_media(
             tenant_id = clinic["tenant_id"]
 
             media_id = str(uuid4())
-            safe_name = Path(file.filename or "photo.jpg").name
-            storage_key = f"clinics/{clinic_id}/media/{media_id}-{safe_name}"
+            optimized_bytes, ext = optimize_image(content, max_width=1200, max_height=900)
+            safe_stem = Path(file.filename or "photo").stem[:40]
+            storage_key = f"clinics/{clinic_id}/media/{media_id}-{safe_stem}{ext}"
             dest = Path(settings.LOCAL_UPLOAD_DIR) / storage_key
             dest.parent.mkdir(parents=True, exist_ok=True)
-            dest.write_bytes(content)
+            dest.write_bytes(optimized_bytes)
 
             file_url = f"/uploads/{storage_key}"
 
@@ -444,11 +443,16 @@ async def upload_brand_asset(
             clinic = await resolve_clinic_context(session, actor["id"])
             clinic_id = clinic["clinic_id"]
 
-            safe_name = Path(file.filename or f"{asset_type}.jpg").name
-            storage_key = f"clinics/{clinic_id}/brand/{asset_type}-{uuid4().hex[:6]}-{safe_name}"
+            if asset_type == "logo":
+                optimized_bytes, ext = optimize_image(content, max_width=400, max_height=400, crop_square=True)
+            else:
+                optimized_bytes, ext = optimize_image(content, max_width=1600, max_height=900)
+
+            safe_stem = Path(file.filename or asset_type).stem[:40]
+            storage_key = f"clinics/{clinic_id}/brand/{asset_type}-{uuid4().hex[:6]}-{safe_stem}{ext}"
             dest = Path(settings.LOCAL_UPLOAD_DIR) / storage_key
             dest.parent.mkdir(parents=True, exist_ok=True)
-            dest.write_bytes(content)
+            dest.write_bytes(optimized_bytes)
 
             file_url = f"/uploads/{storage_key}"
             col_name = "logo_storage_key" if asset_type == "logo" else "cover_image_storage_key"
@@ -458,6 +462,26 @@ async def upload_brand_asset(
             """), {"url": file_url, "id": clinic_id})
 
     return {"asset_type": asset_type, "url": file_url}
+
+
+@router.delete("/brand-assets/{asset_type}")
+async def delete_brand_asset(
+    asset_type: str,
+    actor: Actor = Depends(get_current_actor)
+):
+    if asset_type not in {"logo", "cover"}:
+        raise HTTPException(status_code=400, detail="Asset type must be 'logo' or 'cover'.")
+
+    async with SessionLocal() as session:
+        async with session.begin():
+            clinic = await resolve_clinic_context(session, actor["id"])
+            clinic_id = clinic["clinic_id"]
+            col_name = "logo_storage_key" if asset_type == "logo" else "cover_image_storage_key"
+            await session.execute(text(f"""
+                UPDATE clinics SET {col_name} = NULL WHERE id = CAST(:id AS uuid)
+            """), {"id": clinic_id})
+
+    return {"status": "deleted", "asset_type": asset_type}
 
 
 def _calc_days(target_date) -> int:

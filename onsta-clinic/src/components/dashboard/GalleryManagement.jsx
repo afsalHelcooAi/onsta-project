@@ -1,23 +1,120 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useClinic } from '../../context/ClinicContext';
-import { Image as ImageIcon, Plus, Trash2, Eye, EyeOff, CheckCircle2, X, Sparkles, Upload } from 'lucide-react';
+import { Image as ImageIcon, Plus, Trash2, Eye, EyeOff, Star, X, Upload } from 'lucide-react';
+import { uploadClinicMedia, deleteClinicMedia, patchClinicMedia } from '../../api/clinicProfileApi';
 
 export default function GalleryManagement() {
-  const { gallery, addGalleryImage, deleteGalleryImage, toggleGalleryImageActive } = useClinic();
+  const { gallery, setGallery, setClinicData, addGalleryImage, deleteGalleryImage, toggleGalleryImageActive, showToast } = useClinic();
+  const token = localStorage.getItem('onsta_access_token');
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [previewUrl, setPreviewUrl] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const [mohapConfirmed, setMohapConfirmed] = useState(true);
   const [newImage, setNewImage] = useState({
-    url: 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800&auto=format&fit=crop&q=80',
-    caption: 'Private Dermatology Treatment Room with Laser Consoles',
-    category: 'Treatment Room'
+    url: '',
+    caption: '',
+    category: 'Treatment Room',
+    isCover: false
   });
+  const fileInputRef = useRef(null);
 
-  const handleAdd = (e) => {
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setSelectedFile(file);
+    setPreviewUrl(URL.createObjectURL(file));
+  };
+
+  const handleAdd = async (e) => {
     e.preventDefault();
-    const success = addGalleryImage(newImage);
+    if (!mohapConfirmed) {
+      showToast?.('error', 'Compliance Confirmation Required', 'Please confirm the photo meets MOHAP advertising rules.');
+      return;
+    }
+
+    if (token && selectedFile) {
+      setUploading(true);
+      try {
+        const uploaded = await uploadClinicMedia(selectedFile, newImage.caption, newImage.category, newImage.isCover, token);
+        setGallery(prev => {
+          const updated = newImage.isCover ? prev.map(i => ({ ...i, isCover: false })) : prev;
+          return [{
+            id: uploaded.id,
+            url: uploaded.url,
+            caption: uploaded.caption,
+            category: uploaded.category,
+            isActive: uploaded.isActive !== false,
+            isCover: uploaded.isCover,
+            uploadedAt: new Date().toISOString().split('T')[0]
+          }, ...updated];
+        });
+        if (newImage.isCover) {
+          setClinicData(prev => ({ ...prev, coverImage: uploaded.url }));
+        }
+        showToast?.('success', 'Photo Uploaded', 'Gallery image optimized and published.');
+        setIsModalOpen(false);
+        setSelectedFile(null);
+        setPreviewUrl('');
+        setNewImage({ url: '', caption: '', category: 'Treatment Room', isCover: false });
+      } catch (err) {
+        showToast?.('error', 'Upload Failed', err.message || 'Could not upload photo.');
+      } finally {
+        setUploading(false);
+      }
+      return;
+    }
+
+    const success = addGalleryImage({
+      ...newImage,
+      url: previewUrl || newImage.url || 'https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=800&auto=format&fit=crop&q=80'
+    });
     if (success) {
       setIsModalOpen(false);
+      setSelectedFile(null);
+      setPreviewUrl('');
     }
+  };
+
+  const handleSetAsCover = async (img) => {
+    if (token) {
+      try {
+        await patchClinicMedia(img.id, { is_cover: true }, token);
+        setGallery(prev => prev.map(i => ({ ...i, isCover: i.id === img.id })));
+        setClinicData(prev => ({ ...prev, coverImage: img.url }));
+        showToast?.('success', 'Cover Banner Updated', 'Selected gallery photo is now your clinic cover.');
+      } catch (err) {
+        showToast?.('error', 'Update Failed', err.message);
+      }
+    } else {
+      setClinicData(prev => ({ ...prev, coverImage: img.url }));
+      setGallery(prev => prev.map(i => ({ ...i, isCover: i.id === img.id })));
+    }
+  };
+
+  const handleToggleActive = async (img) => {
+    if (token) {
+      try {
+        await patchClinicMedia(img.id, { is_active: !img.isActive }, token);
+      } catch (err) {
+        showToast?.('error', 'Update Failed', err.message);
+        return;
+      }
+    }
+    toggleGalleryImageActive(img.id);
+  };
+
+  const handleDelete = async (id) => {
+    if (token) {
+      try {
+        await deleteClinicMedia(id, token);
+      } catch (err) {
+        showToast?.('error', 'Delete Failed', err.message);
+        return;
+      }
+    }
+    deleteGalleryImage(id);
   };
 
   return (
@@ -62,7 +159,17 @@ export default function GalleryManagement() {
               </div>
               <div className="absolute top-3 right-3 flex items-center gap-1.5">
                 <button
-                  onClick={() => toggleGalleryImageActive(img.id)}
+                  onClick={() => handleSetAsCover(img)}
+                  className={`px-2 py-1 rounded-full text-[10px] font-semibold backdrop-blur transition-colors flex items-center gap-1 ${
+                    img.isCover ? 'bg-[#6B3B66] text-white' : 'bg-black/60 text-white/90 hover:bg-black/80'
+                  }`}
+                  title="Set as clinic cover banner"
+                >
+                  <Star className={`w-3 h-3 ${img.isCover ? 'fill-amber-300 text-amber-300' : ''}`} />
+                  <span>{img.isCover ? 'Cover' : 'Set Cover'}</span>
+                </button>
+                <button
+                  onClick={() => handleToggleActive(img)}
                   className={`p-1.5 rounded-full backdrop-blur transition-colors ${
                     img.isActive ? 'bg-white text-emerald-800' : 'bg-black/60 text-white/70'
                   }`}
@@ -79,7 +186,7 @@ export default function GalleryManagement() {
                   {img.caption}
                 </p>
                 <p className="text-[10px] text-gray-400 mt-1">
-                  Uploaded: {img.uploadedAt}
+                  Uploaded: {img.uploadedAt || (img.createdAt ? img.createdAt.split('T')[0] : 'Recently')}
                 </p>
               </div>
 
@@ -89,7 +196,7 @@ export default function GalleryManagement() {
                 </span>
 
                 <button
-                  onClick={() => deleteGalleryImage(img.id)}
+                  onClick={() => handleDelete(img.id)}
                   className="text-gray-400 hover:text-red-600 transition-colors p-1"
                   title="Delete image"
                 >
@@ -114,15 +221,15 @@ export default function GalleryManagement() {
 
             <form onSubmit={handleAdd} className="p-6 space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-theme-ink mb-1">
-                  Image URL / Preset
+                <label className="block text-xs font-semibold text-theme-ink mb-1.5">
+                  Clinic Photo (JPG, PNG, WebP) *
                 </label>
                 <input
                   type="text"
                   required
                   value={newImage.url}
                   onChange={(e) => setNewImage({ ...newImage, url: e.target.value })}
-                  className="w-full px-3 py-2 rounded-xl border border-theme-border-slate bg-theme-surface text-xs text-theme-ink focus:outline-none focus:ring-2 focus:ring-theme-primary"
+                  className="w-full px-3 py-2 rounded-xl border border-gray-300 text-xs text-gray-900 focus:outline-none focus:ring-2 focus:ring-[#0d281e]"
                 />
               </div>
 
@@ -136,16 +243,17 @@ export default function GalleryManagement() {
                   className="w-full px-3 py-2 rounded-xl border border-theme-border-slate text-xs text-theme-ink bg-theme-surface"
                 >
                   <option value="Treatment Room">Treatment Room</option>
-                  <option value="Interior">Interior</option>
-                  <option value="Consultation">Consultation</option>
-                  <option value="Sterilization">Sterilization</option>
+                  <option value="Interior">Interior / Reception</option>
+                  <option value="Equipment">Medical Equipment</option>
+                  <option value="Consultation">Consultation Suite</option>
+                  <option value="Team">Clinical Team</option>
                   <option value="Exterior">Exterior</option>
                 </select>
               </div>
 
               <div>
                 <label className="block text-xs font-semibold text-theme-ink mb-1">
-                  Image Caption
+                  Image Caption *
                 </label>
                 <input
                   type="text"
@@ -156,9 +264,33 @@ export default function GalleryManagement() {
                   className="w-full px-3 py-2 rounded-xl border border-theme-border-slate bg-theme-surface text-xs text-theme-ink focus:outline-none focus:ring-2 focus:ring-theme-primary"
                 />
                 <p className="text-[11px] text-theme-muted mt-1">
-                  Must follow advertising rules (no superlatives).
+                  Must follow MOHAP advertising rules (no superlatives).
                 </p>
               </div>
+
+              <label className="flex items-start gap-2 text-[11px] text-gray-600 bg-amber-50 border border-amber-200 rounded-xl p-2.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={mohapConfirmed}
+                  onChange={(e) => setMohapConfirmed(e.target.checked)}
+                  className="mt-0.5 rounded"
+                />
+                <span>
+                  I confirm this photo contains no unconsented patient faces or prohibited promotional text under MOHAP guidelines.
+                </span>
+              </label>
+
+              <label className="flex items-start gap-2 text-[11px] text-gray-600 bg-amber-50 border border-amber-200 rounded-xl p-2.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={mohapConfirmed}
+                  onChange={(e) => setMohapConfirmed(e.target.checked)}
+                  className="mt-0.5 rounded"
+                />
+                <span>
+                  I confirm this photo contains no unconsented patient faces or prohibited promotional text under MOHAP guidelines.
+                </span>
+              </label>
 
               <div className="pt-3 border-t border-theme-border flex justify-end gap-3">
                 <button
@@ -170,9 +302,10 @@ export default function GalleryManagement() {
                 </button>
                 <button
                   type="submit"
-                  className="px-5 py-2 rounded-full bg-theme-primary text-white text-xs alata-regular hover:bg-theme-primary-hover"
+                  disabled={uploading}
+                  className="px-5 py-2 rounded-full bg-theme-primary text-white text-xs alata-regular hover:bg-theme-primary-hover disabled:opacity-50"
                 >
-                  Upload & Verify
+                  {uploading ? 'Optimizing & Uploading...' : 'Upload & Verify'}
                 </button>
               </div>
             </form>

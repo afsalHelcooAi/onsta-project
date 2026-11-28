@@ -88,3 +88,15 @@ export async function uploadBrandAsset(assetType, file, token) {
   }
   return response.json();
 }
+
+export async function deleteBrandAsset(assetType, token) {
+  const response = await fetch(`/api/v1/clinic/brand-assets/${assetType}`, {
+    method: 'DELETE',
+    headers: authHeaders(token),
+  });
+  if (!response.ok) {
+    const errorBody = await response.json().catch(() => ({}));
+    throw new Error(errorBody.detail || `Failed to remove clinic ${assetType}.`);
+  }
+  return response.json();
+}

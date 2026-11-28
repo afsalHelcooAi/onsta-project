@@ -218,6 +218,14 @@ class TestPlatformAdminUsers(unittest.IsolatedAsyncioTestCase):
                 "trade_license_expiry_date": "2026-12-01",
                 "facility_license_expiry_date": "2026-12-15",
             }]),
+            ExecuteResult(scalar=9),
+            ExecuteResult(scalar=6),
+            ExecuteResult(scalar=10),
+            ExecuteResult(scalar=0),
+            ExecuteResult(scalar=0),
+            ExecuteResult(scalar=0),
+            ExecuteResult(scalar=0),
+            ExecuteResult(rows=[]),
         ])
 
         with patch.object(platform_admin, "SessionLocal", return_value=session):

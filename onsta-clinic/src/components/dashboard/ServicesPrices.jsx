@@ -3,10 +3,10 @@ import { useClinic } from '../../context/ClinicContext';
 import VerificationBadge from '../common/VerificationBadge';
 import FaIcon from '../common/FaIcon';
 import ModalPortal from '../common/ModalPortal';
-import { parseTariffSheet, fetchMasterTreatments } from '../../api/serviceApi';
+import { parseTariffSheet, fetchMasterTreatments, uploadServiceImage, deleteServiceImage } from '../../api/serviceApi';
 
 export default function ServicesPrices() {
-  const { services, addService, batchAddServices, updateService, deleteService, toggleServiceActive, showToast } = useClinic();
+  const { services, setServices, addService, batchAddServices, updateService, deleteService, toggleServiceActive, showToast } = useClinic();
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -40,6 +40,12 @@ export default function ServicesPrices() {
   const [duplicatesCount, setDuplicatesCount] = useState(0);
   const fileInputRef = useRef(null);
 
+  const [selectedImageFile, setSelectedImageFile] = useState(null);
+  const [imagePreviewUrl, setImagePreviewUrl] = useState('');
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [formError, setFormError] = useState('');
+  const serviceImgInputRef = useRef(null);
+
   // Modal Form State
   const [formData, setFormData] = useState({
     name: '',
@@ -51,6 +57,7 @@ export default function ServicesPrices() {
     offerPrice: '',
     applicableSpecialty: 'Aesthetic Medicine',
     scopeRequired: 'Aesthetic Medicine Scope',
+    imageUrl: '',
     isActive: true
   });
 
@@ -79,6 +86,9 @@ export default function ServicesPrices() {
 
   const openAddModal = () => {
     setEditingService(null);
+    setSelectedImageFile(null);
+    setImagePreviewUrl('');
+    setFormError('');
     setFormData({
       name: '',
       masterTreatmentId: '',
@@ -89,6 +99,7 @@ export default function ServicesPrices() {
       offerPrice: '',
       applicableSpecialty: 'Aesthetic Medicine',
       scopeRequired: 'Aesthetic Medicine Scope',
+      imageUrl: '',
       isActive: true
     });
     setIsModalOpen(true);
@@ -96,6 +107,9 @@ export default function ServicesPrices() {
 
   const openEditModal = (srv) => {
     setEditingService(srv);
+    setSelectedImageFile(null);
+    setImagePreviewUrl(srv.imageUrl || '');
+    setFormError('');
     setFormData({
       name: srv.name,
       masterTreatmentId: srv.masterTreatmentId || '',
@@ -106,6 +120,7 @@ export default function ServicesPrices() {
       offerPrice: srv.offerPrice ? srv.offerPrice.toString() : '',
       applicableSpecialty: srv.applicableSpecialty || srv.category || 'Aesthetic Medicine',
       scopeRequired: srv.scopeRequired || 'Aesthetic Medicine Scope',
+      imageUrl: srv.customImageUrl || '',
       isActive: srv.isActive !== false
     });
     setIsModalOpen(true);
@@ -123,10 +138,17 @@ export default function ServicesPrices() {
         duration: `${selected.standard_duration_minutes || 45} mins`,
         normalPrice: prev.normalPrice || (selected.reference_price_min ? selected.reference_price_min.toString() : '450'),
         applicableSpecialty: selected.medical_specialty || 'Aesthetic Medicine',
-        scopeRequired: `${selected.category} Clinical Scope`
+        scopeRequired: `${selected.category} Clinical Scope`,
+        masterImageUrl: selected.default_image_url || ''
       }));
+      if (!selectedImageFile && !formData.imageUrl && selected.default_image_url) {
+        setImagePreviewUrl(selected.default_image_url);
+      }
     } else {
-      setFormData(prev => ({ ...prev, masterTreatmentId: '' }));
+      setFormData(prev => ({ ...prev, masterTreatmentId: '', masterImageUrl: '' }));
+      if (!selectedImageFile && !formData.imageUrl) {
+        setImagePreviewUrl('');
+      }
     }
   };
 
@@ -139,13 +161,85 @@ export default function ServicesPrices() {
     }));
   };
 
+  const handleServiceImageSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setSelectedImageFile(file);
+    setImagePreviewUrl(URL.createObjectURL(file));
+  };
+
+  const handleRemoveCustomServiceImage = async () => {
+    const token = localStorage.getItem('onsta_access_token');
+    setSelectedImageFile(null);
+    if (editingService && token) {
+      try {
+        await deleteServiceImage(editingService.id, token);
+        const fallback = editingService.masterImageUrl || '';
+        setImagePreviewUrl(fallback);
+        setFormData(prev => ({ ...prev, imageUrl: '' }));
+        setServices(prev => prev.map(s => s.id === editingService.id ? { ...s, customImageUrl: null, imageUrl: fallback || null } : s));
+        showToast('info', 'Custom Image Removed', 'Service image reset.');
+      } catch (err) {
+        showToast('error', 'Remove Failed', err.message);
+      }
+    } else {
+      const mt = masterTreatments.find(t => t.id === formData.masterTreatmentId);
+      setImagePreviewUrl(mt?.default_image_url || '');
+      setFormData(prev => ({ ...prev, imageUrl: '' }));
+    }
+  };
+
   const handleFormSubmit = async (e) => {
     e.preventDefault();
-    if (editingService) {
-      await updateService(editingService.id, formData);
-    } else {
-      await addService(formData);
+    setFormError('');
+    const normalNum = parseFloat(formData.normalPrice || 0);
+    const hasOffer = formData.offerPrice !== '' && formData.offerPrice !== null && formData.offerPrice !== undefined;
+    const offerNum = hasOffer ? parseFloat(formData.offerPrice) : null;
+
+    if (offerNum !== null) {
+      if (Number.isNaN(offerNum) || offerNum < 0) {
+        setFormError('Offer price must be a valid positive amount.');
+        return;
+      }
+      if (offerNum >= normalNum) {
+        const msg = `Offer price (AED ${offerNum}) must be strictly lower than the standard tariff (AED ${normalNum}).`;
+        setFormError(msg);
+        showToast('error', 'Invalid Offer Price', msg);
+        return;
+      }
     }
+
+    const payloadToSave = {
+      ...formData,
+      normalPrice: normalNum,
+      offerPrice: offerNum,
+    };
+
+    const token = localStorage.getItem('onsta_access_token');
+    let savedId = editingService?.id;
+
+    if (editingService) {
+      const res = await updateService(editingService.id, payloadToSave);
+      if (res?.success === false) return;
+    } else {
+      const res = await addService(payloadToSave);
+      if (res?.success === false) return;
+      savedId = res?.service?.id;
+    }
+
+    if (selectedImageFile && savedId && token) {
+      setUploadingImage(true);
+      try {
+        const imgRes = await uploadServiceImage(savedId, selectedImageFile, token);
+        setServices(prev => prev.map(s => s.id === savedId ? { ...s, imageUrl: imgRes.imageUrl, customImageUrl: imgRes.imageUrl } : s));
+        showToast('success', 'Treatment Photo Uploaded', 'Service image optimized and saved.');
+      } catch (err) {
+        showToast('error', 'Image Upload Failed', err.message);
+      } finally {
+        setUploadingImage(false);
+      }
+    }
+
     setIsModalOpen(false);
   };
 
@@ -356,10 +450,21 @@ export default function ServicesPrices() {
                 filteredServices.map((srv) => (
                   <tr key={srv.id} className="hover:bg-theme-surface transition-colors">
                     <td className="py-3.5 px-5">
-                      <div className="alata-regular text-theme-ink text-sm">{srv.name}</div>
-                      {srv.description && (
-                        <div className="text-[11px] text-theme-muted truncate max-w-sm mt-0.5">{srv.description}</div>
-                      )}
+                      <div className="flex items-center gap-3">
+                        <div className="w-11 h-11 rounded-xl bg-[#F6F0FA] border border-[#EAE0F2] overflow-hidden flex-shrink-0 flex items-center justify-center">
+                          {srv.imageUrl ? (
+                            <img src={srv.imageUrl} alt={srv.name} className="w-full h-full object-cover" />
+                          ) : (
+                            <FaIcon icon="fa-solid fa-spa" className="text-[#9E77AD] text-sm" />
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="alata-regular text-theme-ink text-sm truncate max-w-xs">{srv.name}</div>
+                          {srv.description && (
+                            <div className="text-[11px] text-theme-muted truncate max-w-sm mt-0.5">{srv.description}</div>
+                          )}
+                        </div>
+                      </div>
                     </td>
                     <td className="py-3.5 px-4">
                       <span className="px-2.5 py-1 rounded-full text-[10px] alata-regular bg-theme-primary-soft text-theme-primary border border-theme-border-strong">
@@ -832,13 +937,22 @@ export default function ServicesPrices() {
                   </label>
                   <input
                     type="number"
+                    min="0"
+                    step="0.01"
                     value={formData.offerPrice}
                     onChange={(e) => setFormData({ ...formData, offerPrice: e.target.value })}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-theme-border-slate text-xs alata-regular text-theme-primary focus:outline-none focus:ring-2 focus:ring-theme-primary/30"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-[#E2E8F0] text-xs alata-regular text-[#6B3B66] focus:outline-none focus:ring-2 focus:ring-[#6B3B66]/30"
                     placeholder="e.g. 299"
                   />
                 </div>
               </div>
+
+              {formError && (
+                <div role="alert" className="rounded-xl border border-[#FECACA] bg-[#FEE2E2] px-3.5 py-2.5 text-xs text-[#991B1B] flex items-center gap-2">
+                  <FaIcon icon="fa-solid fa-circle-exclamation" className="text-[#DC2626] shrink-0" />
+                  <span>{formError}</span>
+                </div>
+              )}
 
               <div>
                 <label className="block text-xs font-semibold text-theme-ink mb-1">
@@ -865,6 +979,53 @@ export default function ServicesPrices() {
                 />
               </div>
 
+              {/* Optional Treatment Photo */}
+              <div className="bg-[#FAF8FC] border border-[#EAE0F2] rounded-2xl p-3.5">
+                <div className="flex items-center justify-between mb-2">
+                  <label className="text-xs font-semibold text-[#1E1B2E]">
+                    Treatment Photo <span className="text-[#64748B] font-normal">(Optional — auto-inherits Master Default if mapped)</span>
+                  </label>
+                  {(selectedImageFile || formData.imageUrl) && (
+                    <button
+                      type="button"
+                      onClick={handleRemoveCustomServiceImage}
+                      className="text-[11px] text-[#991B1B] hover:underline"
+                    >
+                      Reset / Remove
+                    </button>
+                  )}
+                </div>
+                <div className="flex items-center gap-3">
+                  <div className="w-16 h-16 rounded-xl bg-white border border-[#DECBE9] overflow-hidden flex items-center justify-center flex-shrink-0">
+                    {imagePreviewUrl ? (
+                      <img src={imagePreviewUrl} alt="Service Preview" className="w-full h-full object-cover" />
+                    ) : (
+                      <FaIcon icon="fa-regular fa-image" className="text-[#9E77AD] text-lg" />
+                    )}
+                  </div>
+                  <div className="flex-1">
+                    <button
+                      type="button"
+                      onClick={() => serviceImgInputRef.current?.click()}
+                      className="px-3.5 py-1.5 rounded-full bg-white border border-[#DECBE9] text-[#6B3B66] hover:bg-[#F0E6F6] text-xs alata-regular inline-flex items-center gap-1.5 transition"
+                    >
+                      <FaIcon icon="fa-solid fa-cloud-arrow-up" />
+                      <span>{imagePreviewUrl ? 'Change Photo' : 'Upload Treatment Photo'}</span>
+                    </button>
+                    <p className="text-[10px] text-[#64748B] mt-1">
+                      Show equipment or treatment suite (JPG, PNG, WebP). Avoid unpermitted before/after photos.
+                    </p>
+                    <input
+                      ref={serviceImgInputRef}
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      onChange={handleServiceImageSelect}
+                      className="hidden"
+                    />
+                  </div>
+                </div>
+              </div>
+
               <div className="pt-4 border-t border-theme-border flex items-center justify-end gap-2">
                 <button
                   type="button"
@@ -875,10 +1036,10 @@ export default function ServicesPrices() {
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2.5 bg-theme-primary hover:bg-theme-primary-hover text-white rounded-full text-xs alata-regular shadow-sm flex items-center gap-2"
+                  className="px-6 py-2.5 bg-[#6B3B66] hover:bg-[#552B51] text-white rounded-full text-xs alata-regular shadow-sm flex items-center gap-2"
                 >
-                  <FaIcon icon="fa-solid fa-circle-check" />
-                  <span>{editingService ? 'Update Service' : 'Save Service'}</span>
+                  <FaIcon icon={uploadingImage ? 'fa-solid fa-spinner fa-spin' : 'fa-solid fa-circle-check'} />
+                  <span>{uploadingImage ? 'Uploading Photo...' : editingService ? 'Update Service' : 'Save Service'}</span>
                 </button>
               </div>
             </form>

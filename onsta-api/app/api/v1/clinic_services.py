@@ -2,6 +2,7 @@ import os
 import io
 import re
 import uuid
+from pathlib import Path
 from typing import Optional, List
 from datetime import datetime
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, Query, status
@@ -12,6 +13,7 @@ from sqlalchemy import text
 from app.db.database import get_db
 from app.api.v1.auth import get_current_actor, Actor
 from app.config import settings
+from app.services.image_utils import optimize_image, ALLOWED_IMAGE_TYPES, MAX_IMAGE_SIZE
 
 router = APIRouter(prefix="/clinic/services", tags=["Clinic Services"])
 
@@ -45,6 +47,7 @@ class ServiceCreateRequest(BaseModel):
     offer_price: Optional[float] = Field(None, ge=0)
     applicable_specialty: Optional[str] = Field("Dermatology", max_length=180)
     scope_required: Optional[str] = Field("Dermatological Outpatient Scope", max_length=255)
+    image_url: Optional[str] = None
     is_active: Optional[bool] = True
 
 
@@ -58,6 +61,7 @@ class ServiceUpdateRequest(BaseModel):
     offer_price: Optional[float] = None
     applicable_specialty: Optional[str] = None
     scope_required: Optional[str] = None
+    image_url: Optional[str] = None
     is_active: Optional[bool] = None
 
 
@@ -345,6 +349,7 @@ async def get_available_master_treatments(
             t.standard_duration_minutes,
             t.reference_price_min::float,
             t.reference_price_max::float,
+            t.default_image_url,
             COALESCE(
                 json_agg(
                     json_build_object(
@@ -386,6 +391,9 @@ async def get_clinic_services(
             COALESCE(s.category, 'Dermatology') AS "category",
             s.master_treatment_id::text AS "masterTreatmentId",
             mt.name AS "masterTreatmentName",
+            COALESCE(s.image_url, mt.default_image_url) AS "imageUrl",
+            s.image_url AS "customImageUrl",
+            mt.default_image_url AS "masterImageUrl",
             COALESCE(s.description, '') AS "description",
             COALESCE(s.duration_display, s.duration_minutes::text || ' mins', '45 mins') AS "duration",
             COALESCE(s.price, 0.0)::float AS "normalPrice",
@@ -442,6 +450,12 @@ async def create_service(
             detail=f"Service '{name_clean}' already exists in your catalogue."
         )
 
+    if payload.offer_price is not None and payload.offer_price >= payload.normal_price:
+        raise HTTPException(
+            status_code=422,
+            detail="Offer price must be strictly lower than the standard tariff price."
+        )
+
     duration_mins = _parse_duration_minutes(payload.duration)
     cat = payload.category or "Dermatology"
     scope = payload.scope_required or CATEGORY_SCOPE_MAP.get(cat, "Dermatological Outpatient Scope")
@@ -451,13 +465,13 @@ async def create_service(
         INSERT INTO services (
             id, tenant_id, clinic_id, name, category, master_treatment_id, description,
             price, offer_price, currency, duration_minutes, duration_display,
-            applicable_specialty, scope_required, status, visibility_status,
+            applicable_specialty, scope_required, image_url, status, visibility_status,
             rules_passed, verification_status, created_at, updated_at
         ) VALUES (
             CAST(:id AS uuid), CAST(:tenant_id AS uuid), CAST(:clinic_id AS uuid),
             :name, :category, CAST(:master_treatment_id AS uuid), :description,
             :price, :offer_price, 'AED', :duration_minutes, :duration_display,
-            :applicable_specialty, :scope_required, :status, 'PUBLISHED',
+            :applicable_specialty, :scope_required, :image_url, :status, 'PUBLISHED',
             8, 'VERIFIED', now(), now()
         )
     """), {
@@ -474,6 +488,7 @@ async def create_service(
         "duration_display": payload.duration or f"{duration_mins} mins",
         "applicable_specialty": payload.applicable_specialty or cat,
         "scope_required": scope,
+        "image_url": payload.image_url or None,
         "status": status_str,
     })
     await db.commit()
@@ -487,6 +502,7 @@ async def create_service(
         "offerPrice": payload.offer_price,
         "duration": payload.duration or f"{duration_mins} mins",
         "scopeRequired": scope,
+        "imageUrl": payload.image_url or None,
         "isActive": payload.is_active,
         "verificationStatus": "VERIFIED",
         "rulesPassed": 8
@@ -586,11 +602,22 @@ async def update_service(
 
     # Ensure service belongs to clinic
     existing = (await db.execute(text("""
-        SELECT id FROM services WHERE id = CAST(:id AS uuid) AND clinic_id = CAST(:cid AS uuid)
-    """), {"id": service_id, "cid": ctx["clinic_id"]})).first()
+        SELECT id, price::float AS price, offer_price::float AS offer_price
+        FROM services WHERE id = CAST(:id AS uuid) AND clinic_id = CAST(:cid AS uuid)
+    """), {"id": service_id, "cid": ctx["clinic_id"]})).mappings().first()
 
     if not existing:
         raise HTTPException(status_code=404, detail="Service not found.")
+
+    effective_normal = payload.normal_price if payload.normal_price is not None else float(existing["price"] or 0)
+    offer_explicitly_set = "offer_price" in payload.model_fields_set
+    effective_offer = payload.offer_price if offer_explicitly_set else existing["offer_price"]
+
+    if effective_offer is not None and effective_offer >= effective_normal:
+        raise HTTPException(
+            status_code=422,
+            detail="Offer price must be strictly lower than the standard tariff price."
+        )
 
     updates = []
     params = {"id": service_id, "cid": ctx["clinic_id"]}
@@ -607,7 +634,7 @@ async def update_service(
     if payload.normal_price is not None:
         updates.append("price = :price")
         params["price"] = payload.normal_price
-    if payload.offer_price is not None:
+    if offer_explicitly_set:
         updates.append("offer_price = :offer_price")
         params["offer_price"] = payload.offer_price
     if payload.duration is not None:
@@ -622,6 +649,9 @@ async def update_service(
     if payload.applicable_specialty is not None:
         updates.append("applicable_specialty = :spec")
         params["spec"] = payload.applicable_specialty
+    if payload.image_url is not None:
+        updates.append("image_url = :image_url")
+        params["image_url"] = payload.image_url or None
     if payload.is_active is not None:
         updates.append("status = :status")
         params["status"] = "ACTIVE" if payload.is_active else "INACTIVE"
@@ -637,6 +667,61 @@ async def update_service(
         await db.commit()
 
     return {"status": "success", "message": "Service updated successfully."}
+
+
+@router.post("/{service_id}/image")
+async def upload_service_image(
+    service_id: str,
+    file: UploadFile = File(...),
+    actor: Actor = Depends(get_current_actor),
+    db: AsyncSession = Depends(get_db),
+):
+    """Upload and optimize a custom treatment photo for a clinic service."""
+    if file.content_type not in ALLOWED_IMAGE_TYPES:
+        raise HTTPException(status_code=415, detail="Upload a JPEG, PNG, or WebP image.")
+
+    content = await file.read(MAX_IMAGE_SIZE + 1)
+    if not content or len(content) > MAX_IMAGE_SIZE:
+        raise HTTPException(status_code=413, detail="Image exceeds the 15 MB limit.")
+
+    ctx = await _resolve_clinic_context(db, actor["id"])
+    existing = (await db.execute(text("""
+        SELECT id FROM services WHERE id = CAST(:id AS uuid) AND clinic_id = CAST(:cid AS uuid)
+    """), {"id": service_id, "cid": ctx["clinic_id"]})).first()
+    if not existing:
+        raise HTTPException(status_code=404, detail="Service not found.")
+
+    optimized_bytes, ext = optimize_image(content, max_width=800, max_height=600)
+    safe_stem = Path(file.filename or "service").stem[:40]
+    storage_key = f"clinics/{ctx['clinic_id']}/services/{service_id}-{uuid.uuid4().hex[:6]}-{safe_stem}{ext}"
+    dest = Path(settings.LOCAL_UPLOAD_DIR) / storage_key
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    dest.write_bytes(optimized_bytes)
+
+    file_url = f"/uploads/{storage_key}"
+    await db.execute(text("""
+        UPDATE services SET image_url = :url, updated_at = now()
+        WHERE id = CAST(:id AS uuid) AND clinic_id = CAST(:cid AS uuid)
+    """), {"url": file_url, "id": service_id, "cid": ctx["clinic_id"]})
+    await db.commit()
+
+    return {"status": "success", "imageUrl": file_url}
+
+
+@router.delete("/{service_id}/image")
+async def delete_service_image(
+    service_id: str,
+    actor: Actor = Depends(get_current_actor),
+    db: AsyncSession = Depends(get_db),
+):
+    """Remove custom service photo (reverts to master treatment default image if mapped)."""
+    ctx = await _resolve_clinic_context(db, actor["id"])
+    await db.execute(text("""
+        UPDATE services SET image_url = NULL, updated_at = now()
+        WHERE id = CAST(:id AS uuid) AND clinic_id = CAST(:cid AS uuid)
+    """), {"id": service_id, "cid": ctx["clinic_id"]})
+    await db.commit()
+    return {"status": "success", "message": "Custom service image removed."}
 
 
 @router.patch("/{service_id}/status")
