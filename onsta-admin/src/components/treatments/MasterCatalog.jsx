@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import AppIcon from '../common/AppIcon';
 
 export default function MasterCatalog() {
+  const { t } = useTranslation();
   const [catalog, setCatalog] = useState({ categories: [], treatments: [], concerns: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -228,13 +230,13 @@ export default function MasterCatalog() {
         <div>
           <div className="flex items-center gap-2 text-theme-primary text-xs alata-regular uppercase tracking-wider mb-1">
             <AppIcon name="ai" size="sm" className="text-theme-primary" />
-            AI Detection & Clinical Taxonomy
+            {t('masterCatalog.kicker')}
           </div>
           <h1 className="text-2xl alata-regular text-theme-ink">
-            Master Treatments & AI Concerns
+            {t('masterCatalog.title')}
           </h1>
           <p className="text-sm text-theme-muted mt-1">
-            Standard clinical treatments with dynamic categories and face-scan AI mapping.
+            {t('masterCatalog.subtitle')}
           </p>
         </div>
 
@@ -244,14 +246,14 @@ export default function MasterCatalog() {
             className="flex items-center gap-2 px-4 py-2 bg-theme-canvas border border-theme-border-strong hover:bg-theme-primary-soft text-theme-primary rounded-full text-sm alata-regular shadow-sm transition-all"
           >
             <AppIcon name="folder-plus" size="sm" />
-            Add Dynamic Category
+            {t('masterCatalog.addCategory')}
           </button>
           <button
             onClick={() => setShowAddModal(true)}
             className="flex items-center gap-2 px-5 py-2 bg-theme-primary hover:bg-theme-primary-hover text-white rounded-full text-sm alata-regular shadow-sm transition-all"
           >
             <AppIcon name="plus" size="sm" />
-            Add Master Treatment
+            {t('masterCatalog.addTreatment')}
           </button>
         </div>
       </header>

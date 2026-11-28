@@ -41,7 +41,7 @@ export default function DashboardLayout() {
 
       {/* Toast Notification Container */}
       {toast && (
-        <div className="fixed bottom-6 right-6 z-50 animate-fadeIn">
+        <div className="fixed bottom-6 end-6 z-50 animate-fadeIn">
           <div className={`p-4 rounded-2xl shadow-xl border flex items-start gap-3 max-w-md ${
             toast.type === 'success'
               ? 'bg-theme-sidebar-bg text-white border-theme-primary'

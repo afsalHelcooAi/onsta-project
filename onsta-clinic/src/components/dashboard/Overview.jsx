@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { useClinic } from '../../context/ClinicContext';
 import AIDocumentScanModal from '../common/AIDocumentScanModal';
 import DoctorAvatar from '../common/DoctorAvatar';
@@ -7,6 +8,7 @@ import AppIcon from '../common/AppIcon';
 import { fetchClinicOverview } from '../../api/overviewApi';
 
 export default function Overview({ onOpenPreview }) {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const {
     clinicData,
@@ -143,7 +145,7 @@ export default function Overview({ onOpenPreview }) {
 
   const handleScanComplete = () => {
     setShowRenewModal(false);
-    showToast('success', 'Renewal Submitted', 'Document submitted for ONSTA Admin review. Check status in Compliance Centre.');
+    showToast('success', t('overview.renewalSubmittedTitle'), t('overview.renewalSubmittedMsg'));
     loadOverview();
   };
 
@@ -152,26 +154,26 @@ export default function Overview({ onOpenPreview }) {
       {/* 1. Executive Welcome Banner */}
       <div className="relative overflow-hidden bg-theme-card rounded-3xl border border-theme-border p-6 sm:p-7 shadow-sm">
         {/* Subtle decorative canvas accent corner */}
-        <div className="pointer-events-none absolute -right-10 -top-10 w-44 h-44 rounded-full bg-theme-canvas opacity-80" />
+        <div className="pointer-events-none absolute -end-10 -top-10 w-44 h-44 rounded-full bg-theme-canvas opacity-80" />
         <div className="relative flex flex-col md:flex-row md:items-center justify-between gap-5">
           <div>
             <div className="flex flex-wrap items-center gap-3">
-              <h1 className="text-2xl sm:text-3xl alata-regular text-theme-ink tracking-tight">
-                Welcome, {clinic.displayName || clinic.legalName}
+              <h1 dir="auto" className="text-2xl sm:text-3xl alata-regular text-theme-ink tracking-tight">
+                {t('overview.welcome', { name: clinic.displayName || clinic.legalName })}
               </h1>
-              <span className="px-3 py-1 rounded-full text-[11px] alata-regular bg-theme-primary-soft text-theme-primary border border-theme-border-strong">
+              <span dir="auto" className="px-3 py-1 rounded-full text-[11px] alata-regular bg-theme-primary-soft text-theme-primary border border-theme-border-strong">
                 {clinic.facilityType}
               </span>
             </div>
             <p className="text-xs text-theme-muted mt-2 flex flex-wrap items-center gap-2.5">
-              <span className="inline-flex items-center gap-1.5">
+              <span dir="auto" className="inline-flex items-center gap-1.5">
                 <AppIcon name="map-pin" className="text-theme-primary" />
                 {clinic.cityArea}, {clinic.emirate}
               </span>
               <span className="text-theme-border-strong">•</span>
               <span className="inline-flex items-center gap-1.5">
                 <AppIcon name="certificate" className="text-theme-primary" />
-                DHA / DET Regulatory Compliance Verified
+                {t('overview.dhaVerified')}
               </span>
             </p>
           </div>
@@ -180,12 +182,12 @@ export default function Overview({ onOpenPreview }) {
             {clinic.publicListingActive ? (
               <span className="px-3.5 py-2 rounded-full text-xs alata-regular bg-[#DCFCE7] text-[#166534] border border-[#BBF7D0] flex items-center gap-2">
                 <AppIcon name="check-circle" className="text-[#16A34A]" />
-                <span>Live on onsta.ae</span>
+                <span>{t('overview.liveOnOnsta')}</span>
               </span>
             ) : (
               <span className="px-3.5 py-2 rounded-full text-xs alata-regular bg-[#FEE2E2] text-[#991B1B] border border-[#FECACA] flex items-center gap-2">
                 <AppIcon name="x-circle" className="text-[#DC2626]" />
-                <span>Listing Suspended</span>
+                <span>{t('overview.listingSuspended')}</span>
               </span>
             )}
 
@@ -194,7 +196,7 @@ export default function Overview({ onOpenPreview }) {
               className="px-5 py-2.5 rounded-full bg-theme-primary hover:bg-theme-primary-hover text-white text-xs alata-regular tracking-wide transition-all flex items-center gap-2 shadow-sm hover:shadow-md"
             >
               <AppIcon name="eye" />
-              <span>Customer Preview</span>
+              <span>{t('overview.customerPreview')}</span>
             </button>
           </div>
         </div>
@@ -225,8 +227,8 @@ export default function Overview({ onOpenPreview }) {
                   <AppIcon name="warning" className="text-base" />
                 </div>
                 <div>
-                  <h4 className="text-sm alata-regular">{alert.title}</h4>
-                  <p className="text-xs opacity-90 mt-1 max-w-2xl leading-relaxed">{alert.message}</p>
+                  <h4 dir="auto" className="text-sm alata-regular">{alert.title}</h4>
+                  <p dir="auto" className="text-xs opacity-90 mt-1 max-w-2xl leading-relaxed">{alert.message}</p>
                 </div>
               </div>
 
@@ -236,24 +238,24 @@ export default function Overview({ onOpenPreview }) {
                     onClick={() => handleOpenRenewModal(alert.documentCode || 'FACILITY_LICENSE')}
                     className="px-4 py-2 rounded-full bg-theme-primary hover:bg-theme-primary-hover text-white text-xs alata-regular transition-colors shadow-sm inline-flex items-center gap-2"
                   >
-                    <span>Re-upload Licence</span>
-                    <AppIcon name="arrow-right" className="text-[11px]" />
+                    <span>{t('overview.reuploadLicence')}</span>
+                    <AppIcon name="arrow-right" className="text-[11px] rtl:rotate-180" />
                   </button>
                 ) : alert.action === 'MANAGE_DOCTORS' ? (
                   <button
                     onClick={() => navigate('/dashboard/doctors')}
                     className="px-4 py-2 rounded-full bg-theme-primary hover:bg-theme-primary-hover text-white text-xs alata-regular transition-colors shadow-sm inline-flex items-center gap-2"
                   >
-                    <span>Renew Doctor Licences</span>
-                    <AppIcon name="arrow-right" className="text-[11px]" />
+                    <span>{t('overview.renewDoctorLicences')}</span>
+                    <AppIcon name="arrow-right" className="text-[11px] rtl:rotate-180" />
                   </button>
                 ) : (
                   <button
                     onClick={() => navigate('/dashboard/compliance')}
                     className="px-4 py-2 rounded-full bg-theme-primary hover:bg-theme-primary-hover text-white text-xs alata-regular transition-colors shadow-sm inline-flex items-center gap-2"
                   >
-                    <span>View Compliance</span>
-                    <AppIcon name="arrow-right" className="text-[11px]" />
+                    <span>{t('overview.viewCompliance')}</span>
+                    <AppIcon name="arrow-right" className="text-[11px] rtl:rotate-180" />
                   </button>
                 )}
               </div>
@@ -268,13 +270,13 @@ export default function Overview({ onOpenPreview }) {
             </div>
             <div>
               <h4 className="text-sm alata-regular text-theme-ink flex flex-wrap items-center gap-2">
-                <span>All UAE Regulatory Systems Compliant & Active</span>
+                <span>{t('overview.allSystemsCompliant')}</span>
                 <span className="px-2.5 py-0.5 rounded-full text-[10px] alata-regular bg-[#DCFCE7] text-[#166534] border border-[#BBF7D0]">
-                  12/12 Rules Pass
+                  {t('overview.rulesPassBadge')}
                 </span>
               </h4>
               <p className="text-xs text-theme-muted mt-1 leading-relaxed">
-                Healthcare facility licence, registered medical practitioners, and AED services catalogue fulfill all statutory DHA, DET, and MOHAP advertising criteria.
+                {t('overview.allSystemsDesc')}
               </p>
             </div>
           </div>
@@ -282,8 +284,8 @@ export default function Overview({ onOpenPreview }) {
             onClick={() => navigate('/dashboard/compliance')}
             className="self-end sm:self-center px-4 py-2 rounded-full bg-theme-primary hover:bg-theme-primary-hover text-white text-xs alata-regular transition-colors inline-flex items-center gap-2 flex-shrink-0 shadow-sm"
           >
-            <span>Compliance Centre</span>
-            <AppIcon name="arrow-right" className="text-[11px]" />
+            <span>{t('overview.complianceCentre')}</span>
+            <AppIcon name="arrow-right" className="text-[11px] rtl:rotate-180" />
           </button>
         </div>
       )}
@@ -296,7 +298,7 @@ export default function Overview({ onOpenPreview }) {
           className="bg-theme-card rounded-2xl border border-theme-border p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:border-theme-border-strong transition-all cursor-pointer group"
         >
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-semibold text-theme-muted uppercase tracking-wider">Medical Team</span>
+            <span className="text-xs font-semibold text-theme-muted uppercase tracking-wider">{t('overview.medicalTeam')}</span>
             <div className="w-9 h-9 rounded-xl bg-theme-primary-soft text-theme-primary group-hover:bg-theme-primary group-hover:text-white flex items-center justify-center transition-colors">
               <AppIcon name="doctor" className="text-sm" />
             </div>
@@ -305,11 +307,11 @@ export default function Overview({ onOpenPreview }) {
             <h3 className="text-3xl alata-regular text-theme-ink">
               {totalDoctorsCount}
             </h3>
-            <span className="text-xs text-theme-muted font-medium">Registered</span>
+            <span className="text-xs text-theme-muted font-medium">{t('overview.registered')}</span>
           </div>
           <div className="mt-3 pt-2.5 border-t border-theme-border flex items-center justify-between text-[11px]">
-            <span className="text-[#166534] font-semibold">{activeDoctorsCount} Active Licences</span>
-            <AppIcon name="caret-right" className="text-[10px] text-theme-subtle group-hover:text-theme-primary transition-colors" />
+            <span className="text-[#166534] font-semibold">{t('overview.activeLicences', { count: activeDoctorsCount })}</span>
+            <AppIcon name="caret-right" className="text-[10px] text-theme-subtle group-hover:text-theme-primary transition-colors rtl:rotate-180" />
           </div>
         </div>
 
@@ -319,7 +321,7 @@ export default function Overview({ onOpenPreview }) {
           className="bg-theme-card rounded-2xl border border-theme-border p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:border-theme-border-strong transition-all cursor-pointer group"
         >
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-semibold text-theme-muted uppercase tracking-wider">Services Catalogue</span>
+            <span className="text-xs font-semibold text-theme-muted uppercase tracking-wider">{t('overview.servicesCatalogue')}</span>
             <div className="w-9 h-9 rounded-xl bg-theme-primary-soft text-theme-primary group-hover:bg-theme-primary group-hover:text-white flex items-center justify-center transition-colors">
               <AppIcon name="stethoscope" className="text-sm" />
             </div>
@@ -328,13 +330,13 @@ export default function Overview({ onOpenPreview }) {
             <h3 className="text-3xl alata-regular text-theme-ink">
               {totalServicesCount}
             </h3>
-            <span className="text-xs text-theme-muted font-medium">Treatments</span>
+            <span className="text-xs text-theme-muted font-medium">{t('overview.treatments')}</span>
           </div>
           <div className="mt-3 pt-2.5 border-t border-theme-border flex items-center justify-between text-[11px]">
             <span className="text-theme-muted font-medium">
-              {minPrice > 0 ? `AED ${Math.round(minPrice)} – ${Math.round(maxPrice)}` : `${activeServicesCount} Active`}
+              {minPrice > 0 ? `${t('common.aed')} ${Math.round(minPrice)} – ${Math.round(maxPrice)}` : t('overview.activeCount', { count: activeServicesCount })}
             </span>
-            <AppIcon name="caret-right" className="text-[10px] text-theme-subtle group-hover:text-theme-primary transition-colors" />
+            <AppIcon name="caret-right" className="text-[10px] text-theme-subtle group-hover:text-theme-primary transition-colors rtl:rotate-180" />
           </div>
         </div>
 
@@ -344,7 +346,7 @@ export default function Overview({ onOpenPreview }) {
           className="bg-theme-card rounded-2xl border border-theme-border p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:border-theme-border-strong transition-all cursor-pointer group"
         >
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-semibold text-theme-muted uppercase tracking-wider">Compliance Score</span>
+            <span className="text-xs font-semibold text-theme-muted uppercase tracking-wider">{t('overview.complianceScore')}</span>
             <div className="w-9 h-9 rounded-xl bg-theme-primary-soft text-theme-primary group-hover:bg-theme-primary group-hover:text-white flex items-center justify-center transition-colors">
               <AppIcon name="shield-check" className="text-sm" />
             </div>
@@ -353,13 +355,13 @@ export default function Overview({ onOpenPreview }) {
             <h3 className="text-3xl alata-regular text-theme-ink">
               {complianceScore}%
             </h3>
-            <span className="text-xs text-[#166534] font-semibold">DHA Rulebook</span>
+            <span className="text-xs text-[#166534] font-semibold">{t('overview.dhaRulebook')}</span>
           </div>
           <div className="mt-3 pt-2.5 border-t border-theme-border flex items-center justify-between text-[11px]">
             <span className={facilityDays <= 60 ? 'text-theme-accent font-semibold' : 'text-theme-muted font-medium'}>
-              Facility: {facilityDays}d left
+              {t('overview.facilityDaysLeft', { days: facilityDays })}
             </span>
-            <AppIcon name="caret-right" className="text-[10px] text-theme-subtle group-hover:text-theme-primary transition-colors" />
+            <AppIcon name="caret-right" className="text-[10px] text-theme-subtle group-hover:text-theme-primary transition-colors rtl:rotate-180" />
           </div>
         </div>
 
@@ -369,7 +371,7 @@ export default function Overview({ onOpenPreview }) {
           className="bg-theme-card rounded-2xl border border-theme-border p-5 shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:border-theme-border-strong transition-all cursor-pointer group"
         >
           <div className="flex items-center justify-between mb-3">
-            <span className="text-xs font-semibold text-theme-muted uppercase tracking-wider">Patient Inquiries</span>
+            <span className="text-xs font-semibold text-theme-muted uppercase tracking-wider">{t('overview.patientInquiries')}</span>
             <div className="w-9 h-9 rounded-xl bg-theme-primary-soft text-theme-primary group-hover:bg-theme-primary group-hover:text-white flex items-center justify-center transition-colors">
               <AppIcon name="calendar-check" className="text-sm" />
             </div>
@@ -378,11 +380,11 @@ export default function Overview({ onOpenPreview }) {
             <h3 className="text-3xl alata-regular text-theme-ink">
               {enquiriesList.length}
             </h3>
-            <span className="text-xs text-theme-muted font-medium">Portal Leads</span>
+            <span className="text-xs text-theme-muted font-medium">{t('overview.portalLeads')}</span>
           </div>
           <div className="mt-3 pt-2.5 border-t border-theme-border flex items-center justify-between text-[11px]">
-            <span className="text-theme-primary font-semibold">Direct Bookings</span>
-            <AppIcon name="caret-right" className="text-[10px] text-theme-subtle group-hover:text-theme-primary transition-colors" />
+            <span className="text-theme-primary font-semibold">{t('overview.directBookings')}</span>
+            <AppIcon name="caret-right" className="text-[10px] text-theme-subtle group-hover:text-theme-primary transition-colors rtl:rotate-180" />
           </div>
         </div>
       </div>
@@ -398,12 +400,12 @@ export default function Overview({ onOpenPreview }) {
                   <AppIcon name="doctor" className="text-sm" />
                 </div>
                 <div>
-                  <h3 className="text-lg alata-regular text-theme-ink">Our Medical Team</h3>
-                  <p className="text-xs text-theme-muted">Licensed practitioners & licence horizon</p>
+                  <h3 className="text-lg alata-regular text-theme-ink">{t('overview.ourMedicalTeam')}</h3>
+                  <p className="text-xs text-theme-muted">{t('overview.practitionersHorizon')}</p>
                 </div>
               </div>
               <span className="px-3 py-1 rounded-full text-[11px] alata-regular bg-theme-canvas text-theme-primary border border-theme-border-strong">
-                {totalDoctorsCount} Doctors
+                {t('overview.doctorsCount', { count: totalDoctorsCount })}
               </span>
             </div>
 
@@ -414,17 +416,17 @@ export default function Overview({ onOpenPreview }) {
                     <div className="flex items-center gap-3 min-w-0">
                       <DoctorAvatar photo={doc.photo} name={doc.fullName} className="w-11 h-11" iconSize="text-base" />
                       <div className="min-w-0">
-                        <p className="alata-regular text-sm text-theme-ink truncate">{doc.fullName}</p>
-                        <p className="text-[11px] text-theme-muted truncate">
+                        <p dir="auto" className="alata-regular text-sm text-theme-ink truncate">{doc.fullName}</p>
+                        <p dir="auto" className="text-[11px] text-theme-muted truncate">
                           {doc.professionalTitle} • {doc.specialty}
                         </p>
-                        <p className="text-[10px] text-theme-subtle mt-0.5 font-medium">
+                        <p dir="ltr" className="text-[10px] text-theme-subtle mt-0.5 font-medium">
                           {doc.authority} • {doc.licenseNumber}
                         </p>
                       </div>
                     </div>
 
-                    <div className="text-right flex-shrink-0">
+                    <div className="text-end flex-shrink-0">
                       <span className={`px-2.5 py-0.5 rounded-full text-[10px] alata-regular ${
                         doc.status === 'EXPIRED'
                           ? 'bg-[#FEE2E2] text-[#991B1B]'
@@ -432,17 +434,21 @@ export default function Overview({ onOpenPreview }) {
                           ? 'bg-theme-accent-soft text-theme-accent-text border border-theme-accent-border'
                           : 'bg-[#DCFCE7] text-[#166534]'
                       }`}>
-                        {doc.statusLabel || (doc.isActive ? 'Active & Valid' : 'Inactive')}
+                        {doc.status === 'EXPIRED'
+                          ? t('status.expired')
+                          : doc.isActive
+                          ? t('overview.activeAndValid')
+                          : t('common.inactive')}
                       </span>
                       <p className="text-[10px] text-theme-subtle mt-1">
-                        Exp: {doc.expiryDate}
+                        {t('overview.expPrefix', { date: doc.expiryDate })}
                       </p>
                     </div>
                   </div>
                 ))
               ) : (
                 <div className="py-8 text-center text-xs text-theme-muted">
-                  No doctors registered yet. Add practitioners to accept patient appointments on onsta.ae.
+                  {t('overview.noDoctors')}
                 </div>
               )}
             </div>
@@ -453,8 +459,8 @@ export default function Overview({ onOpenPreview }) {
               onClick={() => navigate('/dashboard/doctors')}
               className="text-xs alata-regular text-theme-primary hover:text-theme-primary-hover inline-flex items-center gap-1.5 transition-colors"
             >
-              <span>All doctors & licences</span>
-              <AppIcon name="caret-right" className="text-[10px]" />
+              <span>{t('overview.allDoctorsLicences')}</span>
+              <AppIcon name="caret-right" className="text-[10px] rtl:rotate-180" />
             </button>
           </div>
         </div>
@@ -468,12 +474,12 @@ export default function Overview({ onOpenPreview }) {
                   <AppIcon name="stethoscope" className="text-sm" />
                 </div>
                 <div>
-                  <h3 className="text-lg alata-regular text-theme-ink">Departments & Services</h3>
-                  <p className="text-xs text-theme-muted">Published outpatient treatments & AED tariffs</p>
+                  <h3 className="text-lg alata-regular text-theme-ink">{t('overview.departmentsServices')}</h3>
+                  <p className="text-xs text-theme-muted">{t('overview.publishedTreatments')}</p>
                 </div>
               </div>
               <span className="px-3 py-1 rounded-full text-[11px] alata-regular bg-theme-canvas text-theme-primary border border-theme-border-strong">
-                {totalServicesCount} Services
+                {t('overview.servicesCount', { count: totalServicesCount })}
               </span>
             </div>
 
@@ -482,38 +488,38 @@ export default function Overview({ onOpenPreview }) {
                 servicesList.map((srv, idx) => (
                   <div key={srv.id || idx} className="py-3.5 flex items-center justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="alata-regular text-sm text-theme-ink truncate">{srv.name}</p>
-                      <span className="inline-block mt-1 px-2 py-0.5 rounded-md bg-theme-surface border border-theme-border-slate text-[10px] text-theme-muted font-medium">
+                      <p dir="auto" className="alata-regular text-sm text-theme-ink truncate">{srv.name}</p>
+                      <span dir="auto" className="inline-block mt-1 px-2 py-0.5 rounded-md bg-theme-surface border border-theme-border-slate text-[10px] text-theme-muted font-medium">
                         {srv.category}
                       </span>
                     </div>
 
-                    <div className="text-right flex-shrink-0">
+                    <div className="text-end flex-shrink-0">
                       <div className="flex items-baseline justify-end gap-1.5">
                         {srv.offerPrice ? (
                           <>
                             <span className="text-[11px] text-theme-subtle line-through">
-                              {Math.round(srv.price)} AED
+                              {Math.round(srv.price)} {t('common.aed')}
                             </span>
                             <span className="alata-regular text-theme-accent text-sm">
-                              {Math.round(srv.offerPrice)} AED
+                              {Math.round(srv.offerPrice)} {t('common.aed')}
                             </span>
                           </>
                         ) : (
                           <span className="alata-regular text-theme-ink text-sm">
-                            {Math.round(srv.price)} AED
+                            {Math.round(srv.price)} {t('common.aed')}
                           </span>
                         )}
                       </div>
                       <span className="text-[10px] text-[#166534] font-semibold block mt-0.5">
-                        {srv.isActive ? 'Live on onsta.ae' : 'Draft'}
+                        {srv.isActive ? t('overview.liveOnOnsta') : t('overview.draft')}
                       </span>
                     </div>
                   </div>
                 ))
               ) : (
                 <div className="py-8 text-center text-xs text-theme-muted">
-                  No services added yet. Import or add services to display transparent pricing to patients.
+                  {t('overview.noServices')}
                 </div>
               )}
             </div>
@@ -524,8 +530,8 @@ export default function Overview({ onOpenPreview }) {
               onClick={() => navigate('/dashboard/services')}
               className="text-xs alata-regular text-theme-primary hover:text-theme-primary-hover inline-flex items-center gap-1.5 transition-colors"
             >
-              <span>All services & tariffs</span>
-              <AppIcon name="caret-right" className="text-[10px]" />
+              <span>{t('overview.allServicesTariffs')}</span>
+              <AppIcon name="caret-right" className="text-[10px] rtl:rotate-180" />
             </button>
           </div>
         </div>
@@ -542,12 +548,12 @@ export default function Overview({ onOpenPreview }) {
                   <AppIcon name="calendar-check" className="text-sm" />
                 </div>
                 <div>
-                  <h3 className="text-lg alata-regular text-theme-ink">Patient Booking Inquiries</h3>
-                  <p className="text-xs text-theme-muted">Direct appointment requests from onsta.ae</p>
+                  <h3 className="text-lg alata-regular text-theme-ink">{t('overview.patientBookingInquiries')}</h3>
+                  <p className="text-xs text-theme-muted">{t('overview.directRequests')}</p>
                 </div>
               </div>
               <span className="px-3 py-1 rounded-full text-[11px] alata-regular bg-theme-surface text-theme-muted border border-theme-border-slate">
-                Portal Inbox
+                {t('overview.portalInbox')}
               </span>
             </div>
 
@@ -556,7 +562,7 @@ export default function Overview({ onOpenPreview }) {
                 <div key={enq.id} className="py-3.5 flex items-center justify-between gap-3">
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className="alata-regular text-sm text-theme-ink">{enq.patientName}</p>
+                      <p dir="auto" className="alata-regular text-sm text-theme-ink">{enq.patientName}</p>
                       <span className={`px-2 py-0.5 rounded-full text-[9px] alata-regular uppercase tracking-wider ${
                         enq.status === 'new'
                           ? 'bg-theme-accent-soft text-theme-accent-text border border-theme-accent-border'
@@ -564,12 +570,12 @@ export default function Overview({ onOpenPreview }) {
                           ? 'bg-[#DCFCE7] text-[#166534]'
                           : 'bg-theme-primary-soft text-theme-primary'
                       }`}>
-                        {enq.status}
+                        {t(`status.${enq.status}`, { defaultValue: enq.status })}
                       </span>
                     </div>
-                    <p className="text-xs text-theme-muted mt-0.5 truncate">{enq.requestedService}</p>
+                    <p dir="auto" className="text-xs text-theme-muted mt-0.5 truncate">{enq.requestedService}</p>
                     <p className="text-[10px] text-theme-subtle mt-0.5">
-                      Doctor: {enq.preferredDoctor} • {enq.preferredDate}
+                      {t('overview.doctorPrefix', { name: enq.preferredDoctor, date: enq.preferredDate })}
                     </p>
                   </div>
 
@@ -577,7 +583,7 @@ export default function Overview({ onOpenPreview }) {
                     onClick={() => navigate('/dashboard/enquiries')}
                     className="px-3.5 py-1.5 rounded-full border border-theme-border-strong text-theme-primary hover:bg-theme-canvas text-[11px] alata-regular flex-shrink-0 transition-colors"
                   >
-                    Respond
+                    {t('overview.respond')}
                   </button>
                 </div>
               ))}
@@ -589,8 +595,8 @@ export default function Overview({ onOpenPreview }) {
               onClick={() => navigate('/dashboard/enquiries')}
               className="text-xs alata-regular text-theme-primary hover:text-theme-primary-hover inline-flex items-center gap-1.5 transition-colors"
             >
-              <span>Open patient enquiries inbox</span>
-              <AppIcon name="caret-right" className="text-[10px]" />
+              <span>{t('overview.openEnquiriesInbox')}</span>
+              <AppIcon name="caret-right" className="text-[10px] rtl:rotate-180" />
             </button>
           </div>
         </div>
@@ -604,12 +610,12 @@ export default function Overview({ onOpenPreview }) {
                   <AppIcon name="tag" className="text-sm" />
                 </div>
                 <div>
-                  <h3 className="text-lg alata-regular text-theme-ink">Promotional Offers</h3>
-                  <p className="text-xs text-theme-muted">MOHAP Advertising compliant packages</p>
+                  <h3 className="text-lg alata-regular text-theme-ink">{t('overview.promotionalOffers')}</h3>
+                  <p className="text-xs text-theme-muted">{t('overview.mohapCompliantPackages')}</p>
                 </div>
               </div>
               <span className="px-3 py-1 rounded-full text-[11px] alata-regular bg-theme-accent-soft text-theme-accent-text border border-theme-accent-border">
-                {activeOffersCount} Active
+                {t('overview.activeCount', { count: activeOffersCount })}
               </span>
             </div>
 
@@ -618,18 +624,18 @@ export default function Overview({ onOpenPreview }) {
                 {offersList.map((off, idx) => (
                   <div key={off.id || idx} className="py-3.5 flex items-center justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="alata-regular text-sm text-theme-ink truncate">{off.title}</p>
-                      <p className="text-[11px] text-theme-muted truncate">
-                        {off.linkedServiceName || 'Treatment Package'}
+                      <p dir="auto" className="alata-regular text-sm text-theme-ink truncate">{off.title}</p>
+                      <p dir="auto" className="text-[11px] text-theme-muted truncate">
+                        {off.linkedServiceName || t('overview.treatmentPackage')}
                       </p>
                     </div>
 
-                    <div className="text-right flex-shrink-0">
+                    <div className="text-end flex-shrink-0">
                       <span className="px-2.5 py-0.5 rounded-full text-[10px] alata-regular bg-theme-primary text-theme-accent">
-                        {off.discountPercent}% OFF
+                        {t('overview.percentOff', { percent: off.discountPercent })}
                       </span>
                       <p className="text-sm alata-regular text-theme-accent mt-1">
-                        {Math.round(off.offerPrice)} AED
+                        {Math.round(off.offerPrice)} {t('common.aed')}
                       </p>
                     </div>
                   </div>
@@ -641,9 +647,9 @@ export default function Overview({ onOpenPreview }) {
                   <AppIcon name="tag" className="text-lg" />
                 </div>
                 <div>
-                  <h4 className="text-sm alata-regular text-theme-ink">No Active Promotional Offers</h4>
+                  <h4 className="text-sm alata-regular text-theme-ink">{t('overview.noOffersTitle')}</h4>
                   <p className="text-xs text-theme-muted max-w-sm mx-auto mt-1 leading-relaxed">
-                    Launch curated seasonal packages to attract new patients on onsta.ae. Every offer is checked against MOHAP wording norms.
+                    {t('overview.noOffersDesc')}
                   </p>
                 </div>
                 <button
@@ -651,7 +657,7 @@ export default function Overview({ onOpenPreview }) {
                   className="px-5 py-2 rounded-full bg-theme-primary hover:bg-theme-primary-hover text-white text-xs alata-regular transition-all inline-flex items-center gap-2 shadow-sm"
                 >
                   <AppIcon name="plus" className="text-[11px]" />
-                  <span>Add Your First Offer</span>
+                  <span>{t('overview.addFirstOffer')}</span>
                 </button>
               </div>
             )}
@@ -662,8 +668,8 @@ export default function Overview({ onOpenPreview }) {
               onClick={() => navigate('/dashboard/offers')}
               className="text-xs alata-regular text-theme-primary hover:text-theme-primary-hover inline-flex items-center gap-1.5 transition-colors"
             >
-              <span>Manage promotional offers</span>
-              <AppIcon name="caret-right" className="text-[10px]" />
+              <span>{t('overview.manageOffers')}</span>
+              <AppIcon name="caret-right" className="text-[10px] rtl:rotate-180" />
             </button>
           </div>
         </div>
@@ -677,16 +683,16 @@ export default function Overview({ onOpenPreview }) {
               <AppIcon name="file-contract" className="text-sm" />
             </div>
             <div>
-              <h3 className="text-lg alata-regular text-theme-ink">Institutional Healthcare Licences</h3>
-              <p className="text-xs text-theme-muted">Statutory accreditation with DHA & Department of Economy and Tourism</p>
+              <h3 className="text-lg alata-regular text-theme-ink">{t('overview.institutionalLicences')}</h3>
+              <p className="text-xs text-theme-muted">{t('overview.statutoryAccreditation')}</p>
             </div>
           </div>
           <button
             onClick={() => navigate('/dashboard/compliance')}
             className="text-xs alata-regular text-theme-primary hover:text-theme-primary-hover inline-flex items-center gap-1.5"
           >
-            <span>Open Compliance Centre</span>
-            <AppIcon name="caret-right" className="text-[10px]" />
+            <span>{t('overview.openComplianceCentre')}</span>
+            <AppIcon name="caret-right" className="text-[10px] rtl:rotate-180" />
           </button>
         </div>
 
@@ -695,18 +701,18 @@ export default function Overview({ onOpenPreview }) {
           <div className="p-5 rounded-2xl border border-theme-border-slate bg-theme-surface flex items-start justify-between gap-3">
             <div>
               <span className="text-[10px] alata-regular text-theme-primary uppercase tracking-wider block">
-                Healthcare Facility Licence
+                {t('overview.facilityLicenceLabel')}
               </span>
-              <p className="alata-regular text-theme-ink text-sm mt-1">DHA Clinical Facility Accreditation</p>
+              <p className="alata-regular text-theme-ink text-sm mt-1">{t('overview.dhaAccreditation')}</p>
               <p className="text-xs text-theme-muted mt-1.5 font-medium">
-                Licence: {overviewData?.credentials?.[0]?.licenseNumber || 'DHA-F-0012345'}
+                {t('overview.licencePrefix', { number: overviewData?.credentials?.[0]?.licenseNumber || 'DHA-F-0012345' })}
               </p>
               <p className="text-xs text-theme-muted mt-1">
-                Expiry: <strong className="text-theme-ink">{facilityExpiry}</strong>
+                {t('overview.expiryPrefix')} <strong dir="ltr" className="text-theme-ink">{facilityExpiry}</strong>
               </p>
             </div>
 
-            <div className="text-right flex-shrink-0">
+            <div className="text-end flex-shrink-0">
               <span className={`px-3 py-1 rounded-full text-[11px] alata-regular inline-block ${
                 facilityDays <= 0
                   ? 'bg-[#FEE2E2] text-[#991B1B]'
@@ -714,14 +720,16 @@ export default function Overview({ onOpenPreview }) {
                   ? 'bg-[#FFEDD5] text-[#9A3412]'
                   : 'bg-[#DCFCE7] text-[#166534]'
               }`}>
-                {facilityDays <= 0 ? `Expired (${Math.abs(facilityDays)}d ago)` : `${facilityDays} days left`}
+                {facilityDays <= 0
+                  ? t('overview.expiredDaysAgo', { days: Math.abs(facilityDays) })
+                  : t('overview.daysLeft', { days: facilityDays })}
               </span>
               {facilityDays <= 60 && (
                 <button
-                  onClick={() => handleOpenRenewModal('FACILITY_LICENSE', 'Healthcare Facility Licence')}
-                  className="mt-2.5 text-xs alata-regular text-theme-primary hover:underline block ml-auto"
+                  onClick={() => handleOpenRenewModal('FACILITY_LICENSE', t('overview.facilityLicenceLabel'))}
+                  className="mt-2.5 text-xs alata-regular text-theme-primary hover:underline block ms-auto"
                 >
-                  Renew Now
+                  {t('overview.renewNow')}
                 </button>
               )}
             </div>
@@ -731,20 +739,20 @@ export default function Overview({ onOpenPreview }) {
           <div className="p-5 rounded-2xl border border-theme-border-slate bg-theme-surface flex items-start justify-between gap-3">
             <div>
               <span className="text-[10px] alata-regular text-theme-primary uppercase tracking-wider block">
-                Commercial Trade Licence
+                {t('overview.tradeLicenceLabel')}
               </span>
-              <p className="alata-regular text-theme-ink text-sm mt-1">DET Commercial Registration</p>
+              <p className="alata-regular text-theme-ink text-sm mt-1">{t('overview.detRegistration')}</p>
               <p className="text-xs text-theme-muted mt-1.5 font-medium">
-                Licence: {overviewData?.credentials?.[1]?.licenseNumber || 'DET-129845'}
+                {t('overview.licencePrefix', { number: overviewData?.credentials?.[1]?.licenseNumber || 'DET-129845' })}
               </p>
               <p className="text-xs text-theme-muted mt-1">
-                Expiry: <strong className="text-theme-ink">{overviewData?.credentials?.[1]?.expiryDate || '2027-06-30'}</strong>
+                {t('overview.expiryPrefix')} <strong dir="ltr" className="text-theme-ink">{overviewData?.credentials?.[1]?.expiryDate || '2027-06-30'}</strong>
               </p>
             </div>
 
-            <div className="text-right flex-shrink-0">
+            <div className="text-end flex-shrink-0">
               <span className="px-3 py-1 rounded-full text-[11px] alata-regular bg-[#DCFCE7] text-[#166534] inline-block">
-                Active & Valid
+                {t('overview.activeAndValid')}
               </span>
             </div>
           </div>
@@ -764,26 +772,26 @@ export default function Overview({ onOpenPreview }) {
             ) : (
               <div className="w-full h-full flex flex-col items-center justify-center text-theme-subtle">
                 <AppIcon name="hospital" className="text-2xl text-theme-border-strong" />
-                <span className="text-[11px] mt-1.5 font-medium">Cover photo</span>
+                <span className="text-[11px] mt-1.5 font-medium">{t('overview.coverPhoto')}</span>
               </div>
             )}
           </div>
 
-          <div className="flex-1 space-y-2.5 text-center sm:text-left">
+          <div className="flex-1 space-y-2.5 text-center sm:text-start">
             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2.5">
-              <h3 className="text-xl alata-regular text-theme-ink">
+              <h3 dir="auto" className="text-xl alata-regular text-theme-ink">
                 {clinic.displayName}
               </h3>
               <span className="px-2.5 py-0.5 rounded-full text-[10px] alata-regular bg-[#DCFCE7] text-[#166534] border border-[#BBF7D0]">
-                Live on onsta.ae
+                {t('overview.liveOnOnsta')}
               </span>
-              <span className="text-xs text-theme-muted">
+              <span dir="auto" className="text-xs text-theme-muted">
                 {clinic.category} • {clinic.cityArea}, {clinic.emirate}
               </span>
             </div>
 
             <p className="text-xs text-theme-muted leading-relaxed max-w-2xl">
-              Patients browsing on onsta.ae see your verified clinic profile, licensed specialists, transparent AED treatment pricing, and authentic care details.
+              {t('overview.previewDesc')}
             </p>
 
             <div className="pt-2 flex flex-wrap items-center justify-center sm:justify-start gap-3">
@@ -792,15 +800,15 @@ export default function Overview({ onOpenPreview }) {
                 className="px-5 py-2.5 rounded-full bg-theme-primary hover:bg-theme-primary-hover text-white text-xs alata-regular transition-colors inline-flex items-center gap-2 shadow-sm"
               >
                 <AppIcon name="eye" />
-                <span>Open Live Customer Preview</span>
+                <span>{t('overview.openLivePreview')}</span>
               </button>
 
               <button
                 onClick={() => navigate('/dashboard/profile')}
                 className="px-5 py-2.5 rounded-full border border-theme-border-strong text-theme-primary hover:bg-theme-canvas text-xs alata-regular transition-colors inline-flex items-center gap-2"
               >
-                <span>Edit Profile & Media</span>
-                <AppIcon name="arrow-right" className="text-[11px]" />
+                <span>{t('overview.editProfileMedia')}</span>
+                <AppIcon name="arrow-right" className="text-[11px] rtl:rotate-180" />
               </button>
             </div>
           </div>
@@ -812,7 +820,7 @@ export default function Overview({ onOpenPreview }) {
         isOpen={showRenewModal}
         onClose={() => setShowRenewModal(false)}
         documentCode={activeDocForScan?.code || 'FACILITY_LICENSE'}
-        documentTitle={activeDocForScan?.title || 'Healthcare Facility Licence'}
+        documentTitle={activeDocForScan?.title || t('overview.facilityLicenceLabel')}
         currentLicenceNumber={activeDocForScan?.licenseNumber || 'DHA-F-0012345'}
         onComplete={handleScanComplete}
       />

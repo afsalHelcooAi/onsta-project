@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import AdminSidebar from './components/layout/AdminSidebar';
 import ClinicReviewQueue from './components/review/ClinicReviewQueue';
 import RegisteredClinics from './components/clinics/RegisteredClinics';
@@ -10,6 +11,7 @@ import AuditLogs from './components/audit/AuditLogs';
 import MasterCatalog from './components/treatments/MasterCatalog';
 
 export default function App() {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState('overview');
   const [admin, setAdmin] = useState(null);
   const [checkingSession, setCheckingSession] = useState(true);
@@ -24,7 +26,7 @@ export default function App() {
       .finally(() => setCheckingSession(false));
   }, []);
 
-  if (checkingSession) return <div className="flex min-h-screen items-center justify-center">Loading secure session…</div>;
+  if (checkingSession) return <div className="flex min-h-screen items-center justify-center">{t('common.loadingSession')}</div>;
   if (!admin) return <AdminLogin onSignedIn={setAdmin} />;
 
   return (
@@ -39,7 +41,7 @@ export default function App() {
       {activeTab === 'audit-logs' && <AuditLogs />}
       {!['overview', 'review-queue', 'all-clinics', 'compliance-audit', 'master-catalog', 'all-users', 'audit-logs'].includes(activeTab) && (
         <div className="flex-1 flex items-center justify-center text-gray-500 font-medium">
-          Section under development.
+          {t('common.sectionUnderDev')}
         </div>
       )}
     </div>
